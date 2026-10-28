@@ -26,6 +26,7 @@ export function ModernEssentialsCard({ banner }: { banner?: Banner }) {
           src={bgImage}
           alt="Modern Essentials"
           fill
+          sizes="(max-width: 1024px) 100vw, 320px"
           className="object-cover object-center group-hover:scale-103 transition-transform duration-500"
         />
         {/* Soft gradient overlay */}
@@ -88,6 +89,7 @@ export function PromoBannersRow({
               src={fwImg}
               alt="Footwear"
               fill
+              sizes="(max-width: 768px) 100vw, 33vw"
               className="object-cover object-right group-hover:scale-103 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#EAE7DE] via-[#EAE7DE]/80 to-transparent w-3/4" />
@@ -120,6 +122,7 @@ export function PromoBannersRow({
               src={accImg}
               alt="Accessories"
               fill
+              sizes="(max-width: 768px) 100vw, 33vw"
               className="object-cover object-right group-hover:scale-103 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#EAE7DE] via-[#EAE7DE]/80 to-transparent w-3/4" />
@@ -152,6 +155,7 @@ export function PromoBannersRow({
               src={naImg}
               alt="New Arrivals"
               fill
+              sizes="(max-width: 768px) 100vw, 33vw"
               className="object-cover object-right group-hover:scale-103 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#EAE7DE] via-[#EAE7DE]/80 to-transparent w-3/4" />

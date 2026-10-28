@@ -36,6 +36,7 @@ export default function HeroBanner({ banner }: HeroBannerProps) {
             src={heroImage}
             alt="NOTIONS® — Every Outfit a Statement"
             fill
+            sizes="100vw"
             priority
             className="object-cover object-center lg:object-right"
           />

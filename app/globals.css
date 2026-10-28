@@ -1,24 +1,22 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --bg-primary: #FAF9F5;
-    --bg-secondary: #F3EFE6;
-    --brand-green: #143728;
-    --brand-green-hover: #0d281c;
-    --border-subtle: #E6E1D8;
-    --text-primary: #181818;
-    --text-muted: #6B6B6B;
-  }
+:root {
+  --bg-primary: #FAF9F5;
+  --bg-secondary: #F3EFE6;
+  --brand-green: #143728;
+  --brand-green-hover: #0d281c;
+  --border-subtle: #E6E1D8;
+  --text-primary: #181818;
+  --text-muted: #6B6B6B;
+}
 
-  body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: var(--font-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-  }
+body {
+  background-color: #FAF9F5;
+  color: #181818;
+  font-family: var(--font-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 .font-serif {
@@ -45,7 +43,6 @@
   background: #143728;
 }
 
-/* Smooth page transitions */
 html {
   scroll-behavior: smooth;
 }
