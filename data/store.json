@@ -1,0 +1,571 @@
+{
+  "categories": [
+    {
+      "id": "cat-men",
+      "name": "Men's Apparel",
+      "slug": "men",
+      "parent_id": null,
+      "description": "Sophisticated opulent menswear for every occasion",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183109/notions/storefront/cat-shirts.png",
+      "image_public_id": "notions/storefront/cat-shirts",
+      "sort_order": 1,
+      "is_published": true
+    },
+    {
+      "id": "cat-men-shirts",
+      "name": "Shirts",
+      "slug": "men-shirts",
+      "parent_id": "cat-men",
+      "description": "Tailored and casual luxury shirts",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183109/notions/storefront/cat-shirts.png",
+      "image_public_id": "notions/storefront/cat-shirts",
+      "sort_order": 1,
+      "is_published": true
+    },
+    {
+      "id": "cat-men-jeans",
+      "name": "Jeans",
+      "slug": "men-jeans",
+      "parent_id": "cat-men",
+      "description": "Premium selvedge and stretch denim",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183107/notions/storefront/cat-jeans.png",
+      "image_public_id": "notions/storefront/cat-jeans",
+      "sort_order": 2,
+      "is_published": true
+    },
+    {
+      "id": "cat-men-trousers",
+      "name": "Trousers",
+      "slug": "men-trousers",
+      "parent_id": "cat-men",
+      "description": "Refined trousers, chinos and tailored pants",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183112/notions/storefront/cat-trousers.png",
+      "image_public_id": "notions/storefront/cat-trousers",
+      "sort_order": 3,
+      "is_published": true
+    },
+    {
+      "id": "cat-men-t-shirts",
+      "name": "T-shirts",
+      "slug": "men-t-shirts",
+      "parent_id": "cat-men",
+      "description": "Luxury heavyweight and oversized tees",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183111/notions/storefront/cat-t-shirts.png",
+      "image_public_id": "notions/storefront/cat-t-shirts",
+      "sort_order": 4,
+      "is_published": true
+    },
+    {
+      "id": "cat-men-shorts",
+      "name": "Shorts",
+      "slug": "men-shorts",
+      "parent_id": "cat-men",
+      "description": "Tailored and relaxed resort shorts",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183110/notions/storefront/cat-shorts.png",
+      "image_public_id": "notions/storefront/cat-shorts",
+      "sort_order": 5,
+      "is_published": true
+    },
+    {
+      "id": "cat-men-jackets",
+      "name": "Jackets",
+      "slug": "men-jackets",
+      "parent_id": "cat-men",
+      "description": "Artisanal leather, suede, and overshirts",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183106/notions/storefront/cat-jackets.png",
+      "image_public_id": "notions/storefront/cat-jackets",
+      "sort_order": 6,
+      "is_published": true
+    },
+    {
+      "id": "cat-men-dhothis",
+      "name": "Dhothis",
+      "slug": "men-dhothis",
+      "parent_id": "cat-men",
+      "description": "Heritage pure cotton and silk bordered dhothis",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183104/notions/storefront/cat-dhothis.png",
+      "image_public_id": "notions/storefront/cat-dhothis",
+      "sort_order": 7,
+      "is_published": true
+    },
+    {
+      "id": "cat-men-kurta",
+      "name": "Kurta",
+      "slug": "men-kurta",
+      "parent_id": "cat-men",
+      "description": "Handcrafted festive and casual kurtas",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183108/notions/storefront/cat-kurta.png",
+      "image_public_id": "notions/storefront/cat-kurta",
+      "sort_order": 8,
+      "is_published": true
+    },
+    {
+      "id": "cat-footwear",
+      "name": "Footwears",
+      "slug": "footwear",
+      "parent_id": null,
+      "description": "Premium shoes and sandals for every step",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183105/notions/storefront/cat-footwear.png",
+      "image_public_id": "notions/storefront/cat-footwear",
+      "sort_order": 2,
+      "is_published": true
+    },
+    {
+      "id": "cat-shoes",
+      "name": "Shoes",
+      "slug": "shoes",
+      "parent_id": "cat-footwear",
+      "description": "Handmade leather loafers, oxfords, and clean sneakers",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183105/notions/storefront/cat-footwear.png",
+      "image_public_id": "notions/storefront/cat-footwear",
+      "sort_order": 1,
+      "is_published": true
+    },
+    {
+      "id": "cat-sandals",
+      "name": "Sandals",
+      "slug": "sandals",
+      "parent_id": "cat-footwear",
+      "description": "Comfort leather sandals and slides",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183105/notions/storefront/cat-footwear.png",
+      "image_public_id": "notions/storefront/cat-footwear",
+      "sort_order": 2,
+      "is_published": true
+    },
+    {
+      "id": "cat-accessories",
+      "name": "Accessories",
+      "slug": "accessories",
+      "parent_id": null,
+      "description": "Distinctive luxury jewelry and essentials",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183103/notions/storefront/cat-accessories.png",
+      "image_public_id": "notions/storefront/cat-accessories",
+      "sort_order": 3,
+      "is_published": true
+    },
+    {
+      "id": "cat-caps",
+      "name": "Caps",
+      "slug": "caps",
+      "parent_id": "cat-accessories",
+      "description": "Subtle embroidered twill and suede caps",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183103/notions/storefront/cat-accessories.png",
+      "image_public_id": "notions/storefront/cat-accessories",
+      "sort_order": 1,
+      "is_published": true
+    },
+    {
+      "id": "cat-rings",
+      "name": "Rings",
+      "slug": "rings",
+      "parent_id": "cat-accessories",
+      "description": "Solid silver and signet rings",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183103/notions/storefront/cat-accessories.png",
+      "image_public_id": "notions/storefront/cat-accessories",
+      "sort_order": 2,
+      "is_published": true
+    },
+    {
+      "id": "cat-bracelet",
+      "name": "Bracelet",
+      "slug": "bracelet",
+      "parent_id": "cat-accessories",
+      "description": "Cuff bracelets and braided accessories",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183103/notions/storefront/cat-accessories.png",
+      "image_public_id": "notions/storefront/cat-accessories",
+      "sort_order": 3,
+      "is_published": true
+    },
+    {
+      "id": "cat-chain",
+      "name": "Chain",
+      "slug": "chain",
+      "parent_id": "cat-accessories",
+      "description": "Minimalist stainless steel and silver link chains",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183103/notions/storefront/cat-accessories.png",
+      "image_public_id": "notions/storefront/cat-accessories",
+      "sort_order": 4,
+      "is_published": true
+    }
+  ],
+  "products": [
+    {
+      "id": "prod-linen-shirt",
+      "name": "Linen Casual Shirt",
+      "slug": "linen-casual-shirt",
+      "description": "Crafted from breathable 100% European flax linen. Cut in an effortless relaxed silhouette designed for balmy days and sunset dining.",
+      "category_id": "cat-men-shirts",
+      "category_slug": "men-shirts",
+      "category_name": "Shirts",
+      "sku": "NOT-SH-001",
+      "price": 1499,
+      "compare_at_price": 1999,
+      "is_bestseller": true,
+      "is_featured": true,
+      "is_new_arrival": false,
+      "is_published": true,
+      "rating_score": 4.6,
+      "rating_count": 128,
+      "material": "100% European Linen",
+      "care_instructions": "Machine wash cold gentle, hang dry in shade.",
+      "created_at": "2026-10-28T00:00:00.000Z",
+      "images": [
+        {
+          "id": "img-1",
+          "product_id": "prod-linen-shirt",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183101/notions/storefront/bs-linen-casual-shirt.png",
+          "image_public_id": "notions/storefront/bs-linen-casual-shirt",
+          "alt_text": "Linen Casual Shirt in Forest Olive",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "v1-m",
+          "product_id": "prod-linen-shirt",
+          "size": "M",
+          "inventory_quantity": 25,
+          "is_available": true
+        },
+        {
+          "id": "v1-l",
+          "product_id": "prod-linen-shirt",
+          "size": "L",
+          "inventory_quantity": 30,
+          "is_available": true
+        },
+        {
+          "id": "v1-xl",
+          "product_id": "prod-linen-shirt",
+          "size": "XL",
+          "inventory_quantity": 18,
+          "is_available": true
+        },
+        {
+          "id": "v1-xxl",
+          "product_id": "prod-linen-shirt",
+          "size": "XXL",
+          "inventory_quantity": 12,
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "id": "prod-slim-jeans",
+      "name": "Slim Fit Jeans",
+      "slug": "slim-fit-jeans",
+      "description": "High-recovery stretch denim tailored to hug the silhouette naturally without restricting movement. Finished in deep midnight indigo.",
+      "category_id": "cat-men-jeans",
+      "category_slug": "men-jeans",
+      "category_name": "Jeans",
+      "sku": "NOT-JN-002",
+      "price": 1899,
+      "compare_at_price": 2499,
+      "is_bestseller": true,
+      "is_featured": true,
+      "is_new_arrival": false,
+      "is_published": true,
+      "rating_score": 4.5,
+      "rating_count": 96,
+      "material": "98% Organic Cotton, 2% Elastane",
+      "care_instructions": "Wash inside out with dark colors.",
+      "created_at": "2026-10-28T00:00:00.000Z",
+      "images": [
+        {
+          "id": "img-2",
+          "product_id": "prod-slim-jeans",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183102/notions/storefront/bs-slim-fit-jeans.png",
+          "image_public_id": "notions/storefront/bs-slim-fit-jeans",
+          "alt_text": "Slim Fit Jeans Midnight Indigo",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2-30",
+          "product_id": "prod-slim-jeans",
+          "size": "30",
+          "inventory_quantity": 15,
+          "is_available": true
+        },
+        {
+          "id": "v2-32",
+          "product_id": "prod-slim-jeans",
+          "size": "32",
+          "inventory_quantity": 28,
+          "is_available": true
+        },
+        {
+          "id": "v2-34",
+          "product_id": "prod-slim-jeans",
+          "size": "34",
+          "inventory_quantity": 20,
+          "is_available": true
+        },
+        {
+          "id": "v2-36",
+          "product_id": "prod-slim-jeans",
+          "size": "36",
+          "inventory_quantity": 10,
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "id": "prod-oversized-tee",
+      "name": "Essential Oversized Tee",
+      "slug": "essential-oversized-tee",
+      "description": "Heavyweight 240 GSM combed cotton tee featuring dropped shoulders, ribbed crew neckline, and a structured drape that holds its form.",
+      "category_id": "cat-men-t-shirts",
+      "category_slug": "men-t-shirts",
+      "category_name": "T-shirts",
+      "sku": "NOT-TS-003",
+      "price": 999,
+      "compare_at_price": 1299,
+      "is_bestseller": true,
+      "is_featured": true,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 4.4,
+      "rating_count": 210,
+      "material": "100% Combed Compact Cotton (240 GSM)",
+      "care_instructions": "Machine wash cold. Do not tumble dry.",
+      "created_at": "2026-10-28T00:00:00.000Z",
+      "images": [
+        {
+          "id": "img-3",
+          "product_id": "prod-oversized-tee",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183100/notions/storefront/bs-essential-oversized-tee.png",
+          "image_public_id": "notions/storefront/bs-essential-oversized-tee",
+          "alt_text": "Essential Oversized Tee Cream White",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "v3-m",
+          "product_id": "prod-oversized-tee",
+          "size": "M",
+          "inventory_quantity": 40,
+          "is_available": true
+        },
+        {
+          "id": "v3-l",
+          "product_id": "prod-oversized-tee",
+          "size": "L",
+          "inventory_quantity": 45,
+          "is_available": true
+        },
+        {
+          "id": "v3-xl",
+          "product_id": "prod-oversized-tee",
+          "size": "XL",
+          "inventory_quantity": 30,
+          "is_available": true
+        },
+        {
+          "id": "v3-xxl",
+          "product_id": "prod-oversized-tee",
+          "size": "XXL",
+          "inventory_quantity": 15,
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "id": "prod-white-sneaker",
+      "name": "Classic White Sneaker",
+      "slug": "classic-white-sneaker",
+      "description": "Minimalist low-top sneakers in buttery full-grain calf leather with cushioned memory foam footbed and vulcanized cupsole.",
+      "category_id": "cat-shoes",
+      "category_slug": "shoes",
+      "category_name": "Footwears",
+      "sku": "NOT-FW-004",
+      "price": 2499,
+      "compare_at_price": 3499,
+      "is_bestseller": true,
+      "is_featured": true,
+      "is_new_arrival": false,
+      "is_published": true,
+      "rating_score": 4.7,
+      "rating_count": 89,
+      "material": "Full-grain Italian Calf Leather",
+      "care_instructions": "Wipe clean with a damp microfiber cloth.",
+      "created_at": "2026-10-28T00:00:00.000Z",
+      "images": [
+        {
+          "id": "img-4",
+          "product_id": "prod-white-sneaker",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183099/notions/storefront/bs-classic-white-sneaker.png",
+          "image_public_id": "notions/storefront/bs-classic-white-sneaker",
+          "alt_text": "Classic White Sneaker",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "v4-7",
+          "product_id": "prod-white-sneaker",
+          "size": "7",
+          "inventory_quantity": 12,
+          "is_available": true
+        },
+        {
+          "id": "v4-8",
+          "product_id": "prod-white-sneaker",
+          "size": "8",
+          "inventory_quantity": 20,
+          "is_available": true
+        },
+        {
+          "id": "v4-9",
+          "product_id": "prod-white-sneaker",
+          "size": "9",
+          "inventory_quantity": 18,
+          "is_available": true
+        },
+        {
+          "id": "v4-10",
+          "product_id": "prod-white-sneaker",
+          "size": "10",
+          "inventory_quantity": 14,
+          "is_available": true
+        }
+      ]
+    }
+  ],
+  "banners": [
+    {
+      "id": "ban-hero",
+      "section": "hero",
+      "title": "Every Outfit a Statement.",
+      "subtitle": "NEW COLLECTION",
+      "description": "Premium men's fashion for your everyday journey.",
+      "cta_label": "Shop Now",
+      "cta_url": "/category/men",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183114/notions/storefront/hero-banner.png",
+      "image_public_id": "notions/storefront/hero-banner",
+      "badge_text": "Style Beyond Trends • Men's Fashion Reimagined",
+      "sort_order": 1,
+      "is_published": true
+    },
+    {
+      "id": "ban-essentials",
+      "section": "essentials",
+      "title": "For Every Version of You.",
+      "subtitle": "MODERN ESSENTIALS",
+      "description": "Sophisticated tailoring crafted for the discerning modern gentleman.",
+      "cta_label": "Explore Collection",
+      "cta_url": "/category/men",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183115/notions/storefront/modern-essentials.png",
+      "image_public_id": "notions/storefront/modern-essentials",
+      "badge_text": "MODERN ESSENTIALS",
+      "sort_order": 2,
+      "is_published": true
+    },
+    {
+      "id": "ban-footwear",
+      "section": "footwear",
+      "title": "FOOTWEAR THAT MOVES YOU",
+      "subtitle": "FOOTWEAR",
+      "description": "Premium shoes & sandals for every step.",
+      "cta_label": "Shop Footwear",
+      "cta_url": "/category/footwear",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183117/notions/storefront/promo-footwear.png",
+      "image_public_id": "notions/storefront/promo-footwear",
+      "sort_order": 3,
+      "is_published": true
+    },
+    {
+      "id": "ban-accessories",
+      "section": "accessories",
+      "title": "ACCESSORIES FOR A FINER YOU",
+      "subtitle": "ACCESSORIES",
+      "description": "Caps, Rings, Bracelets & Chains",
+      "cta_label": "Explore Accessories",
+      "cta_url": "/category/accessories",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183116/notions/storefront/promo-accessories.png",
+      "image_public_id": "notions/storefront/promo-accessories",
+      "sort_order": 4,
+      "is_published": true
+    },
+    {
+      "id": "ban-new-arrivals",
+      "section": "new_arrivals",
+      "title": "NEW ARRIVALS",
+      "subtitle": "FRESH STYLES",
+      "description": "Fresh styles. Same confidence.",
+      "cta_label": "Shop Now",
+      "cta_url": "/new-arrivals",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183118/notions/storefront/promo-new-arrivals.png",
+      "image_public_id": "notions/storefront/promo-new-arrivals",
+      "sort_order": 5,
+      "is_published": true
+    }
+  ],
+  "settings": {
+    "store_name": "NOTIONS®",
+    "tagline": "OPULENT CLOTHING",
+    "support_email": "concierge@notionsclothing.com",
+    "support_phone": "+91 98765 43210",
+    "address": "Flagship Atelier, 42 Heritage Promenade, Indiranagar, Bengaluru, India",
+    "free_shipping_threshold": 1999,
+    "flat_shipping_rate": 99,
+    "announcement_bar": "Complimentary Shipping across India on orders above ₹1,999"
+  },
+  "orders": [
+    {
+      "id": "ord-1793185007162",
+      "order_number": "NOT-006703",
+      "customer_name": "Aditya Roy",
+      "customer_email": "aditya.roy@notions-test.com",
+      "customer_phone": "+91 9876543210",
+      "shipping_address": {
+        "street": "Penthouse 14B, Sky Promenade, Lavelle Road",
+        "city": "Bengaluru",
+        "state": "Karnataka",
+        "postal_code": "560001",
+        "country": "India"
+      },
+      "subtotal": 3998,
+      "shipping_amount": 0,
+      "discount_amount": 0,
+      "total_amount": 3998,
+      "currency": "INR",
+      "status": "confirmed",
+      "payment_status": "paid",
+      "tracking_carrier": "",
+      "tracking_number": "",
+      "notes": "",
+      "created_at": "2026-10-28T10:56:47.162Z",
+      "items": [
+        {
+          "product_id": "prod-linen-shirt",
+          "product_name": "Linen Casual Shirt",
+          "sku": "NOT-SH-001",
+          "variant_label": "L",
+          "unit_price": 1499,
+          "quantity": 1,
+          "line_total": 1499,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183101/notions/storefront/bs-linen-casual-shirt.png"
+        },
+        {
+          "product_id": "prod-white-sneaker",
+          "product_name": "Classic White Sneaker",
+          "sku": "NOT-FW-004",
+          "variant_label": "9",
+          "unit_price": 2499,
+          "quantity": 1,
+          "line_total": 2499,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183099/notions/storefront/bs-classic-white-sneaker.png"
+        }
+      ],
+      "razorpay_order_id": "order_sim_1793185006703",
+      "razorpay_payment_id": "pay_test_1793185006720"
+    }
+  ]
+}
