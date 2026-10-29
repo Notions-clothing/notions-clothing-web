@@ -4,9 +4,13 @@ import { createClient } from '@supabase/supabase-js';
 import { Category, Product, Banner, SiteSettings, Order } from '@/types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabaseKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  '';
 
-const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 const storeFilePath = path.join(process.cwd(), 'data', 'store.json');
 
@@ -31,82 +35,78 @@ function writeLocalStore(data: any) {
 }
 
 // ----------------------------------------------------
-// CATEGORIES
+// CATEGORIES (Local Store is Primary Source of Truth)
 // ----------------------------------------------------
 export async function getCategories(): Promise<Category[]> {
-  if (supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('is_published', true)
-        .order('sort_order', { ascending: true });
-
-      if (!error && data && data.length > 0) {
-        return data as Category[];
-      }
-    } catch (e) {
-      // Fall through to local store
-    }
-  }
-
   const store = readLocalStore();
-  return (store.categories || []).filter((c: Category) => c.is_published);
+  return (store.categories || [])
+    .filter((c: Category) => c.is_published)
+    .sort((a: Category, b: Category) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
 }
 
 export async function getAllCategoriesAdmin(): Promise<Category[]> {
-  if (supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('sort_order', { ascending: true });
-
-      if (!error && data && data.length > 0) {
-        return data as Category[];
-      }
-    } catch (e) {
-      // Fall through
-    }
-  }
-
   const store = readLocalStore();
-  return store.categories || [];
+  return (store.categories || []).sort(
+    (a: Category, b: Category) => (a.sort_order ?? 99) - (b.sort_order ?? 99)
+  );
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
   const cats = await getCategories();
-  return cats.find(c => c.slug === slug) || null;
+  return cats.find((c) => c.slug === slug) || null;
 }
 
 export async function saveCategory(category: Partial<Category>): Promise<Category> {
   const store = readLocalStore();
-  const id = category.id || `cat-${Date.now()}`;
+  store.categories = store.categories || [];
+
+  // Match by id OR by slug so we never create duplicate categories when editing
+  const existingIndex = store.categories.findIndex(
+    (c: Category) =>
+      (category.id && c.id === category.id) ||
+      (category.slug && c.slug === category.slug)
+  );
+
+  const existing = existingIndex >= 0 ? store.categories[existingIndex] : null;
+  const id = existing?.id || category.id || `cat-${Date.now()}`;
+
   const newCat: Category = {
     id,
-    name: category.name || 'Untitled Category',
-    slug: category.slug || `cat-${Date.now()}`,
-    parent_id: category.parent_id || null,
-    description: category.description || '',
-    image_url: category.image_url || '',
-    image_public_id: category.image_public_id || '',
-    sort_order: category.sort_order ?? (store.categories.length + 1),
-    is_published: category.is_published ?? true,
+    name: category.name || existing?.name || 'Untitled Category',
+    slug: category.slug || existing?.slug || `cat-${Date.now()}`,
+    parent_id: category.parent_id !== undefined ? category.parent_id : (existing?.parent_id ?? null),
+    description: category.description !== undefined ? category.description : (existing?.description || ''),
+    image_url: category.image_url !== undefined ? category.image_url : (existing?.image_url || ''),
+    image_public_id:
+      category.image_public_id !== undefined
+        ? category.image_public_id
+        : (existing?.image_public_id || ''),
+    sort_order: category.sort_order ?? existing?.sort_order ?? store.categories.length + 1,
+    is_published: category.is_published ?? existing?.is_published ?? true,
   };
 
-  const existingIndex = store.categories.findIndex((c: Category) => c.id === id);
   if (existingIndex >= 0) {
-    store.categories[existingIndex] = { ...store.categories[existingIndex], ...newCat };
+    store.categories[existingIndex] = newCat;
   } else {
     store.categories.push(newCat);
   }
+
+  // If the user updated "shoes" photo, also sync "footwear" homepage card if footwear still has default image
+  if (newCat.slug === 'shoes' && newCat.image_url) {
+    const fwIdx = store.categories.findIndex((c: Category) => c.slug === 'footwear');
+    if (fwIdx >= 0) {
+      store.categories[fwIdx].image_url = newCat.image_url;
+      store.categories[fwIdx].image_public_id = newCat.image_public_id;
+    }
+  }
+
   writeLocalStore(store);
 
   if (supabase) {
     try {
       await supabase.from('categories').upsert(newCat);
     } catch (e) {
-      // Ignore Supabase error if table doesn't exist
+      // Ignore if RLS blocks anonymous upsert
     }
   }
 
@@ -115,7 +115,7 @@ export async function saveCategory(category: Partial<Category>): Promise<Categor
 
 export async function deleteCategory(id: string): Promise<boolean> {
   const store = readLocalStore();
-  store.categories = store.categories.filter((c: Category) => c.id !== id);
+  store.categories = (store.categories || []).filter((c: Category) => c.id !== id);
   writeLocalStore(store);
 
   if (supabase) {
@@ -127,7 +127,7 @@ export async function deleteCategory(id: string): Promise<boolean> {
 }
 
 // ----------------------------------------------------
-// PRODUCTS
+// PRODUCTS (Local Store is Primary Source of Truth)
 // ----------------------------------------------------
 export async function getProducts(options?: {
   categorySlug?: string;
@@ -138,50 +138,43 @@ export async function getProducts(options?: {
   sort?: string;
 }): Promise<Product[]> {
   const store = readLocalStore();
-  let list: Product[] = store.products || [];
-
-  if (supabase) {
-    try {
-      let query = supabase.from('products').select('*, images:product_images(*), variants:product_variants(*)').eq('is_published', true);
-
-      if (options?.isBestseller) query = query.eq('is_bestseller', true);
-      if (options?.isFeatured) query = query.eq('is_featured', true);
-      if (options?.isNewArrival) query = query.eq('is_new_arrival', true);
-
-      const { data, error } = await query;
-      if (!error && data && data.length > 0) {
-        list = data as Product[];
-      }
-    } catch (e) {
-      // Fallback to local
-    }
-  }
-
-  // Filter published
-  list = list.filter(p => p.is_published);
+  let list: Product[] = (store.products || []).filter((p: Product) => p.is_published);
 
   if (options?.categorySlug && options.categorySlug !== 'all') {
-    list = list.filter(p => p.category_slug === options.categorySlug || p.category_id === options.categorySlug);
+    const slug = options.categorySlug;
+    list = list.filter((p) => {
+      if (p.category_slug === slug || p.category_id === slug) return true;
+      if (slug === 'men' && p.category_slug?.startsWith('men')) return true;
+      if (slug === 'footwear' && (p.category_slug === 'shoes' || p.category_slug === 'sandals'))
+        return true;
+      if (
+        slug === 'accessories' &&
+        ['caps', 'rings', 'bracelet', 'chain'].includes(p.category_slug || '')
+      )
+        return true;
+      return false;
+    });
   }
 
   if (options?.isBestseller) {
-    list = list.filter(p => p.is_bestseller);
+    list = list.filter((p) => p.is_bestseller);
   }
 
   if (options?.isFeatured) {
-    list = list.filter(p => p.is_featured);
+    list = list.filter((p) => p.is_featured);
   }
 
   if (options?.isNewArrival) {
-    list = list.filter(p => p.is_new_arrival);
+    list = list.filter((p) => p.is_new_arrival);
   }
 
   if (options?.search) {
     const q = options.search.toLowerCase();
-    list = list.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      (p.description && p.description.toLowerCase().includes(q)) ||
-      (p.category_name && p.category_name.toLowerCase().includes(q))
+    list = list.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.description && p.description.toLowerCase().includes(q)) ||
+        (p.category_name && p.category_name.toLowerCase().includes(q))
     );
   }
 
@@ -211,6 +204,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
 export async function saveProduct(product: Partial<Product>): Promise<Product> {
   const store = readLocalStore();
+  store.products = store.products || [];
   const id = product.id || `prod-${Date.now()}`;
   const now = new Date().toISOString();
 
@@ -257,7 +251,7 @@ export async function saveProduct(product: Partial<Product>): Promise<Product> {
 
 export async function deleteProduct(id: string): Promise<boolean> {
   const store = readLocalStore();
-  store.products = store.products.filter((p: Product) => p.id !== id);
+  store.products = (store.products || []).filter((p: Product) => p.id !== id);
   writeLocalStore(store);
 
   if (supabase) {
@@ -283,6 +277,7 @@ export async function getAllBannersAdmin(): Promise<Banner[]> {
 
 export async function saveBanner(banner: Partial<Banner>): Promise<Banner> {
   const store = readLocalStore();
+  store.banners = store.banners || [];
   const id = banner.id || `ban-${Date.now()}`;
   const newBanner: Banner = {
     id,
@@ -299,14 +294,35 @@ export async function saveBanner(banner: Partial<Banner>): Promise<Banner> {
     is_published: banner.is_published ?? true,
   };
 
-  const existingIndex = store.banners.findIndex((b: Banner) => b.id === id);
+  const existingIndex = store.banners.findIndex(
+    (b: Banner) => b.id === id || (banner.section && b.section === banner.section)
+  );
   if (existingIndex >= 0) {
     store.banners[existingIndex] = { ...store.banners[existingIndex], ...newBanner };
   } else {
     store.banners.push(newBanner);
   }
   writeLocalStore(store);
+
+  if (supabase) {
+    try {
+      await supabase.from('banners').upsert(newBanner);
+    } catch (e) {}
+  }
+
   return newBanner;
+}
+
+export async function deleteBanner(id: string): Promise<boolean> {
+  const store = readLocalStore();
+  store.banners = (store.banners || []).filter((b: Banner) => b.id !== id);
+  writeLocalStore(store);
+  if (supabase) {
+    try {
+      await supabase.from('banners').delete().eq('id', id);
+    } catch (e) {}
+  }
+  return true;
 }
 
 // ----------------------------------------------------
@@ -330,6 +346,18 @@ export async function updateSiteSettings(settings: Partial<SiteSettings>): Promi
 export async function getOrdersAdmin(): Promise<Order[]> {
   const store = readLocalStore();
   return store.orders || [];
+}
+
+export async function deleteOrder(id: string): Promise<boolean> {
+  const store = readLocalStore();
+  store.orders = (store.orders || []).filter((o: Order) => o.id !== id);
+  writeLocalStore(store);
+  if (supabase) {
+    try {
+      await supabase.from('orders').delete().eq('id', id);
+    } catch (e) {}
+  }
+  return true;
 }
 
 export async function saveOrder(order: Partial<Order>): Promise<Order> {

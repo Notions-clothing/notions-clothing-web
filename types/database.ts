@@ -128,10 +128,14 @@ export interface Order {
 export interface SiteSettings {
   store_name: string;
   tagline: string;
+  logo_url?: string;
   support_email: string;
   support_phone: string;
+  working_hours?: string;
   address: string;
   free_shipping_threshold: number;
   flat_shipping_rate: number;
   announcement_bar: string;
+  instagram_url?: string;
+  whatsapp_number?: string;
 }

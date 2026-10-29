@@ -1,24 +1,13 @@
 {
   "categories": [
     {
-      "id": "cat-men",
-      "name": "Men's Apparel",
-      "slug": "men",
-      "parent_id": null,
-      "description": "Sophisticated opulent menswear for every occasion",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183109/notions/storefront/cat-shirts.png",
-      "image_public_id": "notions/storefront/cat-shirts",
-      "sort_order": 1,
-      "is_published": true
-    },
-    {
       "id": "cat-men-shirts",
       "name": "Shirts",
       "slug": "men-shirts",
       "parent_id": "cat-men",
       "description": "Tailored and casual luxury shirts",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183109/notions/storefront/cat-shirts.png",
-      "image_public_id": "notions/storefront/cat-shirts",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793258470/notions/categories/grnoxwegrjsp9y1yqhp8.png",
+      "image_public_id": "notions/categories/grnoxwegrjsp9y1yqhp8",
       "sort_order": 1,
       "is_published": true
     },
@@ -28,8 +17,8 @@
       "slug": "men-jeans",
       "parent_id": "cat-men",
       "description": "Premium selvedge and stretch denim",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183107/notions/storefront/cat-jeans.png",
-      "image_public_id": "notions/storefront/cat-jeans",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793259722/notions/categories/jxuw6ut4x6i8wgv7chup.png",
+      "image_public_id": "notions/categories/jxuw6ut4x6i8wgv7chup",
       "sort_order": 2,
       "is_published": true
     },
@@ -39,8 +28,8 @@
       "slug": "men-trousers",
       "parent_id": "cat-men",
       "description": "Refined trousers, chinos and tailored pants",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183112/notions/storefront/cat-trousers.png",
-      "image_public_id": "notions/storefront/cat-trousers",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793259844/notions/categories/qjsxng6t357341mkvyo6.png",
+      "image_public_id": "notions/categories/qjsxng6t357341mkvyo6",
       "sort_order": 3,
       "is_published": true
     },
@@ -50,8 +39,8 @@
       "slug": "men-t-shirts",
       "parent_id": "cat-men",
       "description": "Luxury heavyweight and oversized tees",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183111/notions/storefront/cat-t-shirts.png",
-      "image_public_id": "notions/storefront/cat-t-shirts",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260030/notions/categories/m2kqhopfs4chv5um7mi5.png",
+      "image_public_id": "notions/categories/m2kqhopfs4chv5um7mi5",
       "sort_order": 4,
       "is_published": true
     },
@@ -61,8 +50,8 @@
       "slug": "men-shorts",
       "parent_id": "cat-men",
       "description": "Tailored and relaxed resort shorts",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183110/notions/storefront/cat-shorts.png",
-      "image_public_id": "notions/storefront/cat-shorts",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260090/notions/categories/hdjlobszeiyu6ucnhstk.png",
+      "image_public_id": "notions/categories/hdjlobszeiyu6ucnhstk",
       "sort_order": 5,
       "is_published": true
     },
@@ -72,8 +61,8 @@
       "slug": "men-jackets",
       "parent_id": "cat-men",
       "description": "Artisanal leather, suede, and overshirts",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183106/notions/storefront/cat-jackets.png",
-      "image_public_id": "notions/storefront/cat-jackets",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260163/notions/categories/rl1zpzpcnsbrnohzxmls.png",
+      "image_public_id": "notions/categories/rl1zpzpcnsbrnohzxmls",
       "sort_order": 6,
       "is_published": true
     },
@@ -83,8 +72,8 @@
       "slug": "men-dhothis",
       "parent_id": "cat-men",
       "description": "Heritage pure cotton and silk bordered dhothis",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183104/notions/storefront/cat-dhothis.png",
-      "image_public_id": "notions/storefront/cat-dhothis",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260240/notions/categories/x4amfxqpwuvgejvhwqhk.png",
+      "image_public_id": "notions/categories/x4amfxqpwuvgejvhwqhk",
       "sort_order": 7,
       "is_published": true
     },
@@ -94,42 +83,20 @@
       "slug": "men-kurta",
       "parent_id": "cat-men",
       "description": "Handcrafted festive and casual kurtas",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183108/notions/storefront/cat-kurta.png",
-      "image_public_id": "notions/storefront/cat-kurta",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260327/notions/categories/yso8obj4xsd1orz1idas.png",
+      "image_public_id": "notions/categories/yso8obj4xsd1orz1idas",
       "sort_order": 8,
       "is_published": true
     },
     {
       "id": "cat-footwear",
-      "name": "Footwears",
+      "name": "Footwear",
       "slug": "footwear",
       "parent_id": null,
       "description": "Premium shoes and sandals for every step",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183105/notions/storefront/cat-footwear.png",
-      "image_public_id": "notions/storefront/cat-footwear",
-      "sort_order": 2,
-      "is_published": true
-    },
-    {
-      "id": "cat-shoes",
-      "name": "Shoes",
-      "slug": "shoes",
-      "parent_id": "cat-footwear",
-      "description": "Handmade leather loafers, oxfords, and clean sneakers",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183105/notions/storefront/cat-footwear.png",
-      "image_public_id": "notions/storefront/cat-footwear",
-      "sort_order": 1,
-      "is_published": true
-    },
-    {
-      "id": "cat-sandals",
-      "name": "Sandals",
-      "slug": "sandals",
-      "parent_id": "cat-footwear",
-      "description": "Comfort leather sandals and slides",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183105/notions/storefront/cat-footwear.png",
-      "image_public_id": "notions/storefront/cat-footwear",
-      "sort_order": 2,
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260399/notions/categories/b6rusublhuzvjok1iswl.png",
+      "image_public_id": "notions/categories/b6rusublhuzvjok1iswl",
+      "sort_order": 9,
       "is_published": true
     },
     {
@@ -138,9 +105,42 @@
       "slug": "accessories",
       "parent_id": null,
       "description": "Distinctive luxury jewelry and essentials",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183103/notions/storefront/cat-accessories.png",
-      "image_public_id": "notions/storefront/cat-accessories",
-      "sort_order": 3,
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260480/notions/categories/msnjrancfdgysjv5tvah.png",
+      "image_public_id": "notions/categories/msnjrancfdgysjv5tvah",
+      "sort_order": 10,
+      "is_published": true
+    },
+    {
+      "id": "cat-men",
+      "name": "Men's Apparel",
+      "slug": "men",
+      "parent_id": null,
+      "description": "Sophisticated opulent menswear for every occasion",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260558/notions/categories/nlqvh734f6rvmaeb7tvz.png",
+      "image_public_id": "notions/categories/nlqvh734f6rvmaeb7tvz",
+      "sort_order": 11,
+      "is_published": true
+    },
+    {
+      "id": "cat-shoes",
+      "name": "Shoes",
+      "slug": "shoes",
+      "parent_id": "cat-footwear",
+      "description": "Handmade leather loafers, oxfords, and clean sneakers",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793258483/notions/categories/v51drbrdyc5llas0pa0a.png",
+      "image_public_id": "notions/categories/v51drbrdyc5llas0pa0a",
+      "sort_order": 12,
+      "is_published": true
+    },
+    {
+      "id": "cat-sandals",
+      "name": "Sandals",
+      "slug": "sandals",
+      "parent_id": "cat-footwear",
+      "description": "Comfort leather sandals and slides",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260653/notions/categories/fwnribmdqa7lthzk30s8.png",
+      "image_public_id": "notions/categories/fwnribmdqa7lthzk30s8",
+      "sort_order": 13,
       "is_published": true
     },
     {
@@ -149,9 +149,9 @@
       "slug": "caps",
       "parent_id": "cat-accessories",
       "description": "Subtle embroidered twill and suede caps",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183103/notions/storefront/cat-accessories.png",
-      "image_public_id": "notions/storefront/cat-accessories",
-      "sort_order": 1,
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260803/notions/categories/e749iao5hzjbuxzykqi6.png",
+      "image_public_id": "notions/categories/e749iao5hzjbuxzykqi6",
+      "sort_order": 14,
       "is_published": true
     },
     {
@@ -160,9 +160,9 @@
       "slug": "rings",
       "parent_id": "cat-accessories",
       "description": "Solid silver and signet rings",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183103/notions/storefront/cat-accessories.png",
-      "image_public_id": "notions/storefront/cat-accessories",
-      "sort_order": 2,
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793260930/notions/categories/qoquon52v1agxmp2qlpm.png",
+      "image_public_id": "notions/categories/qoquon52v1agxmp2qlpm",
+      "sort_order": 15,
       "is_published": true
     },
     {
@@ -171,9 +171,9 @@
       "slug": "bracelet",
       "parent_id": "cat-accessories",
       "description": "Cuff bracelets and braided accessories",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183103/notions/storefront/cat-accessories.png",
-      "image_public_id": "notions/storefront/cat-accessories",
-      "sort_order": 3,
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793261029/notions/categories/dcgpzc3hjhla0xyxy1td.png",
+      "image_public_id": "notions/categories/dcgpzc3hjhla0xyxy1td",
+      "sort_order": 16,
       "is_published": true
     },
     {
@@ -182,9 +182,9 @@
       "slug": "chain",
       "parent_id": "cat-accessories",
       "description": "Minimalist stainless steel and silver link chains",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183103/notions/storefront/cat-accessories.png",
-      "image_public_id": "notions/storefront/cat-accessories",
-      "sort_order": 4,
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793261100/notions/categories/ilnddc5verebuna0qpsj.png",
+      "image_public_id": "notions/categories/ilnddc5verebuna0qpsj",
+      "sort_order": 17,
       "is_published": true
     }
   ],
@@ -447,8 +447,8 @@
       "description": "Premium men's fashion for your everyday journey.",
       "cta_label": "Shop Now",
       "cta_url": "/category/men",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183114/notions/storefront/hero-banner.png",
-      "image_public_id": "notions/storefront/hero-banner",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793255871/notions/banners/cofpsusgwc22dunnsaat.png",
+      "image_public_id": "notions/banners/cofpsusgwc22dunnsaat",
       "badge_text": "Style Beyond Trends • Men's Fashion Reimagined",
       "sort_order": 1,
       "is_published": true
@@ -461,8 +461,8 @@
       "description": "Sophisticated tailoring crafted for the discerning modern gentleman.",
       "cta_label": "Explore Collection",
       "cta_url": "/category/men",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183115/notions/storefront/modern-essentials.png",
-      "image_public_id": "notions/storefront/modern-essentials",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793256048/notions/banners/appxyd8xy1pq3bxxaew9.png",
+      "image_public_id": "notions/banners/appxyd8xy1pq3bxxaew9",
       "badge_text": "MODERN ESSENTIALS",
       "sort_order": 2,
       "is_published": true
@@ -475,10 +475,11 @@
       "description": "Premium shoes & sandals for every step.",
       "cta_label": "Shop Footwear",
       "cta_url": "/category/footwear",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183117/notions/storefront/promo-footwear.png",
-      "image_public_id": "notions/storefront/promo-footwear",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793256138/notions/banners/g8kbembaviffznm58puw.png",
+      "image_public_id": "notions/banners/g8kbembaviffznm58puw",
       "sort_order": 3,
-      "is_published": true
+      "is_published": true,
+      "badge_text": ""
     },
     {
       "id": "ban-accessories",
@@ -488,10 +489,11 @@
       "description": "Caps, Rings, Bracelets & Chains",
       "cta_label": "Explore Accessories",
       "cta_url": "/category/accessories",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183116/notions/storefront/promo-accessories.png",
-      "image_public_id": "notions/storefront/promo-accessories",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793256214/notions/banners/vpxux9xqnjgsambzqee3.png",
+      "image_public_id": "notions/banners/vpxux9xqnjgsambzqee3",
       "sort_order": 4,
-      "is_published": true
+      "is_published": true,
+      "badge_text": ""
     },
     {
       "id": "ban-new-arrivals",
@@ -501,71 +503,26 @@
       "description": "Fresh styles. Same confidence.",
       "cta_label": "Shop Now",
       "cta_url": "/new-arrivals",
-      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183118/notions/storefront/promo-new-arrivals.png",
-      "image_public_id": "notions/storefront/promo-new-arrivals",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793256273/notions/banners/kpgz7kryh8v7gak3lnd6.png",
+      "image_public_id": "notions/banners/kpgz7kryh8v7gak3lnd6",
       "sort_order": 5,
-      "is_published": true
+      "is_published": true,
+      "badge_text": ""
     }
   ],
   "settings": {
     "store_name": "NOTIONS®",
     "tagline": "OPULENT CLOTHING",
+    "logo_url": "/logo.png",
     "support_email": "concierge@notionsclothing.com",
     "support_phone": "+91 98765 43210",
+    "working_hours": "Mon - Sat, 10am - 7pm",
     "address": "Flagship Atelier, 42 Heritage Promenade, Indiranagar, Bengaluru, India",
     "free_shipping_threshold": 1999,
     "flat_shipping_rate": 99,
-    "announcement_bar": "Complimentary Shipping across India on orders above ₹1,999"
+    "announcement_bar": "Complimentary Shipping across India on orders above ₹1,999",
+    "instagram_url": "https://instagram.com/notionsclothing",
+    "whatsapp_number": "+919876543210"
   },
-  "orders": [
-    {
-      "id": "ord-1793185007162",
-      "order_number": "NOT-006703",
-      "customer_name": "Aditya Roy",
-      "customer_email": "aditya.roy@notions-test.com",
-      "customer_phone": "+91 9876543210",
-      "shipping_address": {
-        "street": "Penthouse 14B, Sky Promenade, Lavelle Road",
-        "city": "Bengaluru",
-        "state": "Karnataka",
-        "postal_code": "560001",
-        "country": "India"
-      },
-      "subtotal": 3998,
-      "shipping_amount": 0,
-      "discount_amount": 0,
-      "total_amount": 3998,
-      "currency": "INR",
-      "status": "confirmed",
-      "payment_status": "paid",
-      "tracking_carrier": "",
-      "tracking_number": "",
-      "notes": "",
-      "created_at": "2026-10-28T10:56:47.162Z",
-      "items": [
-        {
-          "product_id": "prod-linen-shirt",
-          "product_name": "Linen Casual Shirt",
-          "sku": "NOT-SH-001",
-          "variant_label": "L",
-          "unit_price": 1499,
-          "quantity": 1,
-          "line_total": 1499,
-          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183101/notions/storefront/bs-linen-casual-shirt.png"
-        },
-        {
-          "product_id": "prod-white-sneaker",
-          "product_name": "Classic White Sneaker",
-          "sku": "NOT-FW-004",
-          "variant_label": "9",
-          "unit_price": 2499,
-          "quantity": 1,
-          "line_total": 2499,
-          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793183099/notions/storefront/bs-classic-white-sneaker.png"
-        }
-      ],
-      "razorpay_order_id": "order_sim_1793185006703",
-      "razorpay_payment_id": "pay_test_1793185006720"
-    }
-  ]
+  "orders": []
 }
