@@ -93,7 +93,7 @@ export async function saveCategory(category: Partial<Category>): Promise<Categor
     id,
     name: category.name || existing?.name || 'Untitled Category',
     slug: category.slug || existing?.slug || `cat-${Date.now()}`,
-    parent_id: category.parent_id !== undefined ? category.parent_id : (existing?.parent_id ?? null),
+    parent_id: category.parent_id ? category.parent_id : null,
     description: category.description !== undefined ? category.description : (existing?.description || ''),
     image_url: category.image_url !== undefined ? category.image_url : (existing?.image_url || ''),
     image_public_id:
@@ -270,6 +270,43 @@ export async function deleteColor(id: string): Promise<boolean> {
   return true;
 }
 
+export function normalizeProduct(p: Product): Product {
+  if (!p) return p;
+  if ((!p.images || p.images.length === 0) && p.colors && p.colors.length > 0) {
+    const colorWithImg = p.colors.find((c) => (c.images && c.images.length > 0) || c.image_url);
+    if (colorWithImg) {
+      if (colorWithImg.images && colorWithImg.images.length > 0) {
+        return {
+          ...p,
+          images: colorWithImg.images.map((img, idx) => ({
+            id: img.id || `img-${p.id || 'p'}-${idx}`,
+            product_id: p.id || '',
+            image_url: img.url,
+            image_public_id: img.public_id || '',
+            alt_text: p.name || 'Product Image',
+            sort_order: idx + 1,
+            is_primary: idx === 0,
+          })),
+        };
+      } else if (colorWithImg.image_url) {
+        return {
+          ...p,
+          images: [{
+            id: `img-${p.id || 'p'}-0`,
+            product_id: p.id || '',
+            image_url: colorWithImg.image_url,
+            image_public_id: colorWithImg.image_public_id || '',
+            alt_text: p.name || 'Product Image',
+            sort_order: 1,
+            is_primary: true,
+          }],
+        };
+      }
+    }
+  }
+  return p;
+}
+
 // ----------------------------------------------------
 // PRODUCTS (Local Store is Primary Source of Truth)
 // ----------------------------------------------------
@@ -284,7 +321,7 @@ export async function getProducts(options?: {
   sort?: string;
 }): Promise<Product[]> {
   const store = readLocalStore();
-  let list: Product[] = (store.products || []).filter((p: Product) => p.is_published);
+  let list: Product[] = (store.products || []).map(normalizeProduct).filter((p: Product) => p.is_published);
 
   if (options?.categorySlug && options.categorySlug !== 'all') {
     const slug = options.categorySlug;
@@ -386,13 +423,13 @@ export async function getPaginatedProducts(options?: {
 
 export async function getAllProductsAdmin(): Promise<Product[]> {
   const store = readLocalStore();
-  return store.products || [];
+  return (store.products || []).map(normalizeProduct);
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const store = readLocalStore();
   const product = (store.products || []).find((p: Product) => p.slug === slug || p.id === slug);
-  return product || null;
+  return product ? normalizeProduct(product) : null;
 }
 
 export async function saveProduct(product: Partial<Product>): Promise<Product> {
@@ -400,6 +437,34 @@ export async function saveProduct(product: Partial<Product>): Promise<Product> {
   store.products = store.products || [];
   const id = product.id || `prod-${Date.now()}`;
   const now = new Date().toISOString();
+
+  let productImages = product.images || [];
+  if (productImages.length === 0 && product.colors && product.colors.length > 0) {
+    const colorWithImg = product.colors.find((c) => (c.images && c.images.length > 0) || c.image_url);
+    if (colorWithImg) {
+      if (colorWithImg.images && colorWithImg.images.length > 0) {
+        productImages = colorWithImg.images.map((img, idx) => ({
+          id: img.id || `img-${id}-${idx}`,
+          product_id: id,
+          image_url: img.url,
+          image_public_id: img.public_id || '',
+          alt_text: product.name || 'Product Image',
+          sort_order: idx + 1,
+          is_primary: idx === 0,
+        }));
+      } else if (colorWithImg.image_url) {
+        productImages = [{
+          id: `img-${id}-0`,
+          product_id: id,
+          image_url: colorWithImg.image_url,
+          image_public_id: colorWithImg.image_public_id || '',
+          alt_text: product.name || 'Product Image',
+          sort_order: 1,
+          is_primary: true,
+        }];
+      }
+    }
+  }
 
   const newProd: Product = {
     id,
@@ -421,7 +486,7 @@ export async function saveProduct(product: Partial<Product>): Promise<Product> {
     is_published: product.is_published ?? true,
     rating_score: product.rating_score || 4.8,
     rating_count: product.rating_count || 0,
-    images: product.images || [],
+    images: productImages,
     variants: product.variants || [],
     colors: product.colors || [],
     product_mode: product.product_mode || (product.colors && product.colors.length > 0 ? 'variant' : 'normal'),

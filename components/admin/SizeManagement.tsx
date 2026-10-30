@@ -31,9 +31,11 @@ export default function SizeManagement({
   onRefresh,
   showNotification,
 }: SizeManagementProps) {
-  // Filter top-level or relevant categories
+  // Strictly filter to Main Categories only (exclude subcategories with parent_id)
+  const mainCategories = categories.filter((c) => !c.parent_id);
+
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>(
-    categories[0]?.id || ''
+    mainCategories[0]?.id || ''
   );
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
@@ -53,7 +55,7 @@ export default function SizeManagement({
     isDeleting: false,
   });
 
-  const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
+  const selectedCategory = mainCategories.find((c) => c.id === selectedCategoryId) || categories.find((c) => c.id === selectedCategoryId);
 
   // Filter sizes for the chosen category and search/status
   const categorySizes = sizes.filter((s) => {
@@ -222,7 +224,7 @@ export default function SizeManagement({
                 onChange={(e) => setSelectedCategoryId(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-sm bg-gray-50 hover:bg-white border border-gray-300 rounded-xl font-semibold text-gray-900 focus:outline-none focus:border-[#143728] cursor-pointer transition shadow-2xs"
               >
-                {categories.map((c) => {
+                {mainCategories.map((c) => {
                   const count = sizes.filter((s) => s.category_id === c.id).length;
                   return (
                     <option key={c.id} value={c.id}>
@@ -292,7 +294,7 @@ export default function SizeManagement({
           <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider shrink-0 mr-1">
             Categories:
           </span>
-          {categories.map((c) => {
+          {mainCategories.map((c) => {
             const isSelected = selectedCategoryId === c.id;
             const sizeCount = sizes.filter((s) => s.category_id === c.id).length;
             return (
@@ -484,7 +486,7 @@ export default function SizeManagement({
                   className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl bg-white font-medium focus:outline-none focus:border-[#143728]"
                 >
                   <option value="">Select Category</option>
-                  {categories.map((c) => (
+                  {mainCategories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>
@@ -503,7 +505,7 @@ export default function SizeManagement({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. S, M, L, XL, 32, 8, 9, One Size"
+                  placeholder="Enter size name"
                   value={editingSize.name || ''}
                   onChange={(e) =>
                     setEditingSize({ ...editingSize, name: e.target.value })

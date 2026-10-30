@@ -31,8 +31,10 @@ export default function SubcategoryManagement({
   showNotification,
   handleFileUpload,
 }: SubcategoryManagementProps) {
-  // Main parent categories (categories without a parent_id)
-  const mainCategories = categories.filter((c) => !c.parent_id);
+  // Identify main parent categories vs subcategories
+  const isSubcategory = (c: Category) =>
+    Boolean(c.parent_id && categories.some((parent) => parent.id === c.parent_id && parent.id !== c.id));
+  const mainCategories = categories.filter((c) => !isSubcategory(c));
 
   // Filter state
   const [selectedParentId, setSelectedParentId] = useState<string>('all');
@@ -56,8 +58,8 @@ export default function SubcategoryManagement({
     isDeleting: false,
   });
 
-  // All subcategories (categories with a parent_id)
-  const allSubcategories = categories.filter((c) => Boolean(c.parent_id));
+  // All subcategories (categories belonging to an existing parent category)
+  const allSubcategories = categories.filter((c) => isSubcategory(c));
 
   // Filtered subcategories
   const filteredSubcategories = allSubcategories.filter((sub) => {
@@ -487,7 +489,7 @@ export default function SubcategoryManagement({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Linen Shirts, Sneakers, Casual Belts"
+                  placeholder="Enter subcategory name"
                   value={editingSubcategory.name || ''}
                   onChange={(e) => {
                     const name = e.target.value;
@@ -529,7 +531,7 @@ export default function SubcategoryManagement({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. linen-shirts"
+                  placeholder="Enter subcategory slug"
                   value={editingSubcategory.slug || ''}
                   onChange={(e) =>
                     setEditingSubcategory({ ...editingSubcategory, slug: e.target.value })

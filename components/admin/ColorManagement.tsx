@@ -294,7 +294,7 @@ export default function ColorManagement({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Olive Green"
+                  placeholder="Enter color name"
                   value={editingColor.name || ''}
                   onChange={(e) => setEditingColor({ ...editingColor, name: e.target.value })}
                   className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
@@ -322,7 +322,7 @@ export default function ColorManagement({
                     <input
                       type="text"
                       required
-                      placeholder="#143728"
+                      placeholder="Enter hex code"
                       value={editingColor.hex || ''}
                       onChange={(e) => setEditingColor({ ...editingColor, hex: e.target.value.toUpperCase() })}
                       className="w-full px-3.5 py-2.5 text-sm font-mono uppercase border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"

@@ -47,6 +47,23 @@ export default function ProductDetailClient({
     if (product.images && product.images.length > 0) {
       return product.images;
     }
+    const colorFallback = product.colors?.find((c) => (c.images && c.images.length > 0) || c.image_url);
+    if (colorFallback?.images && colorFallback.images.length > 0) {
+      return colorFallback.images.map((img, idx) => ({
+        id: img.id || `col-fallback-${idx}`,
+        image_url: img.url,
+        alt_text: `${product.name} - ${colorFallback.name}`,
+      }));
+    }
+    if (colorFallback?.image_url) {
+      return [
+        {
+          id: 'color-fallback-single',
+          image_url: colorFallback.image_url,
+          alt_text: `${product.name} - ${colorFallback.name}`,
+        },
+      ];
+    }
     return [
       {
         id: '1',
@@ -559,7 +576,12 @@ export default function ProductDetailClient({
               >
                 <Link href={`/product/${rel.slug}`} className="block relative aspect-[4/4.2] bg-[#F5F3EF]">
                   <Image
-                    src={rel.images?.[0]?.image_url || '/logo.png'}
+                    src={
+                      rel.images?.[0]?.image_url ||
+                      rel.colors?.find((c) => c.image_url || (c.images && c.images.length > 0))?.image_url ||
+                      rel.colors?.find((c) => c.images && c.images.length > 0)?.images?.[0]?.url ||
+                      '/logo.png'
+                    }
                     alt={rel.name}
                     fill
                     className="object-cover group-hover:scale-103 transition-transform"

@@ -1,7 +1,128 @@
 {
-  "categories": [],
-  "sizes": [],
-  "products": [],
+  "categories": [
+    {
+      "id": "cat-1793367161674",
+      "name": "Foot wear",
+      "slug": "foot-wear",
+      "parent_id": null,
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793367158/notions/categories/qn0wxdixymdqiqohxwe5.png",
+      "image_public_id": "notions/categories/qn0wxdixymdqiqohxwe5",
+      "sort_order": 1,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793368991690",
+      "name": "Shoe",
+      "slug": "shoe",
+      "parent_id": "cat-1793367161674",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793369003/notions/categories/gcipznrdjbf8qsaqhnv6.png",
+      "image_public_id": "notions/categories/gcipznrdjbf8qsaqhnv6",
+      "sort_order": 1,
+      "is_published": true
+    }
+  ],
+  "sizes": [
+    {
+      "id": "sz-1793368706624",
+      "category_id": "cat-1793367161674",
+      "category_name": "Foot wear",
+      "name": "5",
+      "sort_order": 1,
+      "is_active": true,
+      "created_at": "2026-10-30T13:58:26.624Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "prod-1793368849863",
+      "name": "Shoe",
+      "slug": "shoe",
+      "description": "Step into timeless style with the Classic White Sneaker. Designed with a clean, minimalist silhouette, these sneakers bring effortless sophistication to your everyday wardrobe.",
+      "category_id": "cat-1793367161674",
+      "category_slug": "foot-wear",
+      "category_name": "Foot wear",
+      "subcategory_id": "cat-1793367958202",
+      "subcategory_slug": "shoes",
+      "subcategory_name": "Shoes",
+      "sku": "NOT-9083",
+      "price": 1499,
+      "compare_at_price": 1999,
+      "is_bestseller": false,
+      "is_featured": true,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 4.7,
+      "rating_count": 24,
+      "images": [
+        {
+          "id": "img-shoe-1",
+          "product_id": "prod-1793368849863",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png",
+          "image_public_id": "notions/products/colors/mofbxbyqtqqx91m7gzfv",
+          "alt_text": "Shoe White",
+          "sort_order": 1,
+          "is_primary": true
+        },
+        {
+          "id": "img-shoe-2",
+          "product_id": "prod-1793368849863",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368886/notions/products/colors/bo5qd6w79wsbom03b0zr.png",
+          "image_public_id": "notions/products/colors/bo5qd6w79wsbom03b0zr",
+          "alt_text": "Shoe White Side View",
+          "sort_order": 2,
+          "is_primary": false
+        }
+      ],
+      "variants": [
+        {
+          "id": "var-1793368863938-0",
+          "product_id": "prod-1793368849863",
+          "size": "5",
+          "inventory_quantity": 10,
+          "is_available": true
+        }
+      ],
+      "colors": [
+        {
+          "color_id": "col-1793368028683",
+          "name": "White",
+          "hex": "#FFFFFF",
+          "stock": 10,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png",
+          "image_public_id": "notions/products/colors/mofbxbyqtqqx91m7gzfv",
+          "images": [
+            {
+              "id": "img-1793368834019-81p2",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png",
+              "public_id": "notions/products/colors/mofbxbyqtqqx91m7gzfv",
+              "sort_order": 1
+            },
+            {
+              "id": "img-1793368886892-71xz",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368886/notions/products/colors/bo5qd6w79wsbom03b0zr.png",
+              "public_id": "notions/products/colors/bo5qd6w79wsbom03b0zr",
+              "sort_order": 2
+            }
+          ],
+          "sizes": [
+            {
+              "size_id": "sz-1793368706624",
+              "size": "5",
+              "stock": 10
+            }
+          ]
+        }
+      ],
+      "product_mode": "variant",
+      "stock": 50,
+      "sizes": [],
+      "material": "100% Premium Cotton",
+      "care_instructions": "Machine wash cold gentle cycle, do not bleach.",
+      "created_at": "2026-10-30T14:00:49.863Z"
+    }
+  ],
   "banners": [
     {
       "id": "ban-hero",
@@ -102,6 +223,13 @@
       "hex": "#FF6600",
       "is_active": true,
       "created_at": "2026-10-30T13:05:45.633Z"
+    },
+    {
+      "id": "col-1793368028683",
+      "name": "White",
+      "hex": "#FFFFFF",
+      "is_active": true,
+      "created_at": "2026-10-30T13:47:08.683Z"
     }
   ],
   "settings": {

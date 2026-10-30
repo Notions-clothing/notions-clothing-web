@@ -60,7 +60,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="relative aspect-[4/4.2] w-full bg-[#F5F3EF] overflow-hidden">
           <Link href={`/product/${product.slug}`} className="block w-full h-full relative">
             <Image
-              src={product.images?.[0]?.image_url || '/logo.png'}
+              src={
+                product.images?.[0]?.image_url ||
+                product.colors?.find((c) => c.image_url || (c.images && c.images.length > 0))?.image_url ||
+                product.colors?.find((c) => c.images && c.images.length > 0)?.images?.[0]?.url ||
+                '/logo.png'
+              }
               alt={product.name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"

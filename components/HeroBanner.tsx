@@ -92,7 +92,7 @@ export default function HeroBanner({ banners: initialBanners, banner: singleBann
     return normalized;
   };
 
-  const bgImage = activeBanner?.image_url || '/reference-assets/hero-banner-clean.png';
+  const bgImage = activeBanner?.image_url || '/logo.png';
 
   return (
     <section
@@ -105,7 +105,7 @@ export default function HeroBanner({ banners: initialBanners, banner: singleBann
       <div className="relative w-full rounded-2xl overflow-hidden bg-[#F6F2E9] min-h-[430px] sm:min-h-[470px] lg:min-h-[510px] flex items-center shadow-xs">
         {/* Background Banners with Smooth Cross-fade Transition */}
         {banners.map((item, idx) => {
-          const itemSrc = item.image_url || '/reference-assets/hero-banner-clean.png';
+          const itemSrc = item.image_url || '/logo.png';
           const isActive = idx === currentIndex;
           return (
             <div

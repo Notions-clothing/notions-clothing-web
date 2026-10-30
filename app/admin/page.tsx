@@ -279,11 +279,40 @@ export default function AdminDashboardPage() {
     e.preventDefault();
     if (!editingProduct) return;
 
+    // Auto-attach variant photos to product images if product level images are empty
+    let productToSave = { ...editingProduct };
+    if ((!productToSave.images || productToSave.images.length === 0) && productToSave.colors && productToSave.colors.length > 0) {
+      const colorWithImg = productToSave.colors.find((c) => (c.images && c.images.length > 0) || c.image_url);
+      if (colorWithImg) {
+        if (colorWithImg.images && colorWithImg.images.length > 0) {
+          productToSave.images = colorWithImg.images.map((img, idx) => ({
+            id: img.id || `img-${Date.now()}-${idx}`,
+            product_id: productToSave.id || '',
+            image_url: img.url,
+            image_public_id: img.public_id || '',
+            alt_text: productToSave.name || 'Product Image',
+            sort_order: idx + 1,
+            is_primary: idx === 0,
+          }));
+        } else if (colorWithImg.image_url) {
+          productToSave.images = [{
+            id: `img-${Date.now()}-0`,
+            product_id: productToSave.id || '',
+            image_url: colorWithImg.image_url,
+            image_public_id: colorWithImg.image_public_id || '',
+            alt_text: productToSave.name || 'Product Image',
+            sort_order: 1,
+            is_primary: true,
+          }];
+        }
+      }
+    }
+
     try {
       const res = await fetch('/api/admin/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingProduct),
+        body: JSON.stringify(productToSave),
       });
 
       if (res.ok) {
@@ -353,7 +382,7 @@ export default function AdminDashboardPage() {
       id: `var-${Date.now()}-${idx}`,
       product_id: editingProduct.id || '',
       size,
-      inventory_quantity: 25,
+      inventory_quantity: 0,
       is_available: true,
     }));
     setEditingProduct({ ...editingProduct, variants: newVariants });
@@ -370,7 +399,7 @@ export default function AdminDashboardPage() {
       const res = await fetch('/api/admin/categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingCategory),
+        body: JSON.stringify({ ...editingCategory, parent_id: editingCategory.parent_id || null }),
       });
 
       if (res.ok) {
@@ -573,12 +602,11 @@ export default function AdminDashboardPage() {
   ];
 
   const filteredCategories = [...categories]
+    .filter((c) => !c.parent_id)
     .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99))
     .filter((c) => {
-      if (categoryGroupFilter === 'all') return true;
       if (categoryGroupFilter === 'homepage') return homepageSlugs.includes(c.slug);
-      if (categoryGroupFilter === 'root') return !c.parent_id;
-      return c.parent_id === categoryGroupFilter || c.id === categoryGroupFilter;
+      return true;
     });
 
   const filteredOrders = orders.filter((o) => {
@@ -1132,7 +1160,7 @@ export default function AdminDashboardPage() {
                     setEditingCategory({
                       name: '',
                       slug: '',
-                      parent_id: 'cat-men',
+                      parent_id: null,
                       description: '',
                       sort_order: categories.length + 1,
                       is_published: true,
@@ -1414,7 +1442,12 @@ export default function AdminDashboardPage() {
                         <div className="flex items-center gap-4 w-full sm:w-auto">
                           <div className="relative w-16 h-20 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 flex-shrink-0">
                             <Image
-                              src={p.images?.[0]?.image_url || '/logo.png'}
+                              src={
+                                p.images?.[0]?.image_url ||
+                                p.colors?.find((c) => c.image_url || (c.images && c.images.length > 0))?.image_url ||
+                                p.colors?.find((c) => c.images && c.images.length > 0)?.images?.[0]?.url ||
+                                '/logo.png'
+                              }
                               alt={p.name}
                               fill
                               sizes="64px"
@@ -1594,7 +1627,7 @@ export default function AdminDashboardPage() {
                     setEditingCategory({
                       name: '',
                       slug: '',
-                      parent_id: 'cat-men',
+                      parent_id: null,
                       description: '',
                       sort_order: categories.length + 1,
                       is_published: true,
@@ -1611,12 +1644,8 @@ export default function AdminDashboardPage() {
               {/* Group Filter Pills */}
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
                 {[
-                  { id: 'all', label: 'All Categories (Homepage Order)' },
+                  { id: 'all', label: 'All Main Categories' },
                   { id: 'homepage', label: 'Homepage Row (10)' },
-                  { id: 'root', label: 'Main Departments' },
-                  { id: 'cat-men', label: "Men's Apparel" },
-                  { id: 'cat-footwear', label: 'Footwear' },
-                  { id: 'cat-accessories', label: 'Accessories' },
                 ].map((grp) => (
                   <button
                     key={grp.id}
@@ -1683,7 +1712,7 @@ export default function AdminDashboardPage() {
 
                         <div className="flex items-center gap-2 mt-2">
                           <span className="text-[11px] font-medium px-2 py-0.5 rounded bg-gray-100 text-gray-600">
-                            {parentCat ? `Under: ${parentCat.name}` : 'Main Department'}
+                            Main Department
                           </span>
                           <span className="text-[11px] text-gray-500 font-semibold">Order: #{c.sort_order}</span>
                         </div>
@@ -2350,7 +2379,7 @@ export default function AdminDashboardPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Linen Casual Shirt"
+                    placeholder="Enter product name"
                     value={editingProduct.name || ''}
                     onChange={(e) =>
                       setEditingProduct({
@@ -2833,7 +2862,7 @@ export default function AdminDashboardPage() {
                               const initialSizes = catSizes.map((s) => ({
                                 size_id: s.id,
                                 size: s.name,
-                                stock: 15,
+                                stock: 0,
                               }));
                               const initialStock = initialSizes.reduce((sum, s) => sum + s.stock, 0);
 
@@ -3180,7 +3209,7 @@ export default function AdminDashboardPage() {
                                               currentSizes.push({
                                                 size_id: cs.id,
                                                 size: cs.name,
-                                                stock: 15,
+                                                stock: 0,
                                               });
                                             }
                                             const totalStock = currentSizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0);
@@ -3306,7 +3335,7 @@ export default function AdminDashboardPage() {
                   onChange={(e) =>
                     setEditingProduct({ ...editingProduct, description: e.target.value })
                   }
-                  placeholder="Describe the fit, fabric, and styling details..."
+                  placeholder="Enter product description"
                   className="w-full px-3.5 py-2 text-sm border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
                 />
               </div>
@@ -3396,7 +3425,7 @@ export default function AdminDashboardPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Foot Wear, Men's Apparel"
+                  placeholder="Enter category name"
                   value={editingCategory.name || ''}
                   onChange={(e) => {
                     const nameVal = e.target.value;
@@ -3435,7 +3464,7 @@ export default function AdminDashboardPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. foot-wear"
+                    placeholder="Enter category slug"
                     value={editingCategory.slug || ''}
                     onChange={(e) =>
                       setEditingCategory({ ...editingCategory, slug: e.target.value })
@@ -3460,28 +3489,7 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block font-semibold text-gray-700 mb-1">Parent Category</label>
-                <select
-                  value={editingCategory.parent_id || ''}
-                  onChange={(e) =>
-                    setEditingCategory({
-                      ...editingCategory,
-                      parent_id: e.target.value || null,
-                    })
-                  }
-                  className="w-full px-3.5 py-2 text-sm border border-gray-300 rounded-xl bg-white"
-                >
-                  <option value="">None (Top-Level / Main Category)</option>
-                  {categories
-                    .filter((c) => !c.parent_id && (!editingCategory.id || c.id !== editingCategory.id))
-                    .map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
+              
 
               {/* Category Active Status */}
               <div className="flex items-center justify-between pt-1">
