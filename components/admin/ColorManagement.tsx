@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Check, X, Palette, AlertCircle } from 'lucide-react';
 import { ProductColor } from '@/types/database';
+import DeleteConfirmModal from './DeleteConfirmModal';
 
 interface ColorManagementProps {
   colors: ProductColor[];
@@ -19,6 +20,17 @@ export default function ColorManagement({
   const [editingColor, setEditingColor] = useState<Partial<ProductColor> | null>(null);
   const [saving, setSaving] = useState(false);
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
+
+  // Delete Confirmation Modal State
+  const [deleteModalState, setDeleteModalState] = useState<{
+    isOpen: boolean;
+    color: ProductColor | null;
+    isDeleting: boolean;
+  }>({
+    isOpen: false,
+    color: null,
+    isDeleting: false,
+  });
 
   const filteredColors = colors.filter((c) => {
     if (filter === 'active') return c.is_active !== false;
@@ -73,13 +85,20 @@ export default function ColorManagement({
     }
   };
 
-  const handleDelete = async (color: ProductColor) => {
-    if (!confirm(`Are you sure you want to delete color "${color.name}" (${color.hex})?`)) {
-      return;
-    }
+  const handleDelete = (color: ProductColor) => {
+    setDeleteModalState({
+      isOpen: true,
+      color,
+      isDeleting: false,
+    });
+  };
+
+  const confirmDeleteColor = async () => {
+    if (!deleteModalState.color) return;
+    setDeleteModalState((prev) => ({ ...prev, isDeleting: true }));
 
     try {
-      const res = await fetch(`/api/admin/colors?id=${color.id}`, {
+      const res = await fetch(`/api/admin/colors?id=${deleteModalState.color.id}`, {
         method: 'DELETE',
       });
 
@@ -88,10 +107,12 @@ export default function ColorManagement({
         throw new Error(data.error || 'Failed to delete color');
       }
 
-      showNotification(`Color "${color.name}" deleted.`);
+      showNotification(`Color "${deleteModalState.color.name}" deleted.`);
       onRefresh();
+      setDeleteModalState({ isOpen: false, color: null, isDeleting: false });
     } catch (err: any) {
-      showNotification(err.message, 'error');
+      showNotification(err.message || 'Failed to delete color', 'error');
+      setDeleteModalState((prev) => ({ ...prev, isDeleting: false }));
     }
   };
 
@@ -369,6 +390,16 @@ export default function ColorManagement({
           </div>
         </div>
       )}
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModalState.isOpen}
+        title="Delete Color"
+        itemName={deleteModalState.color ? `${deleteModalState.color.name} (${deleteModalState.color.hex})` : ''}
+        message="Are you sure you want to delete this color? Products using this color will no longer have it available in new edits."
+        isDeleting={deleteModalState.isDeleting}
+        onClose={() => setDeleteModalState({ isOpen: false, color: null, isDeleting: false })}
+        onConfirm={confirmDeleteColor}
+      />
     </div>
   );
 }

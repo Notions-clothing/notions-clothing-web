@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Package,
   Layers,
+  FolderTree,
   ShoppingBag,
   Image as ImageIcon,
   Settings,
@@ -47,9 +48,11 @@ import {
 import { Product, ProductVariant, ProductImage, Category, CategorySize, Banner, Order, SiteSettings, ProductColor, ProductColorVariant, ProductColorImage, ProductColorSizeVariant } from '@/types/database';
 import ColorManagement from '@/components/admin/ColorManagement';
 import SizeManagement from '@/components/admin/SizeManagement';
+import SubcategoryManagement from '@/components/admin/SubcategoryManagement';
 import BannerManagement from '@/components/admin/BannerManagement';
+import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
-type AdminTab = 'dashboard' | 'products' | 'categories' | 'colors' | 'sizes' | 'orders' | 'banners' | 'settings';
+type AdminTab = 'dashboard' | 'products' | 'categories' | 'subcategories' | 'colors' | 'sizes' | 'orders' | 'banners' | 'settings';
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
@@ -113,6 +116,24 @@ export default function AdminDashboardPage() {
   const [orderSearch, setOrderSearch] = useState('');
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [copiedSql, setCopiedSql] = useState(false);
+
+  // Delete Confirmation Modal State (Products, Categories, Orders, Discard Mode)
+  const [deleteModalState, setDeleteModalState] = useState<{
+    isOpen: boolean;
+    title: string;
+    itemName: string;
+    message?: string;
+    confirmText?: string;
+    isDeleting?: boolean;
+    onConfirm: () => Promise<void> | void;
+  }>({
+    isOpen: false,
+    title: '',
+    itemName: '',
+    confirmText: 'Delete',
+    isDeleting: false,
+    onConfirm: () => {},
+  });
 
   const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
     setNotice({ text, type });
@@ -298,17 +319,32 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleDeleteProduct = async (id: string, name?: string) => {
-    if (!confirm(`Are you sure you want to delete "${name || 'this product'}"?`)) return;
-    try {
-      const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        showNotification('Product deleted');
-        loadData();
-      }
-    } catch (e) {
-      showNotification('Failed to delete product', 'error');
-    }
+  const handleDeleteProduct = (id: string, name?: string) => {
+    setDeleteModalState({
+      isOpen: true,
+      title: 'Delete Product',
+      itemName: name || 'this product',
+      message: 'This product will be permanently deleted from the store. All inventory, variants, and gallery photos will be removed.',
+      confirmText: 'Delete Product',
+      isDeleting: false,
+      onConfirm: async () => {
+        setDeleteModalState((prev) => ({ ...prev, isDeleting: true }));
+        try {
+          const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            showNotification('Product deleted');
+            loadData();
+            setDeleteModalState((prev) => ({ ...prev, isOpen: false, isDeleting: false }));
+          } else {
+            showNotification('Failed to delete product', 'error');
+            setDeleteModalState((prev) => ({ ...prev, isDeleting: false }));
+          }
+        } catch (e) {
+          showNotification('Failed to delete product', 'error');
+          setDeleteModalState((prev) => ({ ...prev, isDeleting: false }));
+        }
+      },
+    });
   };
 
   const applyVariantPreset = (sizes: string[]) => {
@@ -364,17 +400,32 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleDeleteCategory = async (id: string, name?: string) => {
-    if (!confirm(`Delete category "${name || id}"?`)) return;
-    try {
-      const res = await fetch(`/api/admin/categories?id=${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        showNotification('Category deleted');
-        loadData();
-      }
-    } catch (e) {
-      showNotification('Failed to delete category', 'error');
-    }
+  const handleDeleteCategory = (id: string, name?: string) => {
+    setDeleteModalState({
+      isOpen: true,
+      title: 'Delete Category',
+      itemName: name || id,
+      message: 'This category will be permanently removed. Products currently assigned to this category may become unassigned.',
+      confirmText: 'Delete Category',
+      isDeleting: false,
+      onConfirm: async () => {
+        setDeleteModalState((prev) => ({ ...prev, isDeleting: true }));
+        try {
+          const res = await fetch(`/api/admin/categories?id=${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            showNotification('Category deleted');
+            loadData();
+            setDeleteModalState((prev) => ({ ...prev, isOpen: false, isDeleting: false }));
+          } else {
+            showNotification('Failed to delete category', 'error');
+            setDeleteModalState((prev) => ({ ...prev, isDeleting: false }));
+          }
+        } catch (e) {
+          showNotification('Failed to delete category', 'error');
+          setDeleteModalState((prev) => ({ ...prev, isDeleting: false }));
+        }
+      },
+    });
   };
 
   // ----------------------------------------------------
@@ -423,17 +474,32 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleDeleteOrder = async (id: string, orderNum: string) => {
-    if (!confirm(`Delete Order #${orderNum}? This action cannot be undone.`)) return;
-    try {
-      const res = await fetch(`/api/admin/orders?id=${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        showNotification(`Order #${orderNum} deleted`);
-        loadData();
-      }
-    } catch (e) {
-      showNotification('Failed to delete order', 'error');
-    }
+  const handleDeleteOrder = (id: string, orderNum: string) => {
+    setDeleteModalState({
+      isOpen: true,
+      title: 'Delete Order',
+      itemName: `Order #${orderNum}`,
+      message: 'This order record and all customer delivery details will be permanently erased. This action cannot be undone.',
+      confirmText: 'Delete Order',
+      isDeleting: false,
+      onConfirm: async () => {
+        setDeleteModalState((prev) => ({ ...prev, isDeleting: true }));
+        try {
+          const res = await fetch(`/api/admin/orders?id=${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            showNotification(`Order #${orderNum} deleted`);
+            loadData();
+            setDeleteModalState((prev) => ({ ...prev, isOpen: false, isDeleting: false }));
+          } else {
+            showNotification('Failed to delete order', 'error');
+            setDeleteModalState((prev) => ({ ...prev, isDeleting: false }));
+          }
+        } catch (e) {
+          showNotification('Failed to delete order', 'error');
+          setDeleteModalState((prev) => ({ ...prev, isDeleting: false }));
+        }
+      },
+    });
   };
 
   // ----------------------------------------------------
@@ -639,12 +705,16 @@ export default function AdminDashboardPage() {
     );
   }
 
+  const mainCategoriesCount = categories.filter((c) => !c.parent_id).length;
+  const subcategoriesCount = categories.filter((c) => Boolean(c.parent_id)).length;
+
   const navItems: { id: AdminTab; label: string; icon: any; badge?: number }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'products', label: 'Products', icon: Package, badge: products.length },
+    { id: 'categories', label: 'Categories', icon: Layers, badge: mainCategoriesCount },
+    { id: 'subcategories', label: 'Subcategories', icon: FolderTree, badge: subcategoriesCount },
     { id: 'colors', label: 'Product Colors', icon: Palette, badge: colors.length },
     { id: 'sizes', label: 'Product Sizes', icon: Ruler, badge: sizes.length },
-    { id: 'categories', label: 'Categories', icon: Layers, badge: categories.length },
     { id: 'orders', label: 'Orders', icon: ShoppingBag, badge: orders.length },
     { id: 'banners', label: 'Banners & CMS', icon: ImageIcon, badge: banners.length },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -865,7 +935,7 @@ export default function AdminDashboardPage() {
       {/* ====================================================
           MOBILE BOTTOM NAVIGATION BAR
       ==================================================== */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 z-30 grid grid-cols-8 py-1.5 px-0.5 shadow-lg">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 z-30 grid grid-cols-9 py-1.5 px-0.5 shadow-lg">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -879,7 +949,7 @@ export default function AdminDashboardPage() {
             >
               <Icon className={`w-4 h-4 ${isActive ? 'text-[#143728]' : 'text-gray-400'}`} />
               <span className="text-[10px] mt-1 truncate max-w-full px-0.5">
-                {item.id === 'banners' ? 'Banners' : item.id === 'sizes' ? 'Sizes' : item.id === 'colors' ? 'Colors' : item.label}
+                {item.id === 'banners' ? 'Banners' : item.id === 'sizes' ? 'Sizes' : item.id === 'colors' ? 'Colors' : item.id === 'subcategories' ? 'Subcats' : item.label}
               </span>
             </button>
           );
@@ -894,7 +964,7 @@ export default function AdminDashboardPage() {
         <div className="hidden lg:flex h-16 bg-white border-b border-gray-200 px-8 items-center justify-between sticky top-0 z-20">
           <div>
             <h1 className="text-lg font-bold text-gray-900 capitalize">
-              {activeTab === 'banners' ? 'Banners & Homepage CMS' : activeTab === 'colors' ? 'Product Colors' : activeTab === 'sizes' ? 'Product Sizes' : activeTab}
+              {activeTab === 'banners' ? 'Banners & Homepage CMS' : activeTab === 'colors' ? 'Product Colors' : activeTab === 'sizes' ? 'Product Sizes' : activeTab === 'subcategories' ? 'Product Subcategories' : activeTab}
             </h1>
           </div>
 
@@ -1495,6 +1565,18 @@ export default function AdminDashboardPage() {
           {/* ====================================================
               3. CATEGORIES CMS TAB
           ==================================================== */}
+          {/* ====================================================
+              PRODUCT SUBCATEGORIES MANAGEMENT TAB
+          ==================================================== */}
+          {activeTab === 'subcategories' && (
+            <SubcategoryManagement
+              categories={categories}
+              onRefresh={loadData}
+              showNotification={showNotification}
+              handleFileUpload={handleFileUpload}
+            />
+          )}
+
           {activeTab === 'categories' && (
             <div className="space-y-5">
               {/* Header */}
@@ -1619,6 +1701,7 @@ export default function AdminDashboardPage() {
                           <span>Edit / Photo</span>
                         </button>
                         <button
+                          type="button"
                           onClick={() => handleDeleteCategory(c.id, c.name)}
                           className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
                           title="Delete Category"
@@ -2196,10 +2279,25 @@ export default function AdminDashboardPage() {
                       onClick={() => {
                         if (productMode === 'normal') return;
                         if (editingProduct.colors && editingProduct.colors.length > 0) {
-                          const confirmDiscard = window.confirm(
-                            'Switching to Normal Product Mode will discard configured color variants and their independent stock levels. Do you wish to continue?'
-                          );
-                          if (!confirmDiscard) return;
+                          setDeleteModalState({
+                            isOpen: true,
+                            title: 'Switch to Normal Mode?',
+                            itemName: `${editingProduct.name || 'Product'} Colors`,
+                            message: 'Switching to Normal Product Mode will discard configured color variants and their independent stock levels. Do you wish to continue?',
+                            confirmText: 'Discard & Switch',
+                            isDeleting: false,
+                            onConfirm: () => {
+                              setProductMode('normal');
+                              setEditingProduct({
+                                ...editingProduct,
+                                product_mode: 'normal',
+                                colors: [],
+                              });
+                              showNotification('Switched to Normal Product Mode');
+                              setDeleteModalState((prev) => ({ ...prev, isOpen: false }));
+                            },
+                          });
+                          return;
                         }
                         setProductMode('normal');
                         setEditingProduct({
@@ -3298,26 +3396,46 @@ export default function AdminDashboardPage() {
                 <input
                   type="text"
                   required
+                  placeholder="e.g. Foot Wear, Men's Apparel"
                   value={editingCategory.name || ''}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const nameVal = e.target.value;
+                    const autoSlug = nameVal
+                      .toLowerCase()
+                      .replace(/[^a-z0-9]+/g, '-')
+                      .replace(/^-+|-+$/g, '');
                     setEditingCategory({
                       ...editingCategory,
-                      name: e.target.value,
-                      slug:
-                        editingCategory.slug ||
-                        e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-                    })
-                  }
+                      name: nameVal,
+                      slug: !editingCategory.id ? autoSlug : editingCategory.slug,
+                    });
+                  }}
                   className="w-full px-3.5 py-2 text-sm border border-gray-300 rounded-xl"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-gray-700 mb-1">URL Slug *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block font-semibold text-gray-700">URL Slug *</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const generated = (editingCategory.name || '')
+                          .toLowerCase()
+                          .replace(/[^a-z0-9]+/g, '-')
+                          .replace(/^-+|-+$/g, '');
+                        setEditingCategory({ ...editingCategory, slug: generated });
+                      }}
+                      className="text-[10px] text-[#143728] hover:underline font-bold cursor-pointer"
+                    >
+                      Auto-generate
+                    </button>
+                  </div>
                   <input
                     type="text"
                     required
+                    placeholder="e.g. foot-wear"
                     value={editingCategory.slug || ''}
                     onChange={(e) =>
                       setEditingCategory({ ...editingCategory, slug: e.target.value })
@@ -3595,6 +3713,18 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal for Products, Categories, Orders */}
+      <DeleteConfirmModal
+        isOpen={deleteModalState.isOpen}
+        title={deleteModalState.title}
+        itemName={deleteModalState.itemName}
+        message={deleteModalState.message}
+        confirmText={deleteModalState.confirmText}
+        isDeleting={deleteModalState.isDeleting}
+        onClose={() => setDeleteModalState((prev) => ({ ...prev, isOpen: false, isDeleting: false }))}
+        onConfirm={deleteModalState.onConfirm}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Plus, Edit2, Trash2, UploadCloud, X, ArrowRight, Eye, EyeOff, Layers, Package, Link as LinkIcon } from 'lucide-react';
 import { Banner, Category, Product } from '@/types/database';
+import DeleteConfirmModal from './DeleteConfirmModal';
 
 interface BannerManagementProps {
   banners: Banner[];
@@ -29,6 +30,17 @@ export default function BannerManagement({
 
   // Filter state for Product Selection inside Destination picker
   const [selectedProductCategoryId, setSelectedProductCategoryId] = useState<string>('');
+
+  // Delete Confirmation Modal State
+  const [deleteModalState, setDeleteModalState] = useState<{
+    isOpen: boolean;
+    banner: Banner | null;
+    isDeleting: boolean;
+  }>({
+    isOpen: false,
+    banner: null,
+    isDeleting: false,
+  });
 
   const filteredBanners = banners.filter((b) => {
     if (sectionFilter === 'hero') return b.section === 'hero';
@@ -100,20 +112,28 @@ export default function BannerManagement({
     }
   };
 
-  const handleDelete = async (banner: Banner) => {
-    if (!confirm(`Are you sure you want to delete banner "${banner.title || banner.section}"?`)) {
-      return;
-    }
+  const handleDelete = (banner: Banner) => {
+    setDeleteModalState({
+      isOpen: true,
+      banner,
+      isDeleting: false,
+    });
+  };
 
+  const confirmDeleteBanner = async () => {
+    if (!deleteModalState.banner) return;
+    setDeleteModalState((prev) => ({ ...prev, isDeleting: true }));
     try {
-      const res = await fetch(`/api/admin/banners?id=${banner.id}`, {
+      const res = await fetch(`/api/admin/banners?id=${deleteModalState.banner.id}`, {
         method: 'DELETE',
       });
       if (!res.ok) throw new Error('Failed to delete banner');
       showNotification('Banner deleted.');
       onRefresh();
+      setDeleteModalState({ isOpen: false, banner: null, isDeleting: false });
     } catch (err: any) {
-      showNotification(err.message, 'error');
+      showNotification(err.message || 'Failed to delete banner', 'error');
+      setDeleteModalState((prev) => ({ ...prev, isDeleting: false }));
     }
   };
 
@@ -655,6 +675,16 @@ export default function BannerManagement({
           </div>
         </div>
       )}
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModalState.isOpen}
+        title="Delete Banner"
+        itemName={deleteModalState.banner?.title || deleteModalState.banner?.section}
+        message="This banner will be permanently deleted from the CMS and will immediately stop displaying on your storefront."
+        isDeleting={deleteModalState.isDeleting}
+        onClose={() => setDeleteModalState({ isOpen: false, banner: null, isDeleting: false })}
+        onConfirm={confirmDeleteBanner}
+      />
     </div>
   );
 }

@@ -16,6 +16,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { Category, CategorySize } from '@/types/database';
+import DeleteConfirmModal from './DeleteConfirmModal';
 
 interface SizeManagementProps {
   categories: Category[];
@@ -40,6 +41,17 @@ export default function SizeManagement({
   const [showModal, setShowModal] = useState(false);
   const [editingSize, setEditingSize] = useState<Partial<CategorySize> | null>(null);
   const [saving, setSaving] = useState(false);
+
+  // Delete Confirmation Modal State
+  const [deleteModalState, setDeleteModalState] = useState<{
+    isOpen: boolean;
+    size: CategorySize | null;
+    isDeleting: boolean;
+  }>({
+    isOpen: false,
+    size: null,
+    isDeleting: false,
+  });
 
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId);
 
@@ -116,13 +128,20 @@ export default function SizeManagement({
     }
   };
 
-  const handleDelete = async (size: CategorySize) => {
-    if (!confirm(`Are you sure you want to delete size "${size.name}"?`)) {
-      return;
-    }
+  const handleDelete = (size: CategorySize) => {
+    setDeleteModalState({
+      isOpen: true,
+      size,
+      isDeleting: false,
+    });
+  };
+
+  const confirmDeleteSize = async () => {
+    if (!deleteModalState.size) return;
+    setDeleteModalState((prev) => ({ ...prev, isDeleting: true }));
 
     try {
-      const res = await fetch(`/api/admin/sizes?id=${size.id}`, {
+      const res = await fetch(`/api/admin/sizes?id=${deleteModalState.size.id}`, {
         method: 'DELETE',
       });
 
@@ -131,10 +150,12 @@ export default function SizeManagement({
         throw new Error(data.error || 'Failed to delete size');
       }
 
-      showNotification(`Size "${size.name}" deleted.`);
+      showNotification(`Size "${deleteModalState.size.name}" deleted.`);
       onRefresh();
+      setDeleteModalState({ isOpen: false, size: null, isDeleting: false });
     } catch (err: any) {
-      showNotification(err.message, 'error');
+      showNotification(err.message || 'Failed to delete size', 'error');
+      setDeleteModalState((prev) => ({ ...prev, isDeleting: false }));
     }
   };
 
@@ -553,6 +574,16 @@ export default function SizeManagement({
           </div>
         </div>
       )}
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteModalState.isOpen}
+        title="Delete Size"
+        itemName={deleteModalState.size?.name}
+        message={`This size will be deleted from the "${selectedCategory?.name || 'selected'}" category. Products will no longer see this size option.`}
+        isDeleting={deleteModalState.isDeleting}
+        onClose={() => setDeleteModalState({ isOpen: false, size: null, isDeleting: false })}
+        onConfirm={confirmDeleteSize}
+      />
     </div>
   );
 }
