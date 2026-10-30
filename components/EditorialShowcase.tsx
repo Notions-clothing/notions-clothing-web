@@ -11,14 +11,7 @@ export function ModernEssentialsCard({ banner }: { banner?: Banner }) {
   const subtitle = banner?.subtitle || 'MODERN ESSENTIALS';
   const ctaUrl = banner?.cta_url || '/category/men';
   const ctaLabel = banner?.cta_label || 'Explore Collection';
-
-  const hasCustomImage =
-    Boolean(banner?.image_url) &&
-    !banner!.image_url!.includes('v1793183115') &&
-    banner!.image_url !== '/reference-assets/modern-essentials.png';
-
-  const hasCustomText =
-    title !== 'For Every Version of You.' || subtitle !== 'MODERN ESSENTIALS';
+  const bgSrc = banner?.image_url || '/logo.png';
 
   const renderFormattedTitle = () => {
     const normalized = title.trim();
@@ -38,66 +31,39 @@ export function ModernEssentialsCard({ banner }: { banner?: Banner }) {
     return normalized;
   };
 
-  if (hasCustomImage || hasCustomText) {
-    const bgSrc = hasCustomImage
-      ? banner!.image_url!
-      : '/reference-assets/modern-essentials-clean.png';
-
-    return (
-      <div className="relative w-full lg:w-[390px] xl:w-[440px] rounded-xl overflow-hidden border border-[#E2DDD2] bg-[#EFECE3] shadow-xs group flex-shrink-0 aspect-[4/3] sm:aspect-[16/10] lg:aspect-auto lg:h-full min-h-[345px] p-6 sm:p-7 flex flex-col justify-between">
-        {/* Background Photograph — Positioned so model sits cleanly on the right half and text sits on the left */}
-        <Image
-          src={bgSrc}
-          alt={title}
-          fill
-          sizes="(max-width: 1024px) 100vw, 440px"
-          className="object-cover object-[72%_18%] group-hover:scale-102 transition-transform duration-300"
-        />
-
-        {/* Soft left-edge-only readability wash (fades out before reaching the model on the right) */}
-        <div className="absolute inset-y-0 left-0 w-[48%] bg-gradient-to-r from-[#FAF7F0]/75 via-[#FAF7F0]/35 to-transparent pointer-events-none" />
-
-        <div className="relative z-10 max-w-[160px] pt-1">
-          <span className="block text-[10px] sm:text-[11px] font-medium tracking-[0.22em] uppercase text-[#3A3630]">
-            {subtitle}
-          </span>
-          <h3 className="font-serif text-[28px] sm:text-[34px] text-[#161616] mt-2.5 leading-[1.08] tracking-tight">
-            {renderFormattedTitle()}
-          </h3>
-          <div className="w-8 h-[1.5px] bg-[#2B2927]/65 mt-3.5" />
-        </div>
-
-        <div className="relative z-10 pt-4">
-          <Link
-            href={ctaUrl}
-            className="inline-flex items-center space-x-2 px-5 py-2.5 bg-[#143728] hover:bg-[#0c2419] text-white text-xs font-medium rounded-lg shadow-sm transition-all"
-          >
-            <span>{ctaLabel}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="relative w-full lg:w-[390px] xl:w-[440px] rounded-xl overflow-hidden border border-[#E2DDD2] bg-[#EFECE3] shadow-xs group flex-shrink-0 aspect-[275/172] lg:aspect-auto lg:h-full min-h-[345px]">
+    <div className="relative w-full lg:w-[390px] xl:w-[440px] rounded-xl overflow-hidden border border-[#E2DDD2] bg-[#EFECE3] shadow-xs group flex-shrink-0 aspect-[4/3] sm:aspect-[16/10] lg:aspect-auto lg:h-full min-h-[345px] p-6 sm:p-7 flex flex-col justify-between">
+      {/* Background Photograph */}
       <Image
-        src="/reference-assets/modern-essentials.png"
-        alt="Modern Essentials — For Every Version of You"
+        src={bgSrc}
+        alt={title}
         fill
         sizes="(max-width: 1024px) 100vw, 440px"
-        className="object-cover object-center group-hover:scale-102 transition-transform duration-300"
+        className="object-cover object-[72%_18%] group-hover:scale-102 transition-transform duration-300"
       />
 
-      {/* Interactive Explore Collection CTA Button */}
-      <Link
-        href={ctaUrl}
-        className="absolute left-[7%] bottom-[8%] z-20 px-5 py-2.5 bg-[#143728] hover:bg-[#0c2419] text-white text-xs font-medium rounded-lg shadow-md transition-all flex items-center space-x-2 group-hover:scale-102"
-      >
-        <span>{ctaLabel}</span>
-        <ArrowRight className="w-3.5 h-3.5" />
-      </Link>
+      {/* Soft readability wash */}
+      <div className="absolute inset-y-0 left-0 w-[48%] bg-gradient-to-r from-[#FAF7F0]/75 via-[#FAF7F0]/35 to-transparent pointer-events-none" />
+
+      <div className="relative z-10 max-w-[160px] pt-1">
+        <span className="block text-[10px] sm:text-[11px] font-medium tracking-[0.22em] uppercase text-[#3A3630]">
+          {subtitle}
+        </span>
+        <h3 className="font-serif text-[28px] sm:text-[34px] text-[#161616] mt-2.5 leading-[1.08] tracking-tight">
+          {renderFormattedTitle()}
+        </h3>
+        <div className="w-8 h-[1.5px] bg-[#2B2927]/65 mt-3.5" />
+      </div>
+
+      <div className="relative z-10 pt-4">
+        <Link
+          href={ctaUrl}
+          className="inline-flex items-center space-x-2 px-5 py-2.5 bg-[#143728] hover:bg-[#0c2419] text-white text-xs font-medium rounded-lg shadow-sm transition-all"
+        >
+          <span>{ctaLabel}</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
     </div>
   );
 }
@@ -119,9 +85,6 @@ export function PromoBannersRow({
       defaultDesc: 'Premium shoes & sandals for every step.',
       defaultCta: 'Shop Footwear',
       defaultUrl: '/category/footwear',
-      defaultImg: '/reference-assets/promo-footwear.png',
-      cleanImg: '/reference-assets/promo-footwear-clean.png',
-      oldHash: 'v1793183117',
     },
     {
       id: 'accessories',
@@ -130,9 +93,6 @@ export function PromoBannersRow({
       defaultDesc: 'Caps, Rings, Bracelets & Chains',
       defaultCta: 'Explore Accessories',
       defaultUrl: '/category/accessories',
-      defaultImg: '/reference-assets/promo-accessories.png',
-      cleanImg: '/reference-assets/promo-accessories-clean.png',
-      oldHash: 'v1793183116',
     },
     {
       id: 'new_arrivals',
@@ -141,9 +101,6 @@ export function PromoBannersRow({
       defaultDesc: 'Fresh styles. Same confidence.',
       defaultCta: 'Shop Now',
       defaultUrl: '/new-arrivals',
-      defaultImg: '/reference-assets/promo-new-arrivals.png',
-      cleanImg: '/reference-assets/promo-new-arrivals-clean.png',
-      oldHash: 'v1793183118',
     },
   ];
 
@@ -205,76 +162,43 @@ export function PromoBannersRow({
           const desc = item.banner?.description || item.defaultDesc;
           const ctaLabel = item.banner?.cta_label || item.defaultCta;
           const ctaUrl = item.banner?.cta_url || item.defaultUrl;
-
-          const hasCustomImage =
-            Boolean(item.banner?.image_url) &&
-            !item.banner!.image_url!.includes(item.oldHash) &&
-            item.banner!.image_url !== item.defaultImg;
-
-          const hasCustomText =
-            title !== item.defaultTitle || desc !== item.defaultDesc;
-
-          if (hasCustomImage || hasCustomText) {
-            const bgSrc = hasCustomImage ? item.banner!.image_url! : item.cleanImg;
-
-            return (
-              <div
-                key={item.id}
-                className="relative w-full min-h-[150px] sm:min-h-[162px] rounded-xl overflow-hidden border border-[#DDD8CD] bg-[#EAE7DE] shadow-xs group p-5 flex flex-col justify-between"
-              >
-                {/* Full-clarity product photograph */}
-                <Image
-                  src={bgSrc}
-                  alt={title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover object-[center_45%] group-hover:scale-102 transition-transform duration-300"
-                />
-
-                {/* Whisper-light left-only wash so text is always crisp while the product on the right is 100% clear */}
-                <div className="absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-[#F4F0E6]/65 via-[#F4F0E6]/25 to-transparent pointer-events-none" />
-
-                <div className="relative z-10 max-w-[175px]">
-                  <h4 className="font-sans font-semibold text-sm sm:text-[15px] tracking-[0.04em] uppercase text-[#181818] leading-[1.22]">
-                    {renderPromoTitle(item.id, title)}
-                  </h4>
-                  <p className="text-[11px] text-[#3E3A33] mt-1.5 leading-[1.35]">
-                    {renderPromoDesc(item.id, desc)}
-                  </p>
-                </div>
-
-                <div className="relative z-10 pt-3">
-                  <Link
-                    href={ctaUrl}
-                    className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-[#143728] hover:bg-[#0c2419] text-white text-[11px] font-medium rounded-md shadow-xs transition"
-                  >
-                    <span>{ctaLabel}</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
-              </div>
-            );
-          }
+          const bgSrc = item.banner?.image_url || '/logo.png';
 
           return (
             <div
               key={item.id}
-              className="relative w-full aspect-[255/80] rounded-xl overflow-hidden border border-[#DDD8CD] bg-[#EAE7DE] shadow-xs group"
+              className="relative w-full min-h-[150px] sm:min-h-[162px] rounded-xl overflow-hidden border border-[#DDD8CD] bg-[#EAE7DE] shadow-xs group p-5 flex flex-col justify-between"
             >
+              {/* Full-clarity product photograph from DB */}
               <Image
-                src={item.defaultImg}
+                src={bgSrc}
                 alt={title}
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover object-center group-hover:scale-102 transition-transform duration-300"
+                className="object-cover object-[center_45%] group-hover:scale-102 transition-transform duration-300"
               />
-              <Link
-                href={ctaUrl}
-                className="absolute left-[5%] bottom-[12%] z-20 px-3.5 py-1.5 bg-[#143728] hover:bg-[#0c2419] text-white text-[11px] font-medium rounded-md shadow-xs transition-all flex items-center space-x-1"
-              >
-                <span>{ctaLabel}</span>
-                <ArrowRight className="w-3 h-3" />
-              </Link>
+
+              {/* Light wash so text is crisp */}
+              <div className="absolute inset-y-0 left-0 w-[45%] bg-gradient-to-r from-[#F4F0E6]/65 via-[#F4F0E6]/25 to-transparent pointer-events-none" />
+
+              <div className="relative z-10 max-w-[175px]">
+                <h4 className="font-sans font-semibold text-sm sm:text-[15px] tracking-[0.04em] uppercase text-[#181818] leading-[1.22]">
+                  {renderPromoTitle(item.id, title)}
+                </h4>
+                <p className="text-[11px] text-[#3E3A33] mt-1.5 leading-[1.35]">
+                  {renderPromoDesc(item.id, desc)}
+                </p>
+              </div>
+
+              <div className="relative z-10 pt-3">
+                <Link
+                  href={ctaUrl}
+                  className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-[#143728] hover:bg-[#0c2419] text-white text-[11px] font-medium rounded-md shadow-xs transition"
+                >
+                  <span>{ctaLabel}</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
             </div>
           );
         })}

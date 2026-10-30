@@ -18,6 +18,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
+    // Image Upload Validation: JPG, JPEG, PNG, WebP only
+    const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const fileName = file.name.toLowerCase();
+    const hasValidExtension = /\.(jpg|jpeg|png|webp)$/i.test(fileName);
+    const hasValidMime = validMimeTypes.includes(file.type.toLowerCase());
+
+    if (!hasValidMime && !hasValidExtension) {
+      return NextResponse.json(
+        { error: 'Invalid file format. Only JPG, JPEG, PNG, and WebP images are permitted.' },
+        { status: 400 }
+      );
+    }
+
+    // Enforce 10MB file size limit
+    const maxSizeBytes = 10 * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+      return NextResponse.json(
+        { error: 'File size exceeds maximum allowed 10MB limit.' },
+        { status: 400 }
+      );
+    }
+
     // Convert file to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
@@ -27,7 +49,8 @@ export async function POST(request: Request) {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder,
-          resource_type: 'auto',
+          resource_type: 'image',
+          allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
         },
         (error, result) => {
           if (error) reject(error);

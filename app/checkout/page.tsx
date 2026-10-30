@@ -71,6 +71,11 @@ export default function CheckoutPage() {
           items: items.map((item) => ({
             productId: item.product.id,
             selectedSize: item.selectedSize,
+            selectedSizeId: item.selectedSizeId,
+            selectedColor: item.selectedColor,
+            selectedColorId: item.selectedColorId,
+            selectedColorHex: item.selectedColorHex,
+            selectedColorImage: item.selectedColorImage,
             quantity: item.quantity,
           })),
           customer: {
@@ -401,7 +406,7 @@ export default function CheckoutPage() {
                     <div key={item.id} className="flex space-x-3 text-xs">
                       <div className="w-14 h-16 relative bg-[#F5F3EF] rounded overflow-hidden flex-shrink-0">
                         <Image
-                          src={item.product.images?.[0]?.image_url || '/logo.png'}
+                          src={item.selectedColorImage || item.product.images?.[0]?.image_url || '/logo.png'}
                           alt={item.product.name}
                           fill
                           className="object-cover"
@@ -412,8 +417,21 @@ export default function CheckoutPage() {
                           <p className="font-semibold text-[#181818] line-clamp-1">
                             {item.product.name}
                           </p>
-                          <p className="text-[#7A756D] text-[11px]">
-                            Size: {item.selectedSize} × {item.quantity}
+                          <p className="text-[#7A756D] text-[11px] flex items-center flex-wrap gap-1 mt-0.5">
+                            <span>Size: {item.selectedSize}</span>
+                            {item.selectedColor && (
+                              <span className="flex items-center gap-1">
+                                •
+                                {item.selectedColorHex && (
+                                  <span
+                                    className="inline-block w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs"
+                                    style={{ backgroundColor: item.selectedColorHex }}
+                                  />
+                                )}
+                                <span className="text-[#181818] font-medium">{item.selectedColor}</span>
+                              </span>
+                            )}
+                            <span>• Qty: {item.quantity}</span>
                           </p>
                         </div>
                         <p className="font-bold text-[#181818]">

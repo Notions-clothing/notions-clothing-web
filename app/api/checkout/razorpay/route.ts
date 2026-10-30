@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing customer contact details' }, { status: 400 });
     }
 
-    // Server-side authoritative price calculation (never trust client prices!)
+    // Server-side authoritative price and stock validation
     let subtotal = 0;
     const validatedItems = [];
 
@@ -28,15 +28,63 @@ export async function POST(request: Request) {
       const unitPrice = realProduct.price;
       subtotal += unitPrice * qty;
 
+      // Validate stock for specific color+size combination
+      if (item.selectedColor && Array.isArray(realProduct.colors) && realProduct.colors.length > 0) {
+        const colVariant = realProduct.colors.find(
+          (c) =>
+            c.name.toLowerCase() === item.selectedColor.toLowerCase() ||
+            c.color_id === item.selectedColor ||
+            (item.selectedColorId && c.color_id === item.selectedColorId)
+        );
+        if (colVariant) {
+          if (Array.isArray(colVariant.sizes) && colVariant.sizes.length > 0) {
+            const sz = colVariant.sizes.find(
+              (s) =>
+                s.size.toLowerCase() === (item.selectedSize || '').toLowerCase() ||
+                (item.selectedSizeId && s.size_id === item.selectedSizeId)
+            );
+            if (sz && sz.stock < qty) {
+              return NextResponse.json(
+                {
+                  error: `Insufficient stock for ${realProduct.name} (${colVariant.name}, Size ${sz.size}). Only ${sz.stock} available.`,
+                },
+                { status: 400 }
+              );
+            }
+          } else if (colVariant.stock < qty) {
+            return NextResponse.json(
+              {
+                error: `Insufficient stock for ${realProduct.name} (${colVariant.name}). Only ${colVariant.stock} available.`,
+              },
+              { status: 400 }
+            );
+          }
+        }
+      } else {
+        // Normal Product stock validation
+        if (realProduct.stock !== undefined && realProduct.stock < qty) {
+          return NextResponse.json(
+            {
+              error: `Insufficient stock for ${realProduct.name}. Only ${realProduct.stock} available.`,
+            },
+            { status: 400 }
+          );
+        }
+      }
+
       validatedItems.push({
         product_id: realProduct.id,
         product_name: realProduct.name,
         sku: realProduct.sku,
         variant_label: item.selectedSize || 'Standard',
+        selected_size_id: item.selectedSizeId,
+        selected_color: item.selectedColor,
+        selected_color_id: item.selectedColorId,
+        selected_color_hex: item.selectedColorHex,
         unit_price: unitPrice,
         quantity: qty,
         line_total: unitPrice * qty,
-        image_url: realProduct.images?.[0]?.image_url,
+        image_url: item.selectedColorImage || realProduct.images?.[0]?.image_url,
       });
     }
 

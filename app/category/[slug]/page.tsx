@@ -3,7 +3,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import CartDrawer from '@/components/CartDrawer';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { getCategoryBySlug, getCategories, getProducts } from '@/lib/db';
@@ -30,13 +29,20 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   // Find subcategories if this is a parent category
   const subcategories = allCategories.filter((c) => c.parent_id === currentCategory.id);
 
+  // Find parent category if this is a subcategory
+  const parentCategory = currentCategory.parent_id
+    ? allCategories.find((c) => c.id === currentCategory.parent_id)
+    : null;
+
   // Find products belonging to this category or its subcategories
-  const subcategorySlugs = [currentCategory.slug, ...subcategories.map((sc) => sc.slug)];
+  const subcategorySlugs = [currentCategory.slug, currentCategory.id, ...subcategories.map((sc) => sc.slug), ...subcategories.map((sc) => sc.id)];
   const allProducts = await getProducts();
 
   let filteredProducts = allProducts.filter((p) =>
     subcategorySlugs.includes(p.category_slug || '') ||
-    subcategorySlugs.includes(p.category_id)
+    subcategorySlugs.includes(p.category_id) ||
+    subcategorySlugs.includes(p.subcategory_slug || '') ||
+    subcategorySlugs.includes(p.subcategory_id || '')
   );
 
   // Sorting
@@ -56,10 +62,10 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         <nav className="flex items-center space-x-2 text-xs text-[#7A756D] mb-6">
           <Link href="/" className="hover:text-[#143728]">Home</Link>
           <span>/</span>
-          {currentCategory.parent_id && (
+          {parentCategory && (
             <>
-              <Link href="/category/men" className="hover:text-[#143728]">
-                Men's Apparel
+              <Link href={`/category/${parentCategory.slug}`} className="hover:text-[#143728]">
+                {parentCategory.name}
               </Link>
               <span>/</span>
             </>
@@ -68,7 +74,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         </nav>
 
         {/* Category Header Banner */}
-        <div className="relative rounded-2xl overflow-hidden bg-[#F3EFE6] border border-[#E6E1D8] p-8 md:p-12 mb-10 flex flex-col md:flex-row items-center justify-between">
+        <div className="relative rounded-2xl overflow-hidden bg-[#F3EFE6] p-8 md:p-12 mb-10 flex flex-col md:flex-row items-center justify-between shadow-xs">
           <div className="max-w-xl z-10">
             <span className="text-[11px] font-semibold tracking-widest uppercase text-[#143728]">
               Opulent Collection
@@ -167,7 +173,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
         {/* Products Grid */}
         {filteredProducts.length === 0 ? (
-          <div className="py-20 text-center bg-white rounded-xl border border-[#EDE8DE] p-8">
+          <div className="py-20 text-center bg-white rounded-2xl p-8 shadow-xs">
             <div className="w-16 h-16 mx-auto rounded-full bg-[#FAF7F0] flex items-center justify-center mb-4">
               <span className="font-serif text-2xl text-[#143728]">N</span>
             </div>
@@ -193,7 +199,6 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         )}
       </main>
 
-      <CartDrawer />
       <Footer />
     </div>
   );

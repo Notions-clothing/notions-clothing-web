@@ -9,43 +9,21 @@ interface ShopByCategoryProps {
   categories: Category[];
 }
 
-const HOMEPAGE_CATEGORY_SLUGS = [
-  { slug: 'men-shirts', name: 'Shirts', fallbackImg: '/reference-assets/cat-shirts.png' },
-  { slug: 'men-jeans', name: 'Jeans', fallbackImg: '/reference-assets/cat-jeans.png' },
-  { slug: 'men-trousers', name: 'Trousers', fallbackImg: '/reference-assets/cat-trousers.png' },
-  { slug: 'men-t-shirts', name: 'T-shirts', fallbackImg: '/reference-assets/cat-t-shirts.png' },
-  { slug: 'men-shorts', name: 'Shorts', fallbackImg: '/reference-assets/cat-shorts.png' },
-  { slug: 'men-jackets', name: 'Jackets', fallbackImg: '/reference-assets/cat-jackets.png' },
-  { slug: 'men-dhothis', name: 'Dhothis', fallbackImg: '/reference-assets/cat-dhothis.png' },
-  { slug: 'men-kurta', name: 'Kurta', fallbackImg: '/reference-assets/cat-kurta.png' },
-  { slug: 'footwear', name: 'Footwear', fallbackImg: '/reference-assets/cat-footwear.png' },
-  { slug: 'accessories', name: 'Accessories', fallbackImg: '/reference-assets/cat-accessories.png' },
-];
-
 export default function ShopByCategory({ categories }: ShopByCategoryProps) {
-  const displayItems = HOMEPAGE_CATEGORY_SLUGS.map((item, idx) => {
-    const dbCat = categories.find((c) => c.slug === item.slug);
-    // Also check if admin updated "shoes" when looking up "footwear"
-    const shoesCat = item.slug === 'footwear' ? categories.find((c) => c.slug === 'shoes') : null;
+  // Only use database categories (no hardcoded mock arrays or fallback images)
+  const displayItems = (categories || [])
+    .filter((c) => c.is_published !== false && !c.parent_id)
+    .sort((a, b) => (a.sort_order ?? 99) - (b.sort_order ?? 99))
+    .map((cat) => ({
+      slug: cat.slug,
+      name: cat.name,
+      imgSrc: cat.image_url || '/logo.png',
+      isUploadedPhoto: Boolean(cat.image_url && cat.image_url.startsWith('http')),
+    }));
 
-    const rawUrl = dbCat?.image_url || shoesCat?.image_url || '';
-    const isValidImage =
-      Boolean(rawUrl) &&
-      !rawUrl.includes('logo') &&
-      !rawUrl.includes('v17931831') &&
-      !rawUrl.includes('v17931868');
-
-    const imgSrc = isValidImage ? rawUrl : item.fallbackImg;
-    const isUploadedPhoto = imgSrc.startsWith('http');
-
-    return {
-      slug: item.slug,
-      name: dbCat?.name || item.name,
-      imgSrc,
-      isUploadedPhoto,
-      sortOrder: dbCat?.sort_order ?? idx + 1,
-    };
-  }).sort((a, b) => a.sortOrder - b.sortOrder);
+  if (displayItems.length === 0) {
+    return null;
+  }
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -55,7 +33,7 @@ export default function ShopByCategory({ categories }: ShopByCategoryProps) {
           Shop by Category
         </h2>
         <Link
-          href="/category/men"
+          href={`/category/${displayItems[0]?.slug || 'all'}`}
           className="text-xs sm:text-sm font-medium text-[#181818] hover:text-[#143728] flex items-center gap-1 transition"
         >
           <span>View All</span>
@@ -63,13 +41,13 @@ export default function ShopByCategory({ categories }: ShopByCategoryProps) {
         </Link>
       </div>
 
-      {/* DESKTOP ROW (10 cards across in exact order) */}
-      <div className="hidden md:grid md:grid-cols-10 gap-3">
+      {/* DESKTOP ROW (Dynamic flexible responsive layout matching number of DB categories) */}
+      <div className="hidden md:flex md:flex-wrap items-center gap-4">
         {displayItems.map((cat) => (
           <Link
             key={cat.slug}
             href={`/category/${cat.slug}`}
-            className="group flex flex-col items-center text-center transition"
+            className="group flex flex-col items-center text-center transition w-[105px]"
           >
             <div
               className={`relative w-full aspect-[60/55] bg-[#F1EDE4] rounded-xl border border-[#E2DDD5]/80 overflow-hidden ${
@@ -81,7 +59,7 @@ export default function ShopByCategory({ categories }: ShopByCategoryProps) {
                   src={cat.imgSrc}
                   alt={cat.name}
                   fill
-                  sizes="10vw"
+                  sizes="120px"
                   className={`${
                     cat.isUploadedPhoto ? 'object-cover' : 'object-contain'
                   } object-center group-hover:scale-105 transition-transform duration-200`}
