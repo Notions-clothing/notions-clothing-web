@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
-import { Category, Product, Banner, SiteSettings, Order } from '@/types/database';
+import { Category, Product, ProductVariant, Banner, SiteSettings, Order } from '@/types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey =
@@ -404,12 +404,12 @@ export async function saveOrder(order: Partial<Order>): Promise<Order> {
     // Automatically decrement stock for new confirmed/paid orders
     if (Array.isArray(newOrder.items) && newOrder.items.length > 0) {
       for (const item of newOrder.items) {
-        const prod = (store.products || []).find(
+        const prod: Product | undefined = (store.products || []).find(
           (p: Product) => p.id === item.product_id || p.name === item.product_name
         );
         if (prod && Array.isArray(prod.variants)) {
           const variant = prod.variants.find(
-            (v) => v.size.toLowerCase() === (item.variant_label || '').toLowerCase()
+            (v: ProductVariant) => v.size.toLowerCase() === (item.variant_label || '').toLowerCase()
           );
           if (variant) {
             variant.inventory_quantity = Math.max(
