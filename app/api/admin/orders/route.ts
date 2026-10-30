@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getOrdersAdmin, saveOrder, deleteOrder } from '@/lib/db';
+import { sendOrderStatusEmail } from '@/lib/email';
 
 export async function GET() {
   const orders = await getOrdersAdmin();
@@ -10,6 +11,9 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     const saved = await saveOrder(data);
+    if (saved.status === 'shipped' || saved.status === 'delivered') {
+      await sendOrderStatusEmail(saved);
+    }
     return NextResponse.json({ success: true, order: saved });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
