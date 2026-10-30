@@ -188,6 +188,26 @@
       "is_published": true
     }
   ],
+  "sizes": [
+    {
+      "id": "sz-1793358656034",
+      "category_id": "cat-men-shirts",
+      "category_name": "Shirts",
+      "name": "S",
+      "sort_order": 1,
+      "is_active": true,
+      "created_at": "2026-10-30T11:10:56.034Z"
+    },
+    {
+      "id": "sz-1793358676228",
+      "category_id": "cat-footwear",
+      "category_name": "Footwear",
+      "name": "6,7,8",
+      "sort_order": 1,
+      "is_active": true,
+      "created_at": "2026-10-30T11:11:16.228Z"
+    }
+  ],
   "products": [
     {
       "id": "prod-linen-shirt",
@@ -508,6 +528,15 @@
       "sort_order": 5,
       "is_published": true,
       "badge_text": ""
+    }
+  ],
+  "colors": [
+    {
+      "id": "col-1793356927031",
+      "name": "Olive green",
+      "hex": "#143728",
+      "is_active": true,
+      "created_at": "2026-10-30T10:42:07.031Z"
     }
   ],
   "settings": {

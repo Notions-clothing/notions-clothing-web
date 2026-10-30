@@ -12,7 +12,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { totalItems, setIsCartOpen } = useCart();
-  const { count: wishlistCount } = useWishlist();
+  const { count: wishlistCount, setIsWishlistOpen } = useWishlist();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,7 +45,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="p-2 -ml-2 text-[#181818] hover:text-[#143728] focus:outline-none"
+                className="p-2 -ml-2 text-[#181818] hover:text-[#143728] focus:outline-none cursor-pointer"
                 aria-label="Open navigation menu"
               >
                 <Menu className="w-6 h-6" />
@@ -111,7 +111,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-                className="md:hidden p-1.5 text-[#242424] hover:text-[#143728]"
+                className="md:hidden p-1.5 text-[#242424] hover:text-[#143728] cursor-pointer"
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
@@ -126,11 +126,12 @@ export default function Navbar() {
                 <User className="w-5 h-5" />
               </Link>
 
-              {/* Wishlist */}
-              <Link
-                href="/wishlist"
-                className="p-1.5 hover:text-[#143728] transition relative"
-                aria-label="Wishlist"
+              {/* Wishlist Drawer Trigger */}
+              <button
+                type="button"
+                onClick={() => setIsWishlistOpen(true)}
+                className="p-1.5 hover:text-[#143728] transition relative cursor-pointer"
+                aria-label="Open Wishlist"
               >
                 <Heart className="w-5 h-5" />
                 {wishlistCount > 0 && (
@@ -138,13 +139,13 @@ export default function Navbar() {
                     {wishlistCount}
                   </span>
                 )}
-              </Link>
+              </button>
 
               {/* Shopping Cart */}
               <button
                 type="button"
                 onClick={() => setIsCartOpen(true)}
-                className="p-1.5 hover:text-[#143728] transition relative"
+                className="p-1.5 hover:text-[#143728] transition relative cursor-pointer"
                 aria-label="Shopping Cart"
               >
                 <ShoppingBag className="w-5 h-5" />
@@ -197,7 +198,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 text-[#333333] hover:text-[#143728]"
+                  className="p-2 text-[#333333] hover:text-[#143728] cursor-pointer"
                   aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
@@ -227,28 +228,29 @@ export default function Navbar() {
                   <User className="w-4 h-4" />
                   <span>My Account</span>
                 </Link>
-                <Link
-                  href="/wishlist"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 text-[#333333] hover:text-[#143728]"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setIsWishlistOpen(true);
+                  }}
+                  className="w-full flex items-center space-x-3 text-[#333333] hover:text-[#143728] cursor-pointer text-left"
                 >
                   <Heart className="w-4 h-4" />
                   <span>Wishlist ({wishlistCount})</span>
-                </Link>
+                </button>
                 <Link
                   href="/admin"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 text-[#807D75] hover:text-[#143728] text-xs pt-4"
+                  className="flex items-center space-x-3 text-[#333333] hover:text-[#143728]"
                 >
-                  <span>Admin Atelier</span>
+                  <span className="text-xs uppercase tracking-wider text-[#736E65]">Admin Portal</span>
                 </Link>
               </div>
             </div>
 
-            <div className="pt-6 border-t border-[#EAE5DC] text-xs text-[#7A7A7A]">
-              <p className="font-serif italic text-sm text-[#143728] mb-1">NOTIONS®</p>
-              <p>Opulent Clothing & Accessories</p>
-              <p className="mt-1">Crafted for the modern journey</p>
+            <div className="pt-6 border-t border-[#EAE5DC] text-xs text-[#888888]">
+              <p>© {new Date().getFullYear()} NOTIONS®. Opulent Clothing.</p>
             </div>
           </div>
         </div>

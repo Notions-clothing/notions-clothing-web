@@ -27,13 +27,26 @@ CREATE TABLE IF NOT EXISTS public.categories (
 CREATE INDEX IF NOT EXISTS idx_categories_slug ON public.categories(slug);
 CREATE INDEX IF NOT EXISTS idx_categories_parent_id ON public.categories(parent_id);
 
--- 2. PRODUCTS TABLE
+-- 2. PRODUCT COLORS TABLE (Dedicated Color Management)
+CREATE TABLE IF NOT EXISTS public.colors (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(100) NOT NULL,
+    hex VARCHAR(20) NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_colors_active ON public.colors(is_active);
+
+-- 3. PRODUCTS TABLE
 CREATE TABLE IF NOT EXISTS public.products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) UNIQUE NOT NULL,
     description TEXT,
     category_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
+    subcategory_id UUID REFERENCES public.categories(id) ON DELETE SET NULL,
     sku VARCHAR(100) UNIQUE,
     price DECIMAL(10, 2) NOT NULL,
     compare_at_price DECIMAL(10, 2),
@@ -44,6 +57,13 @@ CREATE TABLE IF NOT EXISTS public.products (
     rating_score DECIMAL(3, 2) DEFAULT 4.8,
     rating_count INT DEFAULT 0,
     attributes JSONB DEFAULT '{}'::jsonb,
+    product_mode VARCHAR(20) DEFAULT 'normal', -- 'normal' or 'variant'
+    stock INT DEFAULT 0, -- Common stock quantity for normal product mode
+    sizes JSONB DEFAULT '[]'::jsonb, -- Category-based size names for normal product mode
+    product_mode VARCHAR(20) DEFAULT 'normal', -- 'normal' or 'variant'
+    stock INT DEFAULT 0, -- Common stock quantity for normal product mode
+    sizes JSONB DEFAULT '[]'::jsonb, -- Category-based size names for normal product mode
+    colors JSONB DEFAULT '[]'::jsonb, -- color variants with stock & images
     seo_title VARCHAR(255),
     seo_description TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -52,9 +72,10 @@ CREATE TABLE IF NOT EXISTS public.products (
 
 CREATE INDEX IF NOT EXISTS idx_products_slug ON public.products(slug);
 CREATE INDEX IF NOT EXISTS idx_products_category ON public.products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_subcategory ON public.products(subcategory_id);
 CREATE INDEX IF NOT EXISTS idx_products_published ON public.products(is_published);
 
--- 3. PRODUCT VARIANTS TABLE (sizes, colors, inventory)
+-- 4. PRODUCT VARIANTS TABLE (sizes, colors, inventory)
 CREATE TABLE IF NOT EXISTS public.product_variants (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
@@ -70,7 +91,7 @@ CREATE TABLE IF NOT EXISTS public.product_variants (
 
 CREATE INDEX IF NOT EXISTS idx_variants_product ON public.product_variants(product_id);
 
--- 4. PRODUCT IMAGES TABLE
+-- 5. PRODUCT IMAGES TABLE
 CREATE TABLE IF NOT EXISTS public.product_images (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
@@ -84,7 +105,7 @@ CREATE TABLE IF NOT EXISTS public.product_images (
 
 CREATE INDEX IF NOT EXISTS idx_product_images_product ON public.product_images(product_id);
 
--- 5. BANNERS TABLE (Hero, promotional sections)
+-- 6. BANNERS TABLE (Multiple Hero, promotional sections with destination routing)
 CREATE TABLE IF NOT EXISTS public.banners (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     section VARCHAR(50) NOT NULL, -- 'hero', 'essentials', 'footwear', 'accessories', 'new_arrivals'
@@ -93,6 +114,8 @@ CREATE TABLE IF NOT EXISTS public.banners (
     description TEXT,
     cta_label VARCHAR(100),
     cta_url VARCHAR(255),
+    destination_type VARCHAR(50) DEFAULT 'custom', -- 'custom', 'category', 'product'
+    destination_id VARCHAR(255),
     image_url TEXT,
     image_public_id VARCHAR(255),
     badge_text VARCHAR(100),
@@ -102,14 +125,17 @@ CREATE TABLE IF NOT EXISTS public.banners (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 6. SITE SETTINGS TABLE
+CREATE INDEX IF NOT EXISTS idx_banners_section ON public.banners(section);
+CREATE INDEX IF NOT EXISTS idx_banners_published ON public.banners(is_published);
+
+-- 7. SITE SETTINGS TABLE
 CREATE TABLE IF NOT EXISTS public.site_settings (
     key VARCHAR(100) PRIMARY KEY,
     value JSONB NOT NULL,
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 7. PROFILES & ADDRESSES
+-- 8. PROFILES & ADDRESSES
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     full_name VARCHAR(255),
@@ -134,7 +160,7 @@ CREATE TABLE IF NOT EXISTS public.addresses (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 8. CARTS & CART ITEMS
+-- 9. CARTS & CART ITEMS
 CREATE TABLE IF NOT EXISTS public.carts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id VARCHAR(255) UNIQUE,
@@ -149,12 +175,13 @@ CREATE TABLE IF NOT EXISTS public.cart_items (
     product_id UUID REFERENCES public.products(id) ON DELETE CASCADE,
     variant_id UUID REFERENCES public.product_variants(id) ON DELETE SET NULL,
     quantity INT DEFAULT 1 CHECK (quantity > 0),
+    selected_color VARCHAR(100),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE(cart_id, product_id, variant_id)
 );
 
--- 9. ORDERS TABLE
+-- 10. ORDERS TABLE
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_number VARCHAR(50) UNIQUE NOT NULL,
@@ -182,7 +209,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
 CREATE INDEX IF NOT EXISTS idx_orders_order_number ON public.orders(order_number);
 CREATE INDEX IF NOT EXISTS idx_orders_customer_email ON public.orders(customer_email);
 
--- 10. ORDER ITEMS TABLE
+-- 11. ORDER ITEMS TABLE
 CREATE TABLE IF NOT EXISTS public.order_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -191,13 +218,14 @@ CREATE TABLE IF NOT EXISTS public.order_items (
     product_name VARCHAR(255) NOT NULL,
     sku VARCHAR(100),
     variant_label VARCHAR(100),
+    selected_color VARCHAR(100),
     unit_price DECIMAL(10, 2) NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0),
     line_total DECIMAL(10, 2) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 11. PAYMENTS TABLE
+-- 12. PAYMENTS TABLE
 CREATE TABLE IF NOT EXISTS public.payments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -212,7 +240,7 @@ CREATE TABLE IF NOT EXISTS public.payments (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 12. WISHLISTS TABLE
+-- 13. WISHLISTS TABLE
 CREATE TABLE IF NOT EXISTS public.wishlists (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -226,6 +254,7 @@ CREATE TABLE IF NOT EXISTS public.wishlists (
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- ==============================================================================
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.colors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.product_variants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.product_images ENABLE ROW LEVEL SECURITY;
@@ -242,6 +271,7 @@ ALTER TABLE public.wishlists ENABLE ROW LEVEL SECURITY;
 
 -- Public can read published catalog items
 CREATE POLICY "Public read categories" ON public.categories FOR SELECT USING (is_published = true);
+CREATE POLICY "Public read colors" ON public.colors FOR SELECT USING (is_active = true);
 CREATE POLICY "Public read products" ON public.products FOR SELECT USING (is_published = true);
 CREATE POLICY "Public read variants" ON public.product_variants FOR SELECT USING (is_available = true);
 CREATE POLICY "Public read images" ON public.product_images FOR SELECT USING (true);
@@ -257,63 +287,3 @@ CREATE POLICY "Users read own wishlist" ON public.wishlists FOR ALL USING (true)
 CREATE POLICY "Users view own orders" ON public.orders FOR SELECT USING (
     (auth.uid() IS NOT NULL AND user_id = auth.uid()) OR true
 );
-
--- Service role full access on all tables
--- ==============================================================================
--- SEED DEFAULT CATEGORY HIERARCHY (Section 6 of requirements)
--- Idempotent Insertion
--- ==============================================================================
-DO $$
-DECLARE
-    v_mens_id UUID;
-    v_footwear_id UUID;
-    v_accessories_id UUID;
-BEGIN
-    -- 1. Main Category: Men's Apparel
-    INSERT INTO public.categories (name, slug, parent_id, sort_order, is_published, description)
-    VALUES ('Men''s Apparel', 'men', NULL, 1, true, 'Sophisticated menswear for every occasion')
-    ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
-    RETURNING id INTO v_mens_id;
-
-    -- Subcategories for Men's Apparel
-    INSERT INTO public.categories (name, slug, parent_id, sort_order, is_published)
-    VALUES
-        ('Shirts', 'men-shirts', v_mens_id, 1, true),
-        ('Jeans', 'men-jeans', v_mens_id, 2, true),
-        ('Trousers', 'men-trousers', v_mens_id, 3, true),
-        ('T-shirts', 'men-t-shirts', v_mens_id, 4, true),
-        ('Shorts', 'men-shorts', v_mens_id, 5, true),
-        ('Jackets', 'men-jackets', v_mens_id, 6, true),
-        ('Dhothis', 'men-dhothis', v_mens_id, 7, true),
-        ('Kurta', 'men-kurta', v_mens_id, 8, true)
-    ON CONFLICT (slug) DO NOTHING;
-
-    -- 2. Main Category: Footwears
-    INSERT INTO public.categories (name, slug, parent_id, sort_order, is_published, description)
-    VALUES ('Footwears', 'footwear', NULL, 2, true, 'Handcrafted leather and contemporary casual footwear')
-    ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
-    RETURNING id INTO v_footwear_id;
-
-    -- Subcategories for Footwears
-    INSERT INTO public.categories (name, slug, parent_id, sort_order, is_published)
-    VALUES
-        ('Shoes', 'shoes', v_footwear_id, 1, true),
-        ('Sandals', 'sandals', v_footwear_id, 2, true)
-    ON CONFLICT (slug) DO NOTHING;
-
-    -- 3. Main Category: Accessories
-    INSERT INTO public.categories (name, slug, parent_id, sort_order, is_published, description)
-    VALUES ('Accessories', 'accessories', NULL, 3, true, 'Distinctive accessories to elevate your presence')
-    ON CONFLICT (slug) DO UPDATE SET name = EXCLUDED.name
-    RETURNING id INTO v_accessories_id;
-
-    -- Subcategories for Accessories
-    INSERT INTO public.categories (name, slug, parent_id, sort_order, is_published)
-    VALUES
-        ('Caps', 'caps', v_accessories_id, 1, true),
-        ('Rings', 'rings', v_accessories_id, 2, true),
-        ('Bracelet', 'bracelet', v_accessories_id, 3, true),
-        ('Chain', 'chain', v_accessories_id, 4, true)
-    ON CONFLICT (slug) DO NOTHING;
-
-END $$;

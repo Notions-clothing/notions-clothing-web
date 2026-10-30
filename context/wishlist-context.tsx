@@ -5,8 +5,11 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface WishlistContextType {
   wishlistIds: string[];
   toggleWishlist: (productId: string) => void;
+  removeFromWishlist: (productId: string) => void;
   isInWishlist: (productId: string) => boolean;
   count: number;
+  isWishlistOpen: boolean;
+  setIsWishlistOpen: (open: boolean) => void;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -14,6 +17,7 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [wishlistIds, setWishlistIds] = useState<string[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -38,11 +42,15 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   }, [wishlistIds, isLoaded]);
 
   const toggleWishlist = (productId: string) => {
-    setWishlistIds(prev =>
+    setWishlistIds((prev) =>
       prev.includes(productId)
-        ? prev.filter(id => id !== productId)
+        ? prev.filter((id) => id !== productId)
         : [...prev, productId]
     );
+  };
+
+  const removeFromWishlist = (productId: string) => {
+    setWishlistIds((prev) => prev.filter((id) => id !== productId));
   };
 
   const isInWishlist = (productId: string) => wishlistIds.includes(productId);
@@ -52,8 +60,11 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       value={{
         wishlistIds,
         toggleWishlist,
+        removeFromWishlist,
         isInWishlist,
         count: wishlistIds.length,
+        isWishlistOpen,
+        setIsWishlistOpen,
       }}
     >
       {children}

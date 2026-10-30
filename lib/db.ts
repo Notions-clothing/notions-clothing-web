@@ -1,7 +1,17 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
-import { Category, Product, ProductVariant, Banner, SiteSettings, Order } from '@/types/database';
+import {
+  Category,
+  CategorySize,
+  Product,
+  ProductVariant,
+  ProductColor,
+  ProductColorVariant,
+  Banner,
+  SiteSettings,
+  Order,
+} from '@/types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey =
@@ -18,12 +28,21 @@ function readLocalStore() {
   try {
     if (fs.existsSync(storeFilePath)) {
       const content = fs.readFileSync(storeFilePath, 'utf8');
-      return JSON.parse(content);
+      const parsed = JSON.parse(content);
+      return {
+        categories: parsed.categories || [],
+        sizes: parsed.sizes || [],
+        products: parsed.products || [],
+        banners: parsed.banners || [],
+        colors: parsed.colors || [],
+        settings: parsed.settings || {},
+        orders: parsed.orders || [],
+      };
     }
   } catch (err) {
     console.error('Error reading local store:', err);
   }
-  return { categories: [], products: [], banners: [], settings: {}, orders: [] };
+  return { categories: [], sizes: [], products: [], banners: [], colors: [], settings: {}, orders: [] };
 }
 
 function writeLocalStore(data: any) {
@@ -127,10 +146,137 @@ export async function deleteCategory(id: string): Promise<boolean> {
 }
 
 // ----------------------------------------------------
+// PRODUCT SIZES (Category-Specific Size Management)
+// ----------------------------------------------------
+export async function getSizes(categoryId?: string): Promise<CategorySize[]> {
+  const store = readLocalStore();
+  let list = (store.sizes || []).filter((s: CategorySize) => s.is_active !== false);
+  if (categoryId) {
+    list = list.filter((s: CategorySize) => s.category_id === categoryId);
+  }
+  return list.sort((a: CategorySize, b: CategorySize) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
+}
+
+export async function getAllSizesAdmin(categoryId?: string): Promise<CategorySize[]> {
+  const store = readLocalStore();
+  let list = store.sizes || [];
+  if (categoryId) {
+    list = list.filter((s: CategorySize) => s.category_id === categoryId);
+  }
+  return list.sort((a: CategorySize, b: CategorySize) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
+}
+
+export async function saveSize(size: Partial<CategorySize>): Promise<CategorySize> {
+  const store = readLocalStore();
+  store.sizes = store.sizes || [];
+  const id = size.id || `sz-${Date.now()}`;
+
+  let categoryName = size.category_name;
+  if (!categoryName && size.category_id) {
+    const cat = (store.categories || []).find((c: Category) => c.id === size.category_id);
+    if (cat) categoryName = cat.name;
+  }
+
+  const newSize: CategorySize = {
+    id,
+    category_id: size.category_id || '',
+    category_name: categoryName || '',
+    name: size.name ? size.name.trim() : 'Standard',
+    sort_order: size.sort_order ?? store.sizes.length + 1,
+    is_active: size.is_active ?? true,
+    created_at: size.created_at || new Date().toISOString(),
+  };
+
+  const existingIdx = store.sizes.findIndex((s: CategorySize) => s.id === id);
+  if (existingIdx >= 0) {
+    store.sizes[existingIdx] = { ...store.sizes[existingIdx], ...newSize };
+  } else {
+    store.sizes.push(newSize);
+  }
+  writeLocalStore(store);
+
+  if (supabase) {
+    try {
+      await supabase.from('category_sizes').upsert(newSize);
+    } catch (e) {}
+  }
+
+  return newSize;
+}
+
+export async function deleteSize(id: string): Promise<boolean> {
+  const store = readLocalStore();
+  store.sizes = (store.sizes || []).filter((s: CategorySize) => s.id !== id);
+  writeLocalStore(store);
+  if (supabase) {
+    try {
+      await supabase.from('category_sizes').delete().eq('id', id);
+    } catch (e) {}
+  }
+  return true;
+}
+
+// ----------------------------------------------------
+// PRODUCT COLORS (Dedicated Color Management)
+// ----------------------------------------------------
+export async function getColors(): Promise<ProductColor[]> {
+  const store = readLocalStore();
+  return (store.colors || []).filter((c: ProductColor) => c.is_active !== false);
+}
+
+export async function getAllColorsAdmin(): Promise<ProductColor[]> {
+  const store = readLocalStore();
+  return store.colors || [];
+}
+
+export async function saveColor(color: Partial<ProductColor>): Promise<ProductColor> {
+  const store = readLocalStore();
+  store.colors = store.colors || [];
+  const id = color.id || `col-${Date.now()}`;
+  const newColor: ProductColor = {
+    id,
+    name: color.name ? color.name.trim() : 'Untitled Color',
+    hex: color.hex ? color.hex.trim() : '#000000',
+    is_active: color.is_active ?? true,
+    created_at: color.created_at || new Date().toISOString(),
+  };
+
+  const existingIdx = store.colors.findIndex((c: ProductColor) => c.id === id);
+  if (existingIdx >= 0) {
+    store.colors[existingIdx] = { ...store.colors[existingIdx], ...newColor };
+  } else {
+    store.colors.push(newColor);
+  }
+  writeLocalStore(store);
+
+  if (supabase) {
+    try {
+      await supabase.from('colors').upsert(newColor);
+    } catch (e) {}
+  }
+
+  return newColor;
+}
+
+export async function deleteColor(id: string): Promise<boolean> {
+  const store = readLocalStore();
+  store.colors = (store.colors || []).filter((c: ProductColor) => c.id !== id);
+  writeLocalStore(store);
+  if (supabase) {
+    try {
+      await supabase.from('colors').delete().eq('id', id);
+    } catch (e) {}
+  }
+  return true;
+}
+
+// ----------------------------------------------------
 // PRODUCTS (Local Store is Primary Source of Truth)
 // ----------------------------------------------------
 export async function getProducts(options?: {
   categorySlug?: string;
+  subcategoryId?: string;
+  subcategorySlug?: string;
   isBestseller?: boolean;
   isFeatured?: boolean;
   isNewArrival?: boolean;
@@ -144,6 +290,7 @@ export async function getProducts(options?: {
     const slug = options.categorySlug;
     list = list.filter((p) => {
       if (p.category_slug === slug || p.category_id === slug) return true;
+      if (p.subcategory_slug === slug || p.subcategory_id === slug) return true;
       if (slug === 'men' && p.category_slug?.startsWith('men')) return true;
       if (slug === 'footwear' && (p.category_slug === 'shoes' || p.category_slug === 'sandals'))
         return true;
@@ -154,6 +301,14 @@ export async function getProducts(options?: {
         return true;
       return false;
     });
+  }
+
+  if (options?.subcategoryId) {
+    list = list.filter((p) => p.subcategory_id === options.subcategoryId);
+  }
+
+  if (options?.subcategorySlug) {
+    list = list.filter((p) => p.subcategory_slug === options.subcategorySlug);
   }
 
   if (options?.isBestseller) {
@@ -174,7 +329,8 @@ export async function getProducts(options?: {
       (p) =>
         p.name.toLowerCase().includes(q) ||
         (p.description && p.description.toLowerCase().includes(q)) ||
-        (p.category_name && p.category_name.toLowerCase().includes(q))
+        (p.category_name && p.category_name.toLowerCase().includes(q)) ||
+        (p.subcategory_name && p.subcategory_name.toLowerCase().includes(q))
     );
   }
 
@@ -189,6 +345,43 @@ export async function getProducts(options?: {
   }
 
   return list;
+}
+
+export async function getPaginatedProducts(options?: {
+  page?: number;
+  limit?: number;
+  offset?: number;
+  categorySlug?: string;
+  subcategoryId?: string;
+  subcategorySlug?: string;
+  isBestseller?: boolean;
+  isFeatured?: boolean;
+  isNewArrival?: boolean;
+  search?: string;
+  sort?: string;
+}): Promise<{ products: Product[]; total: number; hasMore: boolean; page: number; limit: number }> {
+  const all = await getProducts(options);
+  const total = all.length;
+
+  const limit = options?.limit && options.limit > 0 ? options.limit : 15;
+  let offset = 0;
+  if (options?.offset !== undefined) {
+    offset = options.offset;
+  } else if (options?.page && options.page > 0) {
+    offset = (options.page - 1) * limit;
+  }
+
+  const page = Math.floor(offset / limit) + 1;
+  const paginated = all.slice(offset, offset + limit);
+  const hasMore = offset + paginated.length < total;
+
+  return {
+    products: paginated,
+    total,
+    hasMore,
+    page,
+    limit,
+  };
 }
 
 export async function getAllProductsAdmin(): Promise<Product[]> {
@@ -216,6 +409,9 @@ export async function saveProduct(product: Partial<Product>): Promise<Product> {
     category_id: product.category_id || '',
     category_slug: product.category_slug || '',
     category_name: product.category_name || '',
+    subcategory_id: product.subcategory_id || '',
+    subcategory_slug: product.subcategory_slug || '',
+    subcategory_name: product.subcategory_name || '',
     sku: product.sku || `NOT-${Date.now().toString().slice(-4)}`,
     price: Number(product.price) || 0,
     compare_at_price: product.compare_at_price ? Number(product.compare_at_price) : null,
@@ -227,6 +423,10 @@ export async function saveProduct(product: Partial<Product>): Promise<Product> {
     rating_count: product.rating_count || 0,
     images: product.images || [],
     variants: product.variants || [],
+    colors: product.colors || [],
+    product_mode: product.product_mode || (product.colors && product.colors.length > 0 ? 'variant' : 'normal'),
+    stock: product.stock !== undefined ? Number(product.stock) : (product.variants?.reduce((s, v) => s + (v.inventory_quantity || 0), 0) ?? 25),
+    sizes: product.sizes || [],
     material: product.material || '',
     care_instructions: product.care_instructions || '',
     created_at: product.created_at || now,
@@ -263,22 +463,36 @@ export async function deleteProduct(id: string): Promise<boolean> {
 }
 
 // ----------------------------------------------------
-// BANNERS
+// BANNERS (Multiple Hero & Promotional Banners)
 // ----------------------------------------------------
 export async function getBanners(): Promise<Banner[]> {
   const store = readLocalStore();
-  return (store.banners || []).filter((b: Banner) => b.is_published);
+  return (store.banners || [])
+    .filter((b: Banner) => b.is_published)
+    .sort((a: Banner, b: Banner) => (a.sort_order ?? 99) - (b.sort_order ?? 99));
 }
 
 export async function getAllBannersAdmin(): Promise<Banner[]> {
   const store = readLocalStore();
-  return store.banners || [];
+  return (store.banners || []).sort(
+    (a: Banner, b: Banner) => (a.sort_order ?? 99) - (b.sort_order ?? 99)
+  );
 }
 
 export async function saveBanner(banner: Partial<Banner>): Promise<Banner> {
   const store = readLocalStore();
   store.banners = store.banners || [];
   const id = banner.id || `ban-${Date.now()}`;
+
+  let ctaUrl = banner.cta_url || '/';
+  if (banner.destination_type === 'category' && banner.destination_id) {
+    const cat = (store.categories || []).find((c: Category) => c.id === banner.destination_id);
+    if (cat) ctaUrl = `/category/${cat.slug}`;
+  } else if (banner.destination_type === 'product' && banner.destination_id) {
+    const prod = (store.products || []).find((p: Product) => p.id === banner.destination_id);
+    if (prod) ctaUrl = `/product/${prod.slug}`;
+  }
+
   const newBanner: Banner = {
     id,
     section: banner.section || 'hero',
@@ -286,17 +500,18 @@ export async function saveBanner(banner: Partial<Banner>): Promise<Banner> {
     subtitle: banner.subtitle || '',
     description: banner.description || '',
     cta_label: banner.cta_label || 'Shop Now',
-    cta_url: banner.cta_url || '/',
+    cta_url: ctaUrl,
+    destination_type: banner.destination_type || 'custom',
+    destination_id: banner.destination_id || null,
     image_url: banner.image_url || '',
     image_public_id: banner.image_public_id || '',
     badge_text: banner.badge_text || '',
-    sort_order: banner.sort_order ?? 1,
+    sort_order: banner.sort_order ?? store.banners.length + 1,
     is_published: banner.is_published ?? true,
   };
 
-  const existingIndex = store.banners.findIndex(
-    (b: Banner) => b.id === id || (banner.section && b.section === banner.section)
-  );
+  // Match only by ID so multiple banners can be saved in any section
+  const existingIndex = store.banners.findIndex((b: Banner) => b.id === id);
   if (existingIndex >= 0) {
     store.banners[existingIndex] = { ...store.banners[existingIndex], ...newBanner };
   } else {
@@ -407,16 +622,57 @@ export async function saveOrder(order: Partial<Order>): Promise<Order> {
         const prod: Product | undefined = (store.products || []).find(
           (p: Product) => p.id === item.product_id || p.name === item.product_name
         );
-        if (prod && Array.isArray(prod.variants)) {
-          const variant = prod.variants.find(
-            (v: ProductVariant) => v.size.toLowerCase() === (item.variant_label || '').toLowerCase()
-          );
-          if (variant) {
-            variant.inventory_quantity = Math.max(
-              0,
-              (Number(variant.inventory_quantity) || 0) - (Number(item.quantity) || 1)
+        if (prod) {
+          const qty = Number(item.quantity) || 1;
+
+          // Decrement variant stock
+          if (Array.isArray(prod.variants)) {
+            const variant = prod.variants.find(
+              (v: ProductVariant) => v.size.toLowerCase() === (item.variant_label || '').toLowerCase()
             );
-            variant.is_available = variant.inventory_quantity > 0;
+            if (variant) {
+              variant.inventory_quantity = Math.max(
+                0,
+                (Number(variant.inventory_quantity) || 0) - qty
+              );
+              variant.is_available = variant.inventory_quantity > 0;
+            }
+          }
+
+          // Normal product common stock decrement
+          if (!item.selected_color && prod.stock !== undefined) {
+            prod.stock = Math.max(0, (Number(prod.stock) || 0) - qty);
+          }
+
+          // Decrement color-size stock & color stock
+          if (item.selected_color && Array.isArray(prod.colors)) {
+            const colorVariant = prod.colors.find(
+              (c: ProductColorVariant) =>
+                c.name.toLowerCase() === (item.selected_color || '').toLowerCase() ||
+                c.color_id === item.selected_color ||
+                (item.selected_color_id && c.color_id === item.selected_color_id)
+            );
+            if (colorVariant) {
+              if (Array.isArray(colorVariant.sizes) && colorVariant.sizes.length > 0) {
+                const sz = colorVariant.sizes.find(
+                  (s) =>
+                    s.size.toLowerCase() === (item.variant_label || '').toLowerCase() ||
+                    (item.selected_size_id && s.size_id === item.selected_size_id)
+                );
+                if (sz) {
+                  sz.stock = Math.max(0, (Number(sz.stock) || 0) - qty);
+                }
+                colorVariant.stock = colorVariant.sizes.reduce(
+                  (sum, s) => sum + (Number(s.stock) || 0),
+                  0
+                );
+              } else {
+                colorVariant.stock = Math.max(
+                  0,
+                  (Number(colorVariant.stock) || 0) - qty
+                );
+              }
+            }
           }
         }
       }

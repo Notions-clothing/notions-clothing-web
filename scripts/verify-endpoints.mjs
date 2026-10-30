@@ -14,6 +14,7 @@ async function run() {
   console.log('Testing NOTIONS® Storefront & API Routes...\n');
   await testRoute('Homepage', 'http://localhost:3000/');
   await testRoute('Public Products API', 'http://localhost:3000/api/products');
+  await testRoute('Public Products Paginated API', 'http://localhost:3000/api/products?page=1&limit=10');
   await testRoute('Category Men', 'http://localhost:3000/category/men');
   await testRoute('Category Shirts', 'http://localhost:3000/category/men-shirts');
   await testRoute('Category Footwear', 'http://localhost:3000/category/footwear');
@@ -29,6 +30,7 @@ async function run() {
   await testRoute('Admin Dashboard', 'http://localhost:3000/admin');
   await testRoute('Admin Products API', 'http://localhost:3000/api/admin/products');
   await testRoute('Admin Categories API', 'http://localhost:3000/api/admin/categories');
+  await testRoute('Admin Colors API', 'http://localhost:3000/api/admin/colors');
   await testRoute('Admin Banners API', 'http://localhost:3000/api/admin/banners');
   await testRoute('Admin Orders API', 'http://localhost:3000/api/admin/orders');
   console.log('\nAll route verifications complete.');

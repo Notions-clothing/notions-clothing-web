@@ -5,7 +5,7 @@ import HeroBanner from '@/components/HeroBanner';
 import ShopByCategory from '@/components/ShopByCategory';
 import BestSellersSection from '@/components/BestSellersSection';
 import { ModernEssentialsCard, PromoBannersRow } from '@/components/EditorialShowcase';
-import CartDrawer from '@/components/CartDrawer';
+import AllProductsSection from '@/components/AllProductsSection';
 import Footer from '@/components/Footer';
 import { getCategories, getProducts, getBanners } from '@/lib/db';
 
@@ -16,7 +16,7 @@ export default async function HomePage() {
   const products = await getProducts();
   const banners = await getBanners();
 
-  const heroBanner = banners.find((b) => b.section === 'hero');
+  const heroBanners = banners.filter((b) => b.section === 'hero');
   const essentialsBanner = banners.find((b) => b.section === 'essentials');
   const footwearBanner = banners.find((b) => b.section === 'footwear');
   const accessoriesBanner = banners.find((b) => b.section === 'accessories');
@@ -28,8 +28,8 @@ export default async function HomePage() {
       <Navbar />
 
       <main className="flex-1">
-        {/* Main Hero Banner */}
-        <HeroBanner banner={heroBanner} />
+        {/* Main Hero Banner Automatic Slider */}
+        <HeroBanner banners={heroBanners} />
 
         {/* Shop by Category Row */}
         <ShopByCategory categories={categories} />
@@ -53,9 +53,15 @@ export default async function HomePage() {
           accessoriesBanner={accessoriesBanner}
           newArrivalsBanner={newArrivalsBanner}
         />
+
+        {/* All Products Section with 10 Initial Products (5 + 5 desktop) and Infinite Loading */}
+        <AllProductsSection
+          initialProducts={products}
+          initialTotal={products.length}
+          initialHasMore={products.length > 10}
+        />
       </main>
 
-      <CartDrawer />
       <Footer />
     </div>
   );

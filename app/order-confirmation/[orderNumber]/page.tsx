@@ -92,8 +92,21 @@ export default async function OrderConfirmationPage({ params }: OrderConfirmatio
                     </div>
                     <div>
                       <h4 className="font-semibold text-[#181818]">{item.product_name}</h4>
-                      <p className="text-[#7A756D] text-[11px]">
-                        Size: {item.variant_label} • Qty: {item.quantity}
+                      <p className="text-[#7A756D] text-[11px] flex items-center flex-wrap gap-1 mt-0.5">
+                        <span>Size: {item.variant_label}</span>
+                        {item.selected_color && (
+                          <span className="flex items-center gap-1">
+                            •
+                            {item.selected_color_hex && (
+                              <span
+                                className="inline-block w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs"
+                                style={{ backgroundColor: item.selected_color_hex }}
+                              />
+                            )}
+                            <span className="text-[#181818] font-medium">{item.selected_color}</span>
+                          </span>
+                        )}
+                        <span>• Qty: {item.quantity}</span>
                       </p>
                     </div>
                   </div>

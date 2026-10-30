@@ -3,6 +3,8 @@ import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/cart-context";
 import { WishlistProvider } from "@/context/wishlist-context";
+import CartDrawer from "@/components/CartDrawer";
+import WishlistDrawer from "@/components/WishlistDrawer";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -42,6 +44,8 @@ export default function RootLayout({
         <WishlistProvider>
           <CartProvider>
             {children}
+            <CartDrawer />
+            <WishlistDrawer />
           </CartProvider>
         </WishlistProvider>
       </body>

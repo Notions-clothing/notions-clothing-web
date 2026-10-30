@@ -40,10 +40,16 @@ import {
   Phone,
   Mail,
   MapPin,
+  Palette,
+  Ruler,
+  ChevronLeft,
 } from 'lucide-react';
-import { Product, Category, Banner, Order, SiteSettings } from '@/types/database';
+import { Product, ProductVariant, ProductImage, Category, CategorySize, Banner, Order, SiteSettings, ProductColor, ProductColorVariant, ProductColorImage, ProductColorSizeVariant } from '@/types/database';
+import ColorManagement from '@/components/admin/ColorManagement';
+import SizeManagement from '@/components/admin/SizeManagement';
+import BannerManagement from '@/components/admin/BannerManagement';
 
-type AdminTab = 'dashboard' | 'products' | 'categories' | 'orders' | 'banners' | 'settings';
+type AdminTab = 'dashboard' | 'products' | 'categories' | 'colors' | 'sizes' | 'orders' | 'banners' | 'settings';
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
@@ -53,6 +59,8 @@ export default function AdminDashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]);
+  const [colors, setColors] = useState<ProductColor[]>([]);
+  const [sizes, setSizes] = useState<CategorySize[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [settings, setSettings] = useState<SiteSettings>({
     store_name: 'NOTIONS®',
@@ -88,6 +96,7 @@ export default function AdminDashboardPage() {
   const [productStatusFilter, setProductStatusFilter] = useState<'all' | 'published' | 'bestseller' | 'new' | 'draft'>('all');
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
+  const [productMode, setProductMode] = useState<'normal' | 'variant'>('variant');
   const [uploadingImage, setUploadingImage] = useState(false);
   const [customImageUrl, setCustomImageUrl] = useState('');
 
@@ -113,18 +122,22 @@ export default function AdminDashboardPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [prodRes, catRes, banRes, ordRes, setRes] = await Promise.all([
+      const [prodRes, catRes, banRes, ordRes, setRes, colRes, sizeRes] = await Promise.all([
         fetch('/api/admin/products'),
         fetch('/api/admin/categories'),
         fetch('/api/admin/banners'),
         fetch('/api/admin/orders'),
         fetch('/api/admin/settings'),
+        fetch('/api/admin/colors'),
+        fetch('/api/admin/sizes'),
       ]);
 
       if (prodRes.ok) setProducts(await prodRes.json());
       if (catRes.ok) setCategories(await catRes.json());
       if (banRes.ok) setBanners(await banRes.json());
       if (ordRes.ok) setOrders(await ordRes.json());
+      if (colRes.ok) setColors(await colRes.json());
+      if (sizeRes?.ok) setSizes(await sizeRes.json());
       if (setRes.ok) {
         const loadedSettings = await setRes.json();
         if (loadedSettings && Object.keys(loadedSettings).length > 0) {
@@ -211,16 +224,20 @@ export default function AdminDashboardPage() {
   // ----------------------------------------------------
   const openNewProductModal = () => {
     const defaultCat = categories.find((c) => c.slug === 'men-shirts') || categories[0];
+    setProductMode('variant');
     setEditingProduct({
       name: '',
       slug: '',
       sku: `NOT-${Math.floor(1000 + Math.random() * 9000)}`,
       description: '',
-      category_id: defaultCat?.id || 'cat-men-shirts',
-      category_slug: defaultCat?.slug || 'men-shirts',
-      category_name: defaultCat?.name || 'Shirts',
+      category_id: defaultCat?.id || '',
+      category_slug: defaultCat?.slug || '',
+      category_name: defaultCat?.name || '',
       price: 1499,
       compare_at_price: 1999,
+      product_mode: 'variant',
+      stock: 50,
+      sizes: [],
       is_bestseller: false,
       is_featured: true,
       is_new_arrival: true,
@@ -230,12 +247,8 @@ export default function AdminDashboardPage() {
       material: '100% Premium Cotton',
       care_instructions: 'Machine wash cold gentle cycle, do not bleach.',
       images: [],
-      variants: [
-        { id: `var-${Date.now()}-1`, product_id: '', size: 'M', inventory_quantity: 25, is_available: true },
-        { id: `var-${Date.now()}-2`, product_id: '', size: 'L', inventory_quantity: 30, is_available: true },
-        { id: `var-${Date.now()}-3`, product_id: '', size: 'XL', inventory_quantity: 20, is_available: true },
-        { id: `var-${Date.now()}-4`, product_id: '', size: 'XXL', inventory_quantity: 15, is_available: true },
-      ],
+      variants: [],
+      colors: [],
     });
     setCustomImageUrl('');
     setShowProductModal(true);
@@ -629,6 +642,8 @@ export default function AdminDashboardPage() {
   const navItems: { id: AdminTab; label: string; icon: any; badge?: number }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'products', label: 'Products', icon: Package, badge: products.length },
+    { id: 'colors', label: 'Product Colors', icon: Palette, badge: colors.length },
+    { id: 'sizes', label: 'Product Sizes', icon: Ruler, badge: sizes.length },
     { id: 'categories', label: 'Categories', icon: Layers, badge: categories.length },
     { id: 'orders', label: 'Orders', icon: ShoppingBag, badge: orders.length },
     { id: 'banners', label: 'Banners & CMS', icon: ImageIcon, badge: banners.length },
@@ -850,7 +865,7 @@ export default function AdminDashboardPage() {
       {/* ====================================================
           MOBILE BOTTOM NAVIGATION BAR
       ==================================================== */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 z-30 grid grid-cols-6 py-1.5 px-1 shadow-lg">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 z-30 grid grid-cols-8 py-1.5 px-0.5 shadow-lg">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -864,7 +879,7 @@ export default function AdminDashboardPage() {
             >
               <Icon className={`w-4 h-4 ${isActive ? 'text-[#143728]' : 'text-gray-400'}`} />
               <span className="text-[10px] mt-1 truncate max-w-full px-0.5">
-                {item.id === 'banners' ? 'Banners' : item.label}
+                {item.id === 'banners' ? 'Banners' : item.id === 'sizes' ? 'Sizes' : item.id === 'colors' ? 'Colors' : item.label}
               </span>
             </button>
           );
@@ -879,7 +894,7 @@ export default function AdminDashboardPage() {
         <div className="hidden lg:flex h-16 bg-white border-b border-gray-200 px-8 items-center justify-between sticky top-0 z-20">
           <div>
             <h1 className="text-lg font-bold text-gray-900 capitalize">
-              {activeTab === 'banners' ? 'Banners & Homepage CMS' : activeTab}
+              {activeTab === 'banners' ? 'Banners & Homepage CMS' : activeTab === 'colors' ? 'Product Colors' : activeTab === 'sizes' ? 'Product Sizes' : activeTab}
             </h1>
           </div>
 
@@ -1443,7 +1458,14 @@ export default function AdminDashboardPage() {
                             <button
                               type="button"
                               onClick={() => {
-                                setEditingProduct(p);
+                                const isVar = p.product_mode === 'variant' || Boolean(p.colors && p.colors.length > 0);
+                                setProductMode(isVar ? 'variant' : 'normal');
+                                setEditingProduct({
+                                  ...p,
+                                  product_mode: isVar ? 'variant' : 'normal',
+                                  stock: p.stock !== undefined ? p.stock : (p.variants?.reduce((sum, v) => sum + (v.inventory_quantity || 0), 0) ?? 25),
+                                  sizes: p.sizes || p.variants?.map((v) => v.size) || [],
+                                });
                                 setCustomImageUrl('');
                                 setShowProductModal(true);
                               }}
@@ -1829,8 +1851,21 @@ export default function AdminDashboardPage() {
                                   <p className="text-xs font-bold text-gray-900">
                                     {item.product_name}
                                   </p>
-                                  <p className="text-[11px] text-gray-500">
-                                    Size: {item.variant_label || 'Standard'} × {item.quantity}
+                                  <p className="text-[11px] text-gray-500 flex items-center gap-1.5 mt-0.5">
+                                    <span>Size: {item.variant_label || 'Standard'}</span>
+                                    {item.selected_color && (
+                                      <span className="flex items-center gap-1">
+                                        • Color:
+                                        {item.selected_color_hex && (
+                                          <span
+                                            className="inline-block w-2 h-2 rounded-full border border-black/15"
+                                            style={{ backgroundColor: item.selected_color_hex }}
+                                          />
+                                        )}
+                                        <strong className="text-gray-700">{item.selected_color}</strong>
+                                      </span>
+                                    )}
+                                    <span>• Qty: {item.quantity}</span>
                                   </p>
                                 </div>
                               </div>
@@ -1849,94 +1884,40 @@ export default function AdminDashboardPage() {
           )}
 
           {/* ====================================================
-              5. BANNERS & HOMEPAGE CMS TAB
+              PRODUCT COLORS CMS TAB (Phase 3)
+          ==================================================== */}
+          {activeTab === 'colors' && (
+            <ColorManagement
+              colors={colors}
+              onRefresh={loadData}
+              showNotification={showNotification}
+            />
+          )}
+          {/* ====================================================
+              PRODUCT SIZES MANAGEMENT TAB
+          ==================================================== */}
+          {activeTab === 'sizes' && (
+            <SizeManagement
+              categories={categories}
+              sizes={sizes}
+              onRefresh={loadData}
+              showNotification={showNotification}
+            />
+          )}
+
+
+          {/* ====================================================
+              5. BANNERS & HOMEPAGE CMS TAB (Phase 2)
           ==================================================== */}
           {activeTab === 'banners' && (
-            <div className="space-y-5">
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-                    Homepage Banners & Editorial CMS
-                  </h2>
-                  <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
-                    Click any banner below to upload a new campaign image or edit its button text and destination link.
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {banners.map((b) => {
-                  const sectionLabels: Record<string, string> = {
-                    hero: '1. Main Hero Banner (Top of Homepage)',
-                    essentials: '2. Modern Essentials Feature Card (Left of Best Sellers)',
-                    footwear: '3. Promo Banner 1 — Footwear',
-                    accessories: '4. Promo Banner 2 — Accessories',
-                    new_arrivals: '5. Promo Banner 3 — New Arrivals',
-                  };
-
-                  return (
-                    <div
-                      key={b.id}
-                      className={`bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-2xs flex flex-col justify-between ${
-                        b.section === 'hero' ? 'md:col-span-2' : ''
-                      }`}
-                    >
-                      <div>
-                        {/* Live Banner Image Preview */}
-                        <div
-                          className={`relative w-full bg-gray-100 border-b border-gray-100 overflow-hidden ${
-                            b.section === 'hero' ? 'h-56 sm:h-72' : 'h-48'
-                          }`}
-                        >
-                          <Image
-                            src={b.image_url || '/logo.png'}
-                            alt={b.title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 50vw"
-                            className="object-cover object-center"
-                          />
-                          <div className="absolute top-3 left-3 bg-gray-900/85 backdrop-blur-xs text-white text-xs font-bold px-3 py-1 rounded-lg">
-                            {sectionLabels[b.section] || b.section}
-                          </div>
-                        </div>
-
-                        <div className="p-5">
-                          <div className="flex items-start justify-between gap-4">
-                            <div>
-                              <span className="text-[11px] font-bold uppercase tracking-wider text-[#143728]">
-                                {b.subtitle || b.section}
-                              </span>
-                              <h3 className="text-base sm:text-lg font-bold text-gray-900 mt-0.5">
-                                {b.title}
-                              </h3>
-                              <p className="text-xs text-gray-500 mt-1">{b.description}</p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100 text-xs text-gray-600">
-                            <span className="font-semibold text-gray-900">
-                              Button: &ldquo;{b.cta_label}&rdquo;
-                            </span>
-                            <span>→</span>
-                            <span className="font-mono text-gray-500">{b.cta_url}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="px-5 pb-5">
-                        <button
-                          onClick={() => setEditingBanner(b)}
-                          className="w-full py-2.5 px-4 bg-[#143728] hover:bg-[#0d261b] text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                          <span>Edit Banner Text, Link & Upload Image</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <BannerManagement
+              banners={banners}
+              categories={categories}
+              products={products}
+              onRefresh={loadData}
+              showNotification={showNotification}
+              handleFileUpload={handleFileUpload}
+            />
           )}
 
           {/* ====================================================
@@ -2198,6 +2179,70 @@ export default function AdminDashboardPage() {
             </div>
 
             <form onSubmit={handleSaveProduct} className="space-y-5 text-xs">
+              {/* ====================================================
+                  PRODUCT CREATION MODE SWITCHING (Normal vs Variant Mode)
+              ==================================================== */}
+              <div className="bg-gray-100 p-2 rounded-2xl border border-gray-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="px-1">
+                    <span className="text-xs font-bold text-gray-800 uppercase tracking-wider block">
+                      Product Mode: 
+                    </span>
+                  </div>
+
+                  <div className="inline-flex p-1 bg-gray-200/80 rounded-xl gap-1 shrink-0 self-start sm:self-auto">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (productMode === 'normal') return;
+                        if (editingProduct.colors && editingProduct.colors.length > 0) {
+                          const confirmDiscard = window.confirm(
+                            'Switching to Normal Product Mode will discard configured color variants and their independent stock levels. Do you wish to continue?'
+                          );
+                          if (!confirmDiscard) return;
+                        }
+                        setProductMode('normal');
+                        setEditingProduct({
+                          ...editingProduct,
+                          product_mode: 'normal',
+                          colors: [],
+                        });
+                        showNotification('Switched to Normal Product Mode');
+                      }}
+                      className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                        productMode === 'normal'
+                          ? 'bg-white text-gray-900 shadow-xs border border-gray-200'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <Package className="w-3.5 h-3.5" />
+                      <span>Normal Product Mode</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (productMode === 'variant') return;
+                        setProductMode('variant');
+                        setEditingProduct({
+                          ...editingProduct,
+                          product_mode: 'variant',
+                        });
+                        showNotification('Switched to Product Variant Mode');
+                      }}
+                      className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                        productMode === 'variant'
+                          ? 'bg-[#143728] text-white shadow-xs'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <Layers className="w-3.5 h-3.5" />
+                      <span>Product Variant Mode</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* 1. Name & Category */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -2223,29 +2268,64 @@ export default function AdminDashboardPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="block font-semibold text-gray-700 mb-1">
-                    Category *
-                  </label>
-                  <select
-                    value={editingProduct.category_id || ''}
-                    onChange={(e) => {
-                      const cat = categories.find((c) => c.id === e.target.value);
-                      setEditingProduct({
-                        ...editingProduct,
-                        category_id: e.target.value,
-                        category_slug: cat?.slug || '',
-                        category_name: cat?.name || '',
-                      });
-                    }}
-                    className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl bg-white focus:border-[#143728] focus:outline-none"
-                  >
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name} ({c.slug})
-                      </option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">
+                      Main Category *
+                    </label>
+                    <select
+                      value={editingProduct.category_id || ''}
+                      onChange={(e) => {
+                        const cat = categories.find((c) => c.id === e.target.value);
+                        setEditingProduct({
+                          ...editingProduct,
+                          category_id: e.target.value,
+                          category_slug: cat?.slug || '',
+                          category_name: cat?.name || '',
+                          subcategory_id: '',
+                          subcategory_slug: '',
+                          subcategory_name: '',
+                        });
+                      }}
+                      className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl bg-white focus:border-[#143728] focus:outline-none"
+                    >
+                      <option value="">-- Select Main Category --</option>
+                      {categories.filter((c) => !c.parent_id).map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">
+                      Subcategory
+                    </label>
+                    <select
+                      value={editingProduct.subcategory_id || ''}
+                      disabled={!editingProduct.category_id}
+                      onChange={(e) => {
+                        const sub = categories.find((s) => s.id === e.target.value);
+                        setEditingProduct({
+                          ...editingProduct,
+                          subcategory_id: e.target.value,
+                          subcategory_slug: sub?.slug || '',
+                          subcategory_name: sub?.name || '',
+                        });
+                      }}
+                      className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl bg-white focus:border-[#143728] focus:outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                    >
+                      <option value="">-- Select Subcategory (Optional) --</option>
+                      {categories
+                        .filter((s) => s.parent_id === editingProduct.category_id)
+                        .map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -2297,247 +2377,825 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* 3. Product Images (Cloudinary Upload + URL option) */}
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="block font-bold text-gray-800">
-                    Product Photographs
-                  </label>
-                  <span className="text-[11px] text-gray-500">
-                    {(editingProduct.images || []).length} uploaded
-                  </span>
-                </div>
+              {/* ====================================================
+                  MODE-SPECIFIC FORM SECTIONS
+              ==================================================== */}
 
-                {/* Current Images Preview */}
-                {(editingProduct.images || []).length > 0 && (
-                  <div className="flex items-center gap-3 overflow-x-auto py-1">
-                    {(editingProduct.images || []).map((img, i) => (
-                      <div
-                        key={img.id || i}
-                        className="relative w-20 h-24 rounded-xl overflow-hidden bg-white border border-gray-300 flex-shrink-0 group"
-                      >
-                        <Image
-                          src={img.image_url}
-                          alt="Product"
-                          fill
-                          sizes="80px"
-                          className="object-cover"
-                        />
-                        {i === 0 && (
-                          <span className="absolute bottom-1 left-1 right-1 bg-black/75 text-white text-[9px] font-bold text-center py-0.5 rounded">
-                            Main Photo
-                          </span>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updatedImgs = (editingProduct.images || []).filter(
-                              (_, idx) => idx !== i
-                            );
-                            setEditingProduct({ ...editingProduct, images: updatedImgs });
-                          }}
-                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-xs shadow"
-                        >
-                          ×
-                        </button>
+              {/* --------------------------------------------------
+                  MODE A: NORMAL PRODUCT MODE (Toggle OFF)
+                  Single common stock, category-based sizes, max 5 images
+              -------------------------------------------------- */}
+              {productMode === 'normal' && (
+                <div className="space-y-4">
+                  {/* Normal Product Common Stock */}
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <label className="block font-bold text-gray-800 text-xs uppercase tracking-wider mb-0.5">
+                          Single Product Stock Quantity (Units) *
+                        </label>
+                        <p className="text-[11px] text-gray-500">
+                          In Normal Product Mode, all selected sizes share this single common stock inventory.
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                )}
 
-                {/* Upload file button */}
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-dashed border-gray-300 hover:border-[#143728] rounded-xl cursor-pointer transition">
-                    <UploadCloud className="w-5 h-5 text-[#143728]" />
-                    <span className="font-semibold text-gray-700">
-                      {uploadingImage ? 'Uploading to Cloudinary...' : 'Click to Upload Image File'}
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        setUploadingImage(true);
-                        try {
-                          const uploaded = await handleFileUpload(file, 'notions/products');
-                          const newImg = {
-                            id: `img-${Date.now()}`,
-                            product_id: editingProduct.id || '',
-                            image_url: uploaded.url,
-                            image_public_id: uploaded.public_id,
-                            alt_text: editingProduct.name || 'Product Image',
-                            sort_order: (editingProduct.images?.length || 0) + 1,
-                            is_primary: (editingProduct.images?.length || 0) === 0,
-                          };
-                          setEditingProduct({
-                            ...editingProduct,
-                            images: [...(editingProduct.images || []), newImg],
-                          });
-                          showNotification('Image uploaded to Cloudinary!');
-                        } catch (err: any) {
-                          showNotification(err.message, 'error');
-                        } finally {
-                          setUploadingImage(false);
-                        }
-                      }}
-                    />
-                  </label>
-
-                  {/* Or paste image URL */}
-                  <div className="flex gap-1.5">
-                    <input
-                      type="text"
-                      value={customImageUrl}
-                      onChange={(e) => setCustomImageUrl(e.target.value)}
-                      placeholder="Or paste image URL..."
-                      className="px-3 py-2 bg-white border border-gray-300 rounded-xl text-xs w-44"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!customImageUrl.trim()) return;
-                        const newImg = {
-                          id: `img-${Date.now()}`,
-                          product_id: editingProduct.id || '',
-                          image_url: customImageUrl.trim(),
-                          image_public_id: 'custom_url',
-                          alt_text: editingProduct.name || 'Product Image',
-                          sort_order: (editingProduct.images?.length || 0) + 1,
-                          is_primary: (editingProduct.images?.length || 0) === 0,
-                        };
-                        setEditingProduct({
-                          ...editingProduct,
-                          images: [...(editingProduct.images || []), newImg],
-                        });
-                        setCustomImageUrl('');
-                      }}
-                      className="px-3 py-2 bg-gray-800 text-white rounded-xl font-semibold text-xs"
-                    >
-                      Add URL
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. Sizes & Inventory Stock Manager */}
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div>
-                    <label className="block font-bold text-gray-800">
-                      Sizes & Inventory Stock
-                    </label>
-                    <p className="text-[11px] text-gray-500">
-                      Use quick presets or add custom sizes below.
-                    </p>
-                  </div>
-                  {/* 1-Click Size Presets */}
-                  <div className="flex flex-wrap gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => applyVariantPreset(['S', 'M', 'L', 'XL', 'XXL'])}
-                      className="px-2.5 py-1 bg-white border border-gray-300 hover:border-[#143728] rounded-lg text-[11px] font-semibold text-gray-700 cursor-pointer"
-                    >
-                      Shirts/Tees (S–XXL)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => applyVariantPreset(['30', '32', '34', '36'])}
-                      className="px-2.5 py-1 bg-white border border-gray-300 hover:border-[#143728] rounded-lg text-[11px] font-semibold text-gray-700 cursor-pointer"
-                    >
-                      Jeans/Trousers (30–36)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => applyVariantPreset(['7', '8', '9', '10'])}
-                      className="px-2.5 py-1 bg-white border border-gray-300 hover:border-[#143728] rounded-lg text-[11px] font-semibold text-gray-700 cursor-pointer"
-                    >
-                      Footwear (7–10)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => applyVariantPreset(['One Size'])}
-                      className="px-2.5 py-1 bg-white border border-gray-300 hover:border-[#143728] rounded-lg text-[11px] font-semibold text-gray-700 cursor-pointer"
-                    >
-                      Accessories (One Size)
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  {(editingProduct.variants || []).map((v, idx) => (
-                    <div
-                      key={v.id || idx}
-                      className="bg-white p-2.5 rounded-xl border border-gray-200 flex flex-col gap-1.5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-gray-400 uppercase">Size</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = (editingProduct.variants || []).filter(
-                              (_, i) => i !== idx
-                            );
-                            setEditingProduct({ ...editingProduct, variants: updated });
-                          }}
-                          className="text-gray-400 hover:text-red-600 text-xs font-bold"
-                        >
-                          ×
-                        </button>
-                      </div>
-                      <input
-                        type="text"
-                        value={v.size}
-                        placeholder="Size"
-                        onChange={(e) => {
-                          const updated = [...(editingProduct.variants || [])];
-                          updated[idx] = { ...updated[idx], size: e.target.value };
-                          setEditingProduct({ ...editingProduct, variants: updated });
-                        }}
-                        className="w-full px-2 py-1 text-xs font-bold border border-gray-200 rounded-lg text-center"
-                      />
-                      <div className="flex items-center justify-between gap-1 mt-0.5">
-                        <span className="text-[10px] text-gray-500">Stock:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500 font-semibold">Total Stock:</span>
                         <input
                           type="number"
-                          value={v.inventory_quantity}
+                          min="0"
+                          required
+                          value={editingProduct.stock ?? 25}
                           onChange={(e) => {
-                            const updated = [...(editingProduct.variants || [])];
-                            updated[idx] = {
-                              ...updated[idx],
-                              inventory_quantity: Number(e.target.value),
-                            };
-                            setEditingProduct({ ...editingProduct, variants: updated });
+                            const val = Math.max(0, Number(e.target.value) || 0);
+                            setEditingProduct({
+                              ...editingProduct,
+                              stock: val,
+                              variants: (editingProduct.sizes || []).map((sz, i) => ({
+                                id: `var-${Date.now()}-${i}`,
+                                product_id: editingProduct.id || '',
+                                size: sz,
+                                inventory_quantity: val,
+                                is_available: val > 0,
+                              })),
+                            });
                           }}
-                          className="w-16 px-2 py-1 text-xs border border-gray-200 rounded-lg text-center font-semibold"
+                          className="w-24 px-3 py-1.5 text-xs border border-gray-300 rounded-lg text-center font-bold bg-white text-gray-900 focus:outline-none focus:border-[#143728]"
                         />
                       </div>
                     </div>
-                  ))}
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const updated = [
-                        ...(editingProduct.variants || []),
-                        {
-                          id: `var-${Date.now()}`,
-                          product_id: editingProduct.id || '',
-                          size: 'L',
-                          inventory_quantity: 20,
-                          is_available: true,
-                        },
-                      ];
-                      setEditingProduct({ ...editingProduct, variants: updated });
-                    }}
-                    className="border-2 border-dashed border-gray-300 hover:border-[#143728] rounded-xl p-2.5 flex flex-col items-center justify-center text-gray-500 hover:text-[#143728] font-semibold transition cursor-pointer"
-                  >
-                    <Plus className="w-4 h-4 mb-0.5" />
-                    <span>Add Size</span>
-                  </button>
+                  {/* Normal Product Category-Based Size Selection */}
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <label className="block font-bold text-gray-800 text-xs uppercase tracking-wider">
+                          Select Sizes for {editingProduct.category_name || 'Category'}
+                        </label>
+                        <p className="text-[11px] text-gray-500">
+                          Sizes are dynamically loaded from Product Sizes. Select applicable size options for this product.
+                        </p>
+                      </div>
+                    </div>
+
+                    {(() => {
+                      const targetCatId = editingProduct.subcategory_id || editingProduct.category_id;
+                      const catSizes = sizes.filter(
+                        (s) =>
+                          (s.category_id === targetCatId ||
+                            s.category_id === editingProduct.category_id ||
+                            (editingProduct.subcategory_id && s.category_id === editingProduct.subcategory_id)) &&
+                          s.is_active !== false
+                      );
+
+                      if (catSizes.length === 0) {
+                        return (
+                          <div className="flex items-start gap-2.5 p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-xs">
+                            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                            <div>
+                              <span className="font-bold block">
+                                No sizes configured for {editingProduct.category_name || 'the selected category'}
+                              </span>
+                              <span className="text-[11px] text-amber-800">
+                                Size creation is managed exclusively in the <strong>Product Sizes</strong> sidebar. Please open the Product Sizes sidebar to add sizes for this category.
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          {catSizes.map((cs) => {
+                            const isSelected = (editingProduct.sizes || []).includes(cs.name);
+                            return (
+                              <button
+                                key={cs.id}
+                                type="button"
+                                onClick={() => {
+                                  let currentSizes = editingProduct.sizes ? [...editingProduct.sizes] : [];
+                                  if (isSelected) {
+                                    currentSizes = currentSizes.filter((s) => s !== cs.name);
+                                  } else {
+                                    currentSizes.push(cs.name);
+                                  }
+                                  const commonStock = editingProduct.stock ?? 25;
+                                  const updatedVariants: ProductVariant[] = currentSizes.map((sz, i) => ({
+                                    id: `var-${Date.now()}-${i}`,
+                                    product_id: editingProduct.id || '',
+                                    size: sz,
+                                    inventory_quantity: commonStock,
+                                    is_available: commonStock > 0,
+                                  }));
+                                  setEditingProduct({
+                                    ...editingProduct,
+                                    sizes: currentSizes,
+                                    variants: updatedVariants,
+                                  });
+                                }}
+                                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer ${
+                                  isSelected
+                                    ? 'bg-[#143728] text-white border-[#143728] shadow-2xs'
+                                    : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                                }`}
+                              >
+                                {cs.name} {isSelected ? '✓' : '+'}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Normal Product Images (Maximum 5 Images) */}
+                  <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <label className="block font-bold text-gray-800 text-xs uppercase tracking-wider">
+                          Product Photographs (Max 5 Images)
+                        </label>
+                        <p className="text-[11px] text-gray-500">
+                          Upload high-resolution product photos. Drag or use arrows to set the primary cover photo.
+                        </p>
+                      </div>
+                    
+                    </div>
+
+                    {/* Image previews with reorder and delete */}
+                    {(editingProduct.images || []).length > 0 ? (
+                      <div className="flex flex-wrap items-center gap-2.5 py-1">
+                        {(editingProduct.images || []).map((img, i, arr) => (
+                          <div
+                            key={img.id || i}
+                            className="relative w-20 h-24 rounded-xl overflow-hidden bg-white border border-gray-300 flex-shrink-0 group shadow-2xs"
+                          >
+                            <Image
+                              src={img.image_url}
+                              alt="Product"
+                              fill
+                              sizes="80px"
+                              className="object-cover"
+                            />
+                            {i === 0 && (
+                              <span className="absolute bottom-0 inset-x-0 bg-black/75 text-white text-[8px] font-bold text-center py-0.5 z-10">
+                                Primary Photo
+                              </span>
+                            )}
+                            <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-1 z-20">
+                              {i > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const imgs = [...(editingProduct.images || [])];
+                                    const temp = imgs[i - 1];
+                                    imgs[i - 1] = imgs[i];
+                                    imgs[i] = temp;
+                                    setEditingProduct({ ...editingProduct, images: imgs });
+                                  }}
+                                  className="p-1 rounded bg-white text-gray-800 text-[10px] hover:bg-gray-100 cursor-pointer"
+                                  title="Move Left"
+                                >
+                                  <ChevronLeft className="w-3 h-3" />
+                                </button>
+                              )}
+                              {i < arr.length - 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const imgs = [...(editingProduct.images || [])];
+                                    const temp = imgs[i + 1];
+                                    imgs[i + 1] = imgs[i];
+                                    imgs[i] = temp;
+                                    setEditingProduct({ ...editingProduct, images: imgs });
+                                  }}
+                                  className="p-1 rounded bg-white text-gray-800 text-[10px] hover:bg-gray-100 cursor-pointer"
+                                  title="Move Right"
+                                >
+                                  <ChevronRight className="w-3 h-3" />
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = (editingProduct.images || []).filter((_, idx) => idx !== i);
+                                  setEditingProduct({ ...editingProduct, images: updated });
+                                }}
+                                className="p-1 rounded bg-red-600 text-white text-[10px] hover:bg-red-700 cursor-pointer"
+                                title="Delete Image"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-gray-400 italic p-3 bg-white rounded-xl border border-dashed border-gray-200 text-center">
+                        No product photos uploaded. Upload up to 5 photos below.
+                      </p>
+                    )}
+
+                    {/* Upload controls (disabled if 5 images reached) */}
+                    {(editingProduct.images || []).length < 5 ? (
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-white border-2 border-dashed border-gray-300 hover:border-[#143728] rounded-xl cursor-pointer transition shadow-2xs">
+                          <UploadCloud className="w-4 h-4 text-[#143728]" />
+                          <span className="font-semibold text-gray-700 text-xs">
+                            {uploadingImage ? 'Uploading Photos...' : 'Upload Images (Max 5 Total, Multiple Supported)'}
+                          </span>
+                          <input
+                            type="file"
+                            multiple
+                            accept="image/png,image/jpeg,image/webp"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const files = Array.from(e.target.files || []);
+                              if (files.length === 0) return;
+                              const currentCount = editingProduct.images?.length || 0;
+                              const availableSlots = 5 - currentCount;
+                              if (availableSlots <= 0) {
+                                showNotification('Maximum 5 images allowed per product.', 'error');
+                                return;
+                              }
+                              const filesToUpload = files.slice(0, availableSlots);
+                              setUploadingImage(true);
+                              try {
+                                const newImgs: ProductImage[] = [];
+                                for (const file of filesToUpload) {
+                                  const uploaded = await handleFileUpload(file, 'notions/products');
+                                  newImgs.push({
+                                    id: `img-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+                                    product_id: editingProduct.id || '',
+                                    image_url: uploaded.url,
+                                    image_public_id: uploaded.public_id,
+                                    alt_text: editingProduct.name || 'Product Image',
+                                    sort_order: currentCount + newImgs.length + 1,
+                                    is_primary: currentCount === 0 && newImgs.length === 0,
+                                  });
+                                }
+                                setEditingProduct({
+                                  ...editingProduct,
+                                  images: [...(editingProduct.images || []), ...newImgs],
+                                });
+                                showNotification(`Uploaded ${newImgs.length} image(s) successfully!`);
+                              } catch (err: any) {
+                                showNotification(err.message, 'error');
+                              } finally {
+                                setUploadingImage(false);
+                              }
+                            }}
+                          />
+                        </label>
+
+                        {/* Paste URL */}
+                        <div className="flex gap-1.5">
+                          <input
+                            type="text"
+                            value={customImageUrl}
+                            onChange={(e) => setCustomImageUrl(e.target.value)}
+                            placeholder="Or paste image URL..."
+                            className="px-3 py-2 bg-white border border-gray-300 rounded-xl text-xs w-44"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!customImageUrl.trim()) return;
+                              if ((editingProduct.images?.length || 0) >= 5) {
+                                showNotification('Maximum 5 images allowed per product.', 'error');
+                                return;
+                              }
+                              const newImg: ProductImage = {
+                                id: `img-${Date.now()}`,
+                                product_id: editingProduct.id || '',
+                                image_url: customImageUrl.trim(),
+                                image_public_id: 'custom_url',
+                                alt_text: editingProduct.name || 'Product Image',
+                                sort_order: (editingProduct.images?.length || 0) + 1,
+                                is_primary: (editingProduct.images?.length || 0) === 0,
+                              };
+                              setEditingProduct({
+                                ...editingProduct,
+                                images: [...(editingProduct.images || []), newImg],
+                              });
+                              setCustomImageUrl('');
+                            }}
+                            className="px-3 py-2 bg-gray-800 hover:bg-gray-900 text-white rounded-xl font-semibold text-xs cursor-pointer"
+                          >
+                            Add URL
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200 text-center font-semibold">
+                        Maximum 5 images reached. Remove an existing image to upload another.
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* --------------------------------------------------
+                  MODE B: PRODUCT VARIANT MODE (Toggle ON)
+                  Colors, per-color galleries (max 5), independent stock
+              -------------------------------------------------- */}
+              {productMode === 'variant' && (
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <label className="block font-bold text-gray-800 text-sm">
+                        Product Colors, Galleries & Color-Wise Stock
+                      </label>
+                      <p className="text-[11px] text-gray-500">
+                        Upload up to 5 photos per color and configure category-specific sizes with independent stock levels.
+                      </p>
+                    </div>
+
+                    {/* Add Color Dropdown */}
+                    <div className="flex items-center gap-2">
+                      <select
+                        className="px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 cursor-pointer shadow-2xs focus:outline-none focus:border-[#143728]"
+                        value=""
+                        onChange={(e) => {
+                          const colId = e.target.value;
+                          if (!colId) return;
+                          const col = colors.find((c) => c.id === colId);
+                          if (col) {
+                            const currentColors = editingProduct.colors || [];
+                            if (!currentColors.some((c) => c.color_id === col.id)) {
+                              const targetCatId = editingProduct.subcategory_id || editingProduct.category_id;
+                              const catSizes = sizes.filter(
+                                (s) =>
+                                  (s.category_id === targetCatId ||
+                                    s.category_id === editingProduct.category_id ||
+                                    (editingProduct.subcategory_id && s.category_id === editingProduct.subcategory_id)) &&
+                                  s.is_active !== false
+                              );
+                              const initialSizes = catSizes.map((s) => ({
+                                size_id: s.id,
+                                size: s.name,
+                                stock: 15,
+                              }));
+                              const initialStock = initialSizes.reduce((sum, s) => sum + s.stock, 0);
+
+                              const newVariant: ProductColorVariant = {
+                                color_id: col.id,
+                                name: col.name,
+                                hex: col.hex,
+                                stock: initialStock,
+                                image_url: '',
+                                image_public_id: '',
+                                images: [],
+                                sizes: initialSizes,
+                              };
+
+                              const updatedColors = [...currentColors, newVariant];
+
+                              const sizeMap: { [key: string]: number } = {};
+                              updatedColors.forEach((c) => {
+                                (c.sizes || []).forEach((s) => {
+                                  sizeMap[s.size] = (sizeMap[s.size] || 0) + (Number(s.stock) || 0);
+                                });
+                              });
+                              const updatedVariants: ProductVariant[] = Object.keys(sizeMap).map((sz, i) => ({
+                                id: `var-${Date.now()}-${i}`,
+                                product_id: editingProduct.id || '',
+                                size: sz,
+                                inventory_quantity: sizeMap[sz],
+                                is_available: sizeMap[sz] > 0,
+                              }));
+
+                              setEditingProduct({
+                                ...editingProduct,
+                                colors: updatedColors,
+                                variants: updatedVariants,
+                              });
+                            }
+                          }
+                        }}
+                      >
+                        <option value="">+ Assign Color Variant</option>
+                        {colors
+                          .filter((c) => c.is_active !== false)
+                          .filter((c) => !(editingProduct.colors || []).some((ec) => ec.color_id === c.id))
+                          .map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.name} ({c.hex})
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Warning if category has no sizes configured yet */}
+                  {(() => {
+                    const targetCatId = editingProduct.subcategory_id || editingProduct.category_id;
+                    const catSizes = sizes.filter(
+                      (s) =>
+                        (s.category_id === targetCatId ||
+                          s.category_id === editingProduct.category_id ||
+                          (editingProduct.subcategory_id && s.category_id === editingProduct.subcategory_id)) &&
+                        s.is_active !== false
+                    );
+                    if (catSizes.length === 0) {
+                      return (
+                        <div className="flex items-start gap-2.5 p-3 bg-amber-50 rounded-xl border border-amber-200 text-amber-900 text-xs">
+                          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="font-bold block">
+                              No sizes configured for {editingProduct.category_name || 'the selected category'}
+                            </span>
+                            <span className="text-[11px] text-amber-800">
+                              Size creation is managed exclusively in the <strong>Product Sizes</strong> sidebar. Please open the Product Sizes sidebar to add sizes for this category.
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
+                  {/* List of Assigned Color Variants */}
+                  {(!editingProduct.colors || editingProduct.colors.length === 0) ? (
+                    <p className="text-xs text-gray-500 italic p-4 bg-white rounded-xl border border-dashed border-gray-200 text-center">
+                      No color variants assigned. Select a color above to upload color photo galleries (up to 5 per color), assign sizes, and set independent stock.
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {editingProduct.colors.map((cv, cIdx) => {
+                        const targetCatId = editingProduct.subcategory_id || editingProduct.category_id;
+                        const catSizes = sizes.filter(
+                          (s) =>
+                            (s.category_id === targetCatId ||
+                              s.category_id === editingProduct.category_id ||
+                              (editingProduct.subcategory_id && s.category_id === editingProduct.subcategory_id)) &&
+                            s.is_active !== false
+                        );
+
+                        const colorImgCount = cv.images?.length || (cv.image_url ? 1 : 0);
+
+                        return (
+                          <div
+                            key={cv.color_id || cIdx}
+                            className="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs space-y-3"
+                          >
+                            {/* Color Variant Header */}
+                            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                              <div className="flex items-center gap-2.5">
+                                <span
+                                  className="w-6 h-6 rounded-full border border-black/20 shadow-2xs shrink-0 inline-block"
+                                  style={{ backgroundColor: cv.hex }}
+                                />
+                                <div>
+                                  <span className="text-xs font-bold text-gray-900">{cv.name}</span>
+                                  <span className="text-[10px] text-gray-400 font-mono uppercase ml-1.5">
+                                    {cv.hex}
+                                  </span>
+                                </div>
+                                <span className="ml-2 px-2 py-0.5 bg-emerald-50 text-[#143728] text-[10px] font-bold rounded-full border border-emerald-100">
+                                  Total Stock: {cv.stock || 0}
+                                </span>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updatedColors = (editingProduct.colors || []).filter((_, i) => i !== cIdx);
+                                  const sizeMap: { [key: string]: number } = {};
+                                  updatedColors.forEach((c) => {
+                                    (c.sizes || []).forEach((s) => {
+                                      sizeMap[s.size] = (sizeMap[s.size] || 0) + (Number(s.stock) || 0);
+                                    });
+                                  });
+                                  const updatedVariants: ProductVariant[] = Object.keys(sizeMap).map((sz, i) => ({
+                                    id: `var-${Date.now()}-${i}`,
+                                    product_id: editingProduct.id || '',
+                                    size: sz,
+                                    inventory_quantity: sizeMap[sz],
+                                    is_available: sizeMap[sz] > 0,
+                                  }));
+                                  setEditingProduct({
+                                    ...editingProduct,
+                                    colors: updatedColors,
+                                    variants: updatedVariants,
+                                  });
+                                }}
+                                className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg cursor-pointer transition"
+                                title="Remove Color"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+
+                            {/* Multi-Image Gallery for this Color (Max 5 Images) */}
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-700">
+                                  {cv.name} Gallery: <span className="text-[#143728]">{colorImgCount} / 5 photos ({Math.max(0, 5 - colorImgCount)} slots left)</span>
+                                </span>
+                                {colorImgCount < 5 ? (
+                                  <label className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 hover:bg-gray-100 border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 cursor-pointer transition">
+                                    <UploadCloud className="w-3.5 h-3.5 text-[#143728]" />
+                                    <span>Upload Photos (Max 5)</span>
+                                    <input
+                                      type="file"
+                                      multiple
+                                      accept="image/png,image/jpeg,image/webp"
+                                      className="hidden"
+                                      onChange={async (e) => {
+                                        const files = Array.from(e.target.files || []);
+                                        if (files.length === 0) return;
+                                        const availableSlots = 5 - colorImgCount;
+                                        if (availableSlots <= 0) {
+                                          showNotification(`Maximum 5 images allowed for ${cv.name}.`, 'error');
+                                          return;
+                                        }
+                                        const filesToUpload = files.slice(0, availableSlots);
+                                        setUploadingImage(true);
+                                        try {
+                                          const updatedColors = [...(editingProduct.colors || [])];
+                                          const currentImages = updatedColors[cIdx].images ? [...updatedColors[cIdx].images!] : [];
+                                          if (updatedColors[cIdx].image_url && currentImages.length === 0) {
+                                            currentImages.push({
+                                              id: `img-${Date.now()}-0`,
+                                              url: updatedColors[cIdx].image_url!,
+                                              public_id: updatedColors[cIdx].image_public_id,
+                                              sort_order: 1,
+                                            });
+                                          }
+                                          for (const file of filesToUpload) {
+                                            const uploaded = await handleFileUpload(file, 'notions/products/colors');
+                                            currentImages.push({
+                                              id: `img-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+                                              url: uploaded.url,
+                                              public_id: uploaded.public_id,
+                                              sort_order: currentImages.length + 1,
+                                            });
+                                          }
+                                          updatedColors[cIdx] = {
+                                            ...updatedColors[cIdx],
+                                            images: currentImages,
+                                            image_url: currentImages[0]?.url,
+                                            image_public_id: currentImages[0]?.public_id,
+                                          };
+                                          setEditingProduct({ ...editingProduct, colors: updatedColors });
+                                          showNotification(`Uploaded ${filesToUpload.length} image(s) for ${cv.name}!`);
+                                        } catch (err: any) {
+                                          showNotification(err.message, 'error');
+                                        } finally {
+                                          setUploadingImage(false);
+                                        }
+                                      }}
+                                    />
+                                  </label>
+                                ) : (
+                                  <span className="text-[10px] text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-semibold border border-amber-200">
+                                    Max 5 Photos Reached
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Image Previews, Reorder, Delete & Replace */}
+                              {(!cv.images || cv.images.length === 0) && !cv.image_url ? (
+                                <p className="text-[11px] text-gray-400 italic p-2.5 bg-gray-50 rounded-lg text-center">
+                                  No photos uploaded for {cv.name} yet. Click "Upload Photos" above to add up to 5 images.
+                                </p>
+                              ) : (
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {(cv.images && cv.images.length > 0
+                                    ? cv.images
+                                    : cv.image_url
+                                    ? [{ id: 'legacy-1', url: cv.image_url, public_id: cv.image_public_id, sort_order: 1 }]
+                                    : []
+                                  ).map((img, imgIdx, imgArr) => (
+                                    <div
+                                      key={img.id || imgIdx}
+                                      className="relative w-16 h-20 rounded-lg bg-gray-50 border border-gray-200 overflow-hidden group shadow-2xs"
+                                    >
+                                      <Image src={img.url} alt={`${cv.name} ${imgIdx}`} fill className="object-cover" />
+                                      {imgIdx === 0 && (
+                                        <span className="absolute bottom-0 inset-x-0 bg-black/75 text-white text-[8px] font-bold text-center py-0.5 z-10">
+                                          Primary
+                                        </span>
+                                      )}
+                                      <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-1 z-20">
+                                        {imgIdx > 0 && (
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const updatedColors = [...(editingProduct.colors || [])];
+                                              const imgs = [...(updatedColors[cIdx].images || [])];
+                                              const temp = imgs[imgIdx - 1];
+                                              imgs[imgIdx - 1] = imgs[imgIdx];
+                                              imgs[imgIdx] = temp;
+                                              updatedColors[cIdx] = {
+                                                ...updatedColors[cIdx],
+                                                images: imgs,
+                                                image_url: imgs[0]?.url,
+                                              };
+                                              setEditingProduct({ ...editingProduct, colors: updatedColors });
+                                            }}
+                                            className="p-1 rounded bg-white text-gray-800 text-[10px] hover:bg-gray-100"
+                                            title="Move Left"
+                                          >
+                                            <ChevronLeft className="w-3 h-3" />
+                                          </button>
+                                        )}
+                                        {imgIdx < imgArr.length - 1 && (
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              const updatedColors = [...(editingProduct.colors || [])];
+                                              const imgs = [...(updatedColors[cIdx].images || [])];
+                                              const temp = imgs[imgIdx + 1];
+                                              imgs[imgIdx + 1] = imgs[imgIdx];
+                                              imgs[imgIdx] = temp;
+                                              updatedColors[cIdx] = {
+                                                ...updatedColors[cIdx],
+                                                images: imgs,
+                                                image_url: imgs[0]?.url,
+                                              };
+                                              setEditingProduct({ ...editingProduct, colors: updatedColors });
+                                            }}
+                                            className="p-1 rounded bg-white text-gray-800 text-[10px] hover:bg-gray-100"
+                                            title="Move Right"
+                                          >
+                                            <ChevronRight className="w-3 h-3" />
+                                          </button>
+                                        )}
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const updatedColors = [...(editingProduct.colors || [])];
+                                            const imgs = (updatedColors[cIdx].images || []).filter((_, i) => i !== imgIdx);
+                                            updatedColors[cIdx] = {
+                                              ...updatedColors[cIdx],
+                                              images: imgs,
+                                              image_url: imgs[0]?.url || '',
+                                              image_public_id: imgs[0]?.public_id || '',
+                                            };
+                                            setEditingProduct({ ...editingProduct, colors: updatedColors });
+                                          }}
+                                          className="p-1 rounded bg-red-600 text-white text-[10px] hover:bg-red-700"
+                                          title="Delete Image"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Category-Wise Sizes & Stock for this Color */}
+                            <div className="pt-2 border-t border-gray-100">
+                              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-700 block mb-1.5">
+                                Applicable Sizes & Stock for {cv.name}:
+                              </span>
+
+                              {catSizes.length === 0 ? (
+                                <p className="text-[11px] text-amber-700 italic">
+                                  No sizes found in category "{editingProduct.category_name || 'selected'}". Configure sizes in Product Sizes tab first.
+                                </p>
+                              ) : (
+                                <div className="space-y-2">
+                                  {/* Size Selection Pills */}
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {catSizes.map((cs) => {
+                                      const isAssigned = (cv.sizes || []).some(
+                                        (s) => s.size.toLowerCase() === cs.name.toLowerCase() || s.size_id === cs.id
+                                      );
+                                      return (
+                                        <button
+                                          key={cs.id}
+                                          type="button"
+                                          onClick={() => {
+                                            const updatedColors = [...(editingProduct.colors || [])];
+                                            let currentSizes = updatedColors[cIdx].sizes ? [...updatedColors[cIdx].sizes!] : [];
+                                            if (isAssigned) {
+                                              currentSizes = currentSizes.filter(
+                                                (s) => s.size.toLowerCase() !== cs.name.toLowerCase() && s.size_id !== cs.id
+                                              );
+                                            } else {
+                                              currentSizes.push({
+                                                size_id: cs.id,
+                                                size: cs.name,
+                                                stock: 15,
+                                              });
+                                            }
+                                            const totalStock = currentSizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0);
+                                            updatedColors[cIdx] = {
+                                              ...updatedColors[cIdx],
+                                              sizes: currentSizes,
+                                              stock: totalStock,
+                                            };
+
+                                            const sizeMap: { [key: string]: number } = {};
+                                            updatedColors.forEach((c) => {
+                                              (c.sizes || []).forEach((s) => {
+                                                sizeMap[s.size] = (sizeMap[s.size] || 0) + (Number(s.stock) || 0);
+                                              });
+                                            });
+                                            const updatedVariants: ProductVariant[] = Object.keys(sizeMap).map((sz, i) => ({
+                                              id: `var-${Date.now()}-${i}`,
+                                              product_id: editingProduct.id || '',
+                                              size: sz,
+                                              inventory_quantity: sizeMap[sz],
+                                              is_available: sizeMap[sz] > 0,
+                                            }));
+
+                                            setEditingProduct({
+                                              ...editingProduct,
+                                              colors: updatedColors,
+                                              variants: updatedVariants,
+                                            });
+                                          }}
+                                          className={`px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer border ${
+                                            isAssigned
+                                              ? 'bg-[#143728] text-white border-[#143728]'
+                                              : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                                          }`}
+                                        >
+                                          {cs.name} {isAssigned ? '✓' : '+'}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+
+                                  {/* Stock input grid for each active size */}
+                                  {(cv.sizes && cv.sizes.length > 0) ? (
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 pt-1">
+                                      {cv.sizes.map((sz, szIdx) => (
+                                        <div
+                                          key={sz.size_id || szIdx}
+                                          className="bg-gray-50 p-2 rounded-lg border border-gray-200 text-center"
+                                        >
+                                          <span className="text-[10px] font-bold text-gray-500 uppercase block mb-1">
+                                            Size {sz.size}
+                                          </span>
+                                          <div className="flex items-center justify-center gap-1">
+                                            <span className="text-[10px] text-gray-400">Qty:</span>
+                                            <input
+                                              type="number"
+                                              min="0"
+                                              value={sz.stock}
+                                              onChange={(e) => {
+                                                const updatedColors = [...(editingProduct.colors || [])];
+                                                const currentSizes = [...(updatedColors[cIdx].sizes || [])];
+                                                currentSizes[szIdx] = {
+                                                  ...currentSizes[szIdx],
+                                                  stock: Math.max(0, Number(e.target.value) || 0),
+                                                };
+                                                const totalStock = currentSizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0);
+                                                updatedColors[cIdx] = {
+                                                  ...updatedColors[cIdx],
+                                                  sizes: currentSizes,
+                                                  stock: totalStock,
+                                                };
+
+                                                const sizeMap: { [key: string]: number } = {};
+                                                updatedColors.forEach((c) => {
+                                                  (c.sizes || []).forEach((s) => {
+                                                    sizeMap[s.size] = (sizeMap[s.size] || 0) + (Number(s.stock) || 0);
+                                                  });
+                                                });
+                                                const updatedVariants: ProductVariant[] = Object.keys(sizeMap).map((sName, i) => ({
+                                                  id: `var-${Date.now()}-${i}`,
+                                                  product_id: editingProduct.id || '',
+                                                  size: sName,
+                                                  inventory_quantity: sizeMap[sName],
+                                                  is_available: sizeMap[sName] > 0,
+                                                }));
+
+                                                setEditingProduct({
+                                                  ...editingProduct,
+                                                  colors: updatedColors,
+                                                  variants: updatedVariants,
+                                                });
+                                              }}
+                                              className="w-14 px-1.5 py-0.5 text-xs border border-gray-300 rounded font-bold text-center bg-white"
+                                            />
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <p className="text-[11px] text-gray-400 italic">
+                                      No sizes selected for this color. Click the size buttons above to assign sizes and stock.
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* 5. Description & Material */}
               <div>
@@ -2685,7 +3343,7 @@ export default function AdminDashboardPage() {
               </div>
 
               <div>
-                <label className="block font-semibold text-gray-700 mb-1">Parent Department</label>
+                <label className="block font-semibold text-gray-700 mb-1">Parent Category</label>
                 <select
                   value={editingCategory.parent_id || ''}
                   onChange={(e) =>
@@ -2696,11 +3354,31 @@ export default function AdminDashboardPage() {
                   }
                   className="w-full px-3.5 py-2 text-sm border border-gray-300 rounded-xl bg-white"
                 >
-                  <option value="">None (Top-Level Department)</option>
-                  <option value="cat-men">Men&apos;s Apparel</option>
-                  <option value="cat-footwear">Footwear</option>
-                  <option value="cat-accessories">Accessories</option>
+                  <option value="">None (Top-Level / Main Category)</option>
+                  {categories
+                    .filter((c) => !c.parent_id && (!editingCategory.id || c.id !== editingCategory.id))
+                    .map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
                 </select>
+              </div>
+
+              {/* Category Active Status */}
+              <div className="flex items-center justify-between pt-1">
+                <span className="font-semibold text-gray-700">Active / Published</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingCategory.is_published !== false}
+                    onChange={(e) =>
+                      setEditingCategory({ ...editingCategory, is_published: e.target.checked })
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#143728]" />
+                </label>
               </div>
 
               {/* Category Image Upload */}

@@ -4,18 +4,31 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, ProductVariant } from '@/types/database';
 
 export interface CartItemType {
-  id: string; // unique item key: prodId + size
+  id: string; // unique item key: prodId + size + (color || '')
   product: Product;
   variant?: ProductVariant;
   selectedSize: string;
+  selectedSizeId?: string;
   selectedColor?: string;
+  selectedColorId?: string;
+  selectedColorHex?: string;
+  selectedColorImage?: string;
   quantity: number;
   unitPrice: number;
 }
 
 interface CartContextType {
   items: CartItemType[];
-  addItem: (product: Product, size: string, quantity?: number) => void;
+  addItem: (
+    product: Product,
+    size: string,
+    quantity?: number,
+    color?: string,
+    colorHex?: string,
+    colorImage?: string,
+    colorId?: string,
+    sizeId?: string
+  ) => void;
   removeItem: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -58,14 +71,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [items, isLoaded]);
 
-  const addItem = (product: Product, size: string, quantity: number = 1) => {
-    const itemId = `${product.id}-${size}`;
-    const variant = product.variants?.find(v => v.size === size);
+  const addItem = (
+    product: Product,
+    size: string,
+    quantity: number = 1,
+    color?: string,
+    colorHex?: string,
+    colorImage?: string,
+    colorId?: string,
+    sizeId?: string
+  ) => {
+    const cleanColor = color?.trim() || '';
+    const itemId = cleanColor ? `${product.id}-${cleanColor}-${size}` : `${product.id}-${size}`;
+    const variant = product.variants?.find((v) => v.size === size);
 
-    setItems(prev => {
-      const existing = prev.find(item => item.id === itemId);
+    setItems((prev) => {
+      const existing = prev.find((item) => item.id === itemId);
       if (existing) {
-        return prev.map(item =>
+        return prev.map((item) =>
           item.id === itemId
             ? { ...item, quantity: item.quantity + quantity }
             : item
@@ -78,6 +101,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             product,
             variant,
             selectedSize: size,
+            selectedSizeId: sizeId || undefined,
+            selectedColor: cleanColor || undefined,
+            selectedColorId: colorId || undefined,
+            selectedColorHex: colorHex || undefined,
+            selectedColorImage: colorImage || undefined,
             quantity,
             unitPrice: product.price,
           },
@@ -88,7 +116,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const removeItem = (itemId: string) => {
-    setItems(prev => prev.filter(item => item.id !== itemId));
+    setItems((prev) => prev.filter((item) => item.id !== itemId));
   };
 
   const updateQuantity = (itemId: string, quantity: number) => {
@@ -96,8 +124,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       removeItem(itemId);
       return;
     }
-    setItems(prev =>
-      prev.map(item => (item.id === itemId ? { ...item, quantity } : item))
+    setItems((prev) =>
+      prev.map((item) => (item.id === itemId ? { ...item, quantity } : item))
     );
   };
 
