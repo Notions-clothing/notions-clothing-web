@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getProductBySlug } from '@/lib/db';
+import { getProductBySlug, getSiteSettings } from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
@@ -40,7 +40,11 @@ export async function POST(request: Request) {
       });
     }
 
-    const shippingAmount = subtotal >= 1999 || subtotal === 0 ? 0 : 99;
+    const settings = await getSiteSettings();
+    const freeThreshold = Number(settings.free_shipping_threshold ?? 1999);
+    const flatRate = Number(settings.flat_shipping_rate ?? 99);
+
+    const shippingAmount = subtotal >= freeThreshold || subtotal === 0 ? 0 : flatRate;
     const totalAmount = subtotal + shippingAmount;
     const orderNumber = `NOT-${Date.now().toString().slice(-6)}`;
 
@@ -48,8 +52,9 @@ export async function POST(request: Request) {
     const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
 
     let razorpayOrderId = `order_sim_${Date.now()}`;
+    let rzpCreated = false;
 
-    // If Razorpay live/test credentials are configured, create real Razorpay Order
+    // Create real Razorpay Order using live/test credentials
     if (razorpayKeyId && razorpaySecret) {
       try {
         const authHeader = 'Basic ' + Buffer.from(`${razorpayKeyId}:${razorpaySecret}`).toString('base64');
@@ -73,6 +78,7 @@ export async function POST(request: Request) {
         if (rzpRes.ok) {
           const rzpData = await rzpRes.json();
           razorpayOrderId = rzpData.id;
+          rzpCreated = true;
         } else {
           console.error('Razorpay API error response:', await rzpRes.text());
         }
@@ -92,7 +98,7 @@ export async function POST(request: Request) {
       subtotal,
       shippingAmount,
       items: validatedItems,
-      hasRealCredentials: !!(razorpayKeyId && razorpaySecret),
+      hasRealCredentials: rzpCreated,
     });
   } catch (err: any) {
     console.error('Checkout error:', err);

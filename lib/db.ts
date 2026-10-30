@@ -401,6 +401,26 @@ export async function saveOrder(order: Partial<Order>): Promise<Order> {
     store.orders[existingIdx] = { ...store.orders[existingIdx], ...newOrder };
   } else {
     store.orders.unshift(newOrder);
+    // Automatically decrement stock for new confirmed/paid orders
+    if (Array.isArray(newOrder.items) && newOrder.items.length > 0) {
+      for (const item of newOrder.items) {
+        const prod = (store.products || []).find(
+          (p: Product) => p.id === item.product_id || p.name === item.product_name
+        );
+        if (prod && Array.isArray(prod.variants)) {
+          const variant = prod.variants.find(
+            (v) => v.size.toLowerCase() === (item.variant_label || '').toLowerCase()
+          );
+          if (variant) {
+            variant.inventory_quantity = Math.max(
+              0,
+              (Number(variant.inventory_quantity) || 0) - (Number(item.quantity) || 1)
+            );
+            variant.is_available = variant.inventory_quantity > 0;
+          }
+        }
+      }
+    }
   }
   writeLocalStore(store);
   return newOrder;
