@@ -1,12 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
+import CategorySortSelect from '@/components/CategorySortSelect';
 import { getCategoryBySlug, getCategories, getProducts } from '@/lib/db';
-import { SlidersHorizontal } from 'lucide-react';
 
 export const revalidate = 0;
 
@@ -23,6 +23,15 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
   const allCategories = await getCategories();
 
   if (!currentCategory) {
+    if (slug === 'men' || slug === 'all') {
+      redirect('/shop');
+    }
+    if (slug === 'men-apparel' || slug === 'mens-apparel') {
+      redirect('/category/men-s-apparel');
+    }
+    if (slug === 'footwear') {
+      redirect('/category/foot-wear');
+    }
     notFound();
   }
 
@@ -73,42 +82,47 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
           <span className="text-[#181818] font-medium">{currentCategory.name}</span>
         </nav>
 
-        {/* Category Header Banner */}
-        <div className="relative rounded-2xl overflow-hidden bg-[#F3EFE6] p-8 md:p-12 mb-10 flex flex-col md:flex-row items-center justify-between shadow-xs">
-          <div className="max-w-xl z-10">
+        {/* Category Header Banner with Full Width & Height Cover Image */}
+        <div className="relative rounded-2xl overflow-hidden bg-[#F3EFE6] p-8 md:p-12 mb-10 min-h-[220px] md:min-h-[280px] flex flex-col justify-center shadow-xs">
+          {currentCategory.image_url && (
+            <>
+              {/* Full Width & Height Background Image */}
+              <Image
+                src={currentCategory.image_url}
+                alt={currentCategory.name}
+                fill
+                priority
+                sizes="(max-width: 1280px) 100vw, 1280px"
+                className="object-cover object-center"
+              />
+              {/* Editorial gradient overlay for maximum readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#FAF7F0]/95 via-[#FAF7F0]/75 to-transparent/20 md:w-3/4 pointer-events-none z-5" />
+            </>
+          )}
+
+          <div className="relative z-10 max-w-xl">
             <span className="text-[11px] font-semibold tracking-widest uppercase text-[#143728]">
               Opulent Collection
             </span>
             <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#181818] mt-2 mb-3">
               {currentCategory.name}
             </h1>
-            <p className="text-xs sm:text-sm text-[#5C574F] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#3B3730] leading-relaxed">
               {currentCategory.description || 'Explore our hand-finished collection of opulent luxury apparel and essentials.'}
             </p>
           </div>
-
-          {currentCategory.image_url && (
-            <div className="mt-6 md:mt-0 relative w-36 h-36 md:w-48 md:h-48 flex-shrink-0">
-              <Image
-                src={currentCategory.image_url}
-                alt={currentCategory.name}
-                fill
-                className="object-contain object-center"
-              />
-            </div>
-          )}
         </div>
 
-        {/* Subcategories Filter Chips */}
+        {/* Subcategories Filter Chips (Scrollable along X axis on mobile) */}
         {subcategories.length > 0 && (
           <div className="mb-8">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[#666666] mb-3">
               Subcategories
             </h3>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-nowrap overflow-x-auto scrollbar-none gap-2 pb-2 pt-1 touch-pan-x sm:flex-wrap">
               <Link
                 href={`/category/${currentCategory.slug}`}
-                className="px-4 py-1.5 rounded-full text-xs font-medium bg-[#143728] text-white transition"
+                className="px-4 py-1.5 rounded-full text-xs font-medium bg-[#143728] text-white transition shrink-0 whitespace-nowrap"
               >
                 All {currentCategory.name}
               </Link>
@@ -116,7 +130,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 <Link
                   key={sub.id}
                   href={`/category/${sub.slug}`}
-                  className="px-4 py-1.5 rounded-full text-xs font-medium bg-[#F3EFE6] text-[#333333] hover:bg-[#EAE5DC] transition"
+                  className="px-4 py-1.5 rounded-full text-xs font-medium bg-[#F3EFE6] text-[#333333] hover:bg-[#EAE5DC] transition shrink-0 whitespace-nowrap"
                 >
                   {sub.name}
                 </Link>
@@ -126,49 +140,12 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         )}
 
         {/* Products Header & Sorting */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#EAE5DC] mb-6 gap-3">
+        <div className="flex flex-row items-center justify-between pb-4 border-b border-[#EAE5DC] mb-6 gap-3">
           <p className="text-xs text-[#6B665E]">
             Showing <strong className="text-[#181818]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'item' : 'items'}
           </p>
 
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-xs text-[#555555]">
-              <SlidersHorizontal className="w-3.5 h-3.5 text-[#143728]" />
-              <span>Sort by:</span>
-              <div className="flex space-x-1">
-                <Link
-                  href={`/category/${currentCategory.slug}?sort=newest`}
-                  className={`px-2.5 py-1 rounded text-xs transition ${
-                    sort === 'newest'
-                      ? 'bg-[#143728] text-white font-medium'
-                      : 'text-[#555555] hover:text-[#181818]'
-                  }`}
-                >
-                  Newest
-                </Link>
-                <Link
-                  href={`/category/${currentCategory.slug}?sort=price-low`}
-                  className={`px-2.5 py-1 rounded text-xs transition ${
-                    sort === 'price-low'
-                      ? 'bg-[#143728] text-white font-medium'
-                      : 'text-[#555555] hover:text-[#181818]'
-                  }`}
-                >
-                  Price: Low to High
-                </Link>
-                <Link
-                  href={`/category/${currentCategory.slug}?sort=price-high`}
-                  className={`px-2.5 py-1 rounded text-xs transition ${
-                    sort === 'price-high'
-                      ? 'bg-[#143728] text-white font-medium'
-                      : 'text-[#555555] hover:text-[#181818]'
-                  }`}
-                >
-                  Price: High to Low
-                </Link>
-              </div>
-            </div>
-          </div>
+          <CategorySortSelect categorySlug={currentCategory.slug} currentSort={sort} />
         </div>
 
         {/* Products Grid */}

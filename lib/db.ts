@@ -11,6 +11,7 @@ import {
   Banner,
   SiteSettings,
   Order,
+  ProductSpecification,
 } from '@/types/database';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -272,39 +273,50 @@ export async function deleteColor(id: string): Promise<boolean> {
 
 export function normalizeProduct(p: Product): Product {
   if (!p) return p;
-  if ((!p.images || p.images.length === 0) && p.colors && p.colors.length > 0) {
-    const colorWithImg = p.colors.find((c) => (c.images && c.images.length > 0) || c.image_url);
+  const normalized: Product = { ...p };
+  if ((!normalized.images || normalized.images.length === 0) && normalized.colors && normalized.colors.length > 0) {
+    const colorWithImg = normalized.colors.find((c) => (c.images && c.images.length > 0) || c.image_url);
     if (colorWithImg) {
       if (colorWithImg.images && colorWithImg.images.length > 0) {
-        return {
-          ...p,
-          images: colorWithImg.images.map((img, idx) => ({
-            id: img.id || `img-${p.id || 'p'}-${idx}`,
-            product_id: p.id || '',
-            image_url: img.url,
-            image_public_id: img.public_id || '',
-            alt_text: p.name || 'Product Image',
-            sort_order: idx + 1,
-            is_primary: idx === 0,
-          })),
-        };
+        normalized.images = colorWithImg.images.map((img, idx) => ({
+          id: img.id || `img-${normalized.id || 'p'}-${idx}`,
+          product_id: normalized.id || '',
+          image_url: img.url,
+          image_public_id: img.public_id || '',
+          alt_text: normalized.name || 'Product Image',
+          sort_order: idx + 1,
+          is_primary: idx === 0,
+        }));
       } else if (colorWithImg.image_url) {
-        return {
-          ...p,
-          images: [{
-            id: `img-${p.id || 'p'}-0`,
-            product_id: p.id || '',
-            image_url: colorWithImg.image_url,
-            image_public_id: colorWithImg.image_public_id || '',
-            alt_text: p.name || 'Product Image',
-            sort_order: 1,
-            is_primary: true,
-          }],
-        };
+        normalized.images = [{
+          id: `img-${normalized.id || 'p'}-0`,
+          product_id: normalized.id || '',
+          image_url: colorWithImg.image_url,
+          image_public_id: colorWithImg.image_public_id || '',
+          alt_text: normalized.name || 'Product Image',
+          sort_order: 1,
+          is_primary: true,
+        }];
       }
     }
   }
-  return p;
+
+  // Specifications normalization & sorting
+  if (Array.isArray(normalized.specifications)) {
+    normalized.specifications = normalized.specifications
+      .filter((s) => s && s.key && s.key.trim() !== '' && s.value !== undefined && s.value !== null && s.value.toString().trim() !== '')
+      .map((s, idx) => ({
+        id: s.id || `spec-${normalized.id || 'p'}-${idx}`,
+        key: s.key.trim(),
+        value: s.value.toString().trim(),
+        sort_order: s.sort_order !== undefined ? Number(s.sort_order) : (idx + 1),
+      }))
+      .sort((a, b) => (a.sort_order ?? 999) - (b.sort_order ?? 999));
+  } else {
+    normalized.specifications = [];
+  }
+
+  return normalized;
 }
 
 // ----------------------------------------------------
@@ -494,6 +506,29 @@ export async function saveProduct(product: Partial<Product>): Promise<Product> {
     sizes: product.sizes || [],
     material: product.material || '',
     care_instructions: product.care_instructions || '',
+    specifications: (() => {
+      if (!Array.isArray(product.specifications)) return [];
+      const seenKeys = new Set<string>();
+      const valid: ProductSpecification[] = [];
+
+      product.specifications.forEach((s, idx) => {
+        if (!s || !s.key || !s.key.trim()) return;
+        const trimmedKey = s.key.trim();
+        const keyLower = trimmedKey.toLowerCase();
+        if (seenKeys.has(keyLower)) return; // Prevent duplicate keys for the same product
+        const val = s.value !== undefined && s.value !== null ? s.value.toString().trim() : '';
+        if (!val) return; // Skip empty values
+        seenKeys.add(keyLower);
+
+        valid.push({
+          id: s.id || `spec-${id}-${idx}-${Date.now()}`,
+          key: trimmedKey,
+          value: val,
+          sort_order: s.sort_order !== undefined ? Number(s.sort_order) : (idx + 1),
+        });
+      });
+      return valid.sort((a, b) => (a.sort_order ?? 999) - (b.sort_order ?? 999));
+    })(),
     created_at: product.created_at || now,
   };
 

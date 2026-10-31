@@ -34,7 +34,17 @@ export default function WishlistDrawer() {
     }
   }, [isWishlistOpen, allProducts.length]);
 
-  if (!isWishlistOpen) return null;
+  // Lock body scroll when drawer is open
+  useEffect(() => {
+    if (isWishlistOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isWishlistOpen]);
 
   const wishlistProducts = allProducts.filter((p) => wishlistIds.includes(p.id));
   const recommendedProducts = allProducts
@@ -60,17 +70,28 @@ export default function WishlistDrawer() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div
+      className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 ${
+        isWishlistOpen ? 'pointer-events-auto' : 'pointer-events-none'
+      }`}
+      aria-hidden={!isWishlistOpen}
+    >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+        className={`fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300 ease-out ${
+          isWishlistOpen ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={() => setIsWishlistOpen(false)}
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-[#FAF9F5] shadow-2xl flex flex-col h-full">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10 pointer-events-none">
+        <div
+          className={`w-full sm:w-[420px] max-w-full sm:max-w-md bg-[#FAF9F5] shadow-2xl flex flex-col h-[100dvh] max-h-[100dvh] pointer-events-auto transform transition-transform duration-300 ease-out ${
+            isWishlistOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
           {/* Header */}
-          <div className="px-6 py-5 border-b border-[#EAE5DC] flex items-center justify-between shrink-0">
+          <div className="px-4 sm:px-6 py-4 border-b border-[#EAE5DC] flex items-center justify-between shrink-0">
             <div className="flex items-center space-x-2">
               <Heart className="w-5 h-5 text-[#143728] fill-[#143728]" />
               <h2 className="text-base font-semibold text-[#181818] tracking-tight">
@@ -80,7 +101,7 @@ export default function WishlistDrawer() {
             <button
               type="button"
               onClick={() => setIsWishlistOpen(false)}
-              className="p-1.5 text-[#555555] hover:text-[#181818] transition cursor-pointer"
+              className="p-2 -mr-1 text-[#555555] hover:text-[#181818] transition cursor-pointer"
               aria-label="Close wishlist"
             >
               <X className="w-5 h-5" />
@@ -88,21 +109,21 @@ export default function WishlistDrawer() {
           </div>
 
           {/* Scrollable Container containing Wishlist items + Recommendations */}
-          <div className="flex-1 overflow-y-auto divide-y divide-[#EAE5DC]">
+          <div className="flex-1 overflow-y-auto flex flex-col justify-between">
             {/* Wishlist Items List */}
-            <div className="px-6 py-4 space-y-4">
+            <div className={`px-4 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4 ${wishlistIds.length === 0 ? 'flex-1 flex flex-col justify-center items-center' : ''}`}>
               {wishlistIds.length === 0 ? (
-                <div className="py-12 flex flex-col items-center justify-center text-center">
-                  <div className="w-16 h-16 rounded-full bg-[#F3EFE6] flex items-center justify-center mb-4">
-                    <Heart className="w-7 h-7 text-[#807D75]" />
+                <div className="py-4 flex flex-col items-center justify-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-[#F3EFE6] flex items-center justify-center mb-2.5">
+                    <Heart className="w-5 h-5 text-[#807D75]" />
                   </div>
-                  <h3 className="font-serif text-lg text-[#181818] mb-1">Your wishlist is empty</h3>
-                  <p className="text-xs text-[#737373] max-w-xs mb-6">
+                  <h3 className="font-serif text-base sm:text-lg text-[#181818] mb-1">Your wishlist is empty</h3>
+                  <p className="text-xs text-[#737373] max-w-xs mb-3.5">
                     Save items you love by clicking the heart icon while exploring our collections.
                   </p>
                   <button
                     onClick={() => setIsWishlistOpen(false)}
-                    className="px-6 py-2.5 bg-[#143728] hover:bg-[#0d281c] text-white text-xs font-medium rounded-full transition cursor-pointer"
+                    className="px-5 py-2 bg-[#143728] hover:bg-[#0d281c] text-white text-xs font-medium rounded-full transition cursor-pointer"
                   >
                     Explore Collections
                   </button>
@@ -203,13 +224,13 @@ export default function WishlistDrawer() {
 
             {/* Bottom Horizontal Recommendation Slider */}
             {recommendedProducts.length > 0 && (
-              <div className="p-6 bg-[#F8F5EE]">
-                <div className="flex items-center justify-between mb-3">
+              <div className="p-3.5 sm:p-5 bg-[#F8F5EE] border-t border-[#EAE5DC] mt-auto shrink-0">
+                <div className="flex items-center justify-between mb-2 sm:mb-3">
                   <div>
-                    <h4 className="font-serif text-sm font-semibold text-[#181818] tracking-tight">
+                    <h4 className="font-serif text-xs sm:text-sm font-semibold text-[#181818] tracking-tight">
                       You May Also Like
                     </h4>
-                    <p className="text-[11px] text-[#736E65]">Curated complements for your wardrobe</p>
+                    <p className="text-[10px] sm:text-[11px] text-[#736E65]">Curated complements for your wardrobe</p>
                   </div>
                   <div className="flex items-center space-x-1">
                     <button
@@ -233,17 +254,17 @@ export default function WishlistDrawer() {
 
                 <div
                   ref={sliderRef}
-                  className="flex space-x-3 overflow-x-auto scrollbar-none pb-2 pt-1 touch-pan-x"
+                  className="flex space-x-2.5 sm:space-x-3 overflow-x-auto scrollbar-none pb-1.5 pt-0.5 touch-pan-x"
                 >
                   {recommendedProducts.map((item) => (
                     <div
                       key={item.id}
-                      className="w-40 shrink-0 bg-white rounded-xl overflow-hidden shadow-xs flex flex-col justify-between"
+                      className="w-32 sm:w-36 shrink-0 bg-white rounded-lg sm:rounded-xl overflow-hidden shadow-xs flex flex-col justify-between"
                     >
                       <Link
                         href={`/product/${item.slug}`}
                         onClick={() => setIsWishlistOpen(false)}
-                        className="relative aspect-[4/4.5] w-full bg-[#F5F3EF] block"
+                        className="relative aspect-square w-full bg-[#F5F3EF] block"
                       >
                         <Image
                           src={item.images?.[0]?.image_url || '/logo.png'}
@@ -253,7 +274,7 @@ export default function WishlistDrawer() {
                         />
                       </Link>
 
-                      <div className="p-2.5 flex flex-col justify-between flex-1 space-y-2">
+                      <div className="p-2 sm:p-2.5 flex flex-col justify-between flex-1 space-y-1.5">
                         <div>
                           <Link
                             href={`/product/${item.slug}`}
@@ -283,11 +304,11 @@ export default function WishlistDrawer() {
           </div>
 
           {/* Footer CTA */}
-          <div className="p-4 bg-white border-t border-[#EAE5DC] shrink-0">
+          <div className="p-3 sm:p-4 bg-white border-t border-[#EAE5DC] shrink-0">
             <button
               type="button"
               onClick={() => setIsWishlistOpen(false)}
-              className="w-full py-2.5 text-xs text-[#555555] hover:text-[#181818] font-medium text-center transition cursor-pointer"
+              className="w-full py-2 text-xs text-[#555555] hover:text-[#181818] font-medium text-center transition cursor-pointer"
             >
               Continue Shopping
             </button>

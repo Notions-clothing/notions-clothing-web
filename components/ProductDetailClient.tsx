@@ -112,6 +112,16 @@ export default function ProductDetailClient({
   const [addedNotice, setAddedNotice] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'shipping' | 'care'>('details');
 
+  // Product Specifications
+  const validSpecifications = useMemo(() => {
+    if (!product.specifications || !Array.isArray(product.specifications)) return [];
+    return product.specifications.filter(
+      (s) => s && s.key && s.key.trim() !== '' && s.value !== undefined && s.value !== null && s.value.toString().trim() !== ''
+    );
+  }, [product.specifications]);
+
+  const hasSpecifications = validSpecifications.length > 0;
+
   // Exact stock calculation
   const currentSizeObj = availableSizes.find((s) => s.size === selectedSize);
   const exactStock = isVariantProduct
@@ -555,6 +565,43 @@ export default function ProductDetailClient({
           </div>
         </div>
       </div>
+
+      {/* Product Specifications Section */}
+      {hasSpecifications && (
+        <section className="pt-12 pb-6 border-t border-[#EDE8DE]">
+          <div className="mb-6 flex items-baseline justify-between">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-widest text-[#143728]">
+                Craftsmanship & Details
+              </span>
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#181818] mt-1">
+                Product Specifications
+              </h2>
+            </div>
+            <span className="text-xs text-[#7A756D]">
+              {validSpecifications.length} {validSpecifications.length === 1 ? 'Detail' : 'Details'}
+            </span>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-[#EDE8DE] p-6 sm:p-8 shadow-xs">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3">
+              {validSpecifications.map((spec, sIdx) => (
+                <div
+                  key={spec.id || sIdx}
+                  className="flex items-baseline justify-between py-2.5 border-b border-[#EDE8DE]/60 text-xs sm:text-sm"
+                >
+                  <span className="text-[#7A756D] font-medium pr-4">
+                    {spec.key}
+                  </span>
+                  <span className="text-[#181818] font-semibold text-right break-words">
+                    {spec.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Related Products Section */}
       {relatedProducts.length > 0 && (

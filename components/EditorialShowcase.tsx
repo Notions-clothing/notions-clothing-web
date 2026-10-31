@@ -32,7 +32,7 @@ export function ModernEssentialsCard({ banner }: { banner?: Banner }) {
   };
 
   return (
-    <div className="relative w-full lg:w-[390px] xl:w-[440px] rounded-xl overflow-hidden border border-[#E2DDD2] bg-[#EFECE3] shadow-xs group flex-shrink-0 aspect-[4/3] sm:aspect-[16/10] lg:aspect-auto lg:h-full min-h-[345px] p-6 sm:p-7 flex flex-col justify-between">
+    <div className="relative w-full lg:w-[360px] xl:w-[400px] h-[260px] sm:h-[320px] lg:h-full min-h-[260px] rounded-2xl overflow-hidden border border-[#E2DDD2] bg-[#EFECE3] shadow-xs group flex-shrink-0 p-6 sm:p-7 flex flex-col justify-between">
       {/* Background Photograph */}
       <Image
         src={bgSrc}
@@ -43,19 +43,19 @@ export function ModernEssentialsCard({ banner }: { banner?: Banner }) {
       />
 
       {/* Soft readability wash */}
-      <div className="absolute inset-y-0 left-0 w-[48%] bg-gradient-to-r from-[#FAF7F0]/75 via-[#FAF7F0]/35 to-transparent pointer-events-none" />
+      <div className="absolute inset-y-0 left-0 w-[60%] sm:w-[48%] bg-gradient-to-r from-[#FAF7F0]/85 via-[#FAF7F0]/45 to-transparent pointer-events-none" />
 
-      <div className="relative z-10 max-w-[160px] pt-1">
+      <div className="relative z-10 max-w-[200px] sm:max-w-[240px] pt-1">
         <span className="block text-[10px] sm:text-[11px] font-medium tracking-[0.22em] uppercase text-[#3A3630]">
           {subtitle}
         </span>
-        <h3 className="font-serif text-[28px] sm:text-[34px] text-[#161616] mt-2.5 leading-[1.08] tracking-tight">
+        <h3 className="font-serif text-[24px] sm:text-[30px] lg:text-[34px] text-[#161616] mt-1.5 sm:mt-2 leading-[1.08] tracking-tight">
           {renderFormattedTitle()}
         </h3>
-        <div className="w-8 h-[1.5px] bg-[#2B2927]/65 mt-3.5" />
+        <div className="w-8 h-[1.5px] bg-[#2B2927]/65 mt-2.5 sm:mt-3" />
       </div>
 
-      <div className="relative z-10 pt-4">
+      <div className="relative z-10 pt-3 sm:pt-4">
         <Link
           href={ctaUrl}
           className="inline-flex items-center space-x-2 px-5 py-2.5 bg-[#143728] hover:bg-[#0c2419] text-white text-xs font-medium rounded-lg shadow-sm transition-all"

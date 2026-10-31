@@ -21,6 +21,171 @@
       "image_public_id": "notions/categories/gcipznrdjbf8qsaqhnv6",
       "sort_order": 1,
       "is_published": true
+    },
+    {
+      "id": "cat-1793437193969",
+      "name": "Men’s Apparel",
+      "slug": "men-s-apparel",
+      "parent_id": null,
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793437217/notions/categories/blzslehp901p06zikami.png",
+      "image_public_id": "notions/categories/blzslehp901p06zikami",
+      "sort_order": 3,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793437305536",
+      "name": "⁠Accessories",
+      "slug": "accessories",
+      "parent_id": null,
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793437301/notions/categories/g7wos6ozgbundmbs0rdf.png",
+      "image_public_id": "notions/categories/g7wos6ozgbundmbs0rdf",
+      "sort_order": 4,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793437988881",
+      "name": "T-shirt",
+      "slug": "t-shirt",
+      "parent_id": "cat-1793437193969",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793438022/notions/categories/xhsguixqdwslts1oafrd.png",
+      "image_public_id": "notions/categories/xhsguixqdwslts1oafrd",
+      "sort_order": 2,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793438873673",
+      "name": "Shirts",
+      "slug": "shirts",
+      "parent_id": "cat-1793437193969",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793438866/notions/categories/wzmzpmsrqgky9pwvx5ne.png",
+      "image_public_id": "notions/categories/wzmzpmsrqgky9pwvx5ne",
+      "sort_order": 3,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793439572409",
+      "name": "Jeans",
+      "slug": "jeans",
+      "parent_id": "cat-1793437193969",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793439551/notions/categories/udpsrtmrdazbbj2rtndv.png",
+      "image_public_id": "notions/categories/udpsrtmrdazbbj2rtndv",
+      "sort_order": 4,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793439772925",
+      "name": "Trousers",
+      "slug": "trousers",
+      "parent_id": "cat-1793437193969",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793439765/notions/categories/fyrmzxvufybkc4xwiwx4.png",
+      "image_public_id": "notions/categories/fyrmzxvufybkc4xwiwx4",
+      "sort_order": 5,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793439954825",
+      "name": "Shorts",
+      "slug": "shorts",
+      "parent_id": "cat-1793437193969",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793439948/notions/categories/abgkltxumkpitbbsg96p.png",
+      "image_public_id": "notions/categories/abgkltxumkpitbbsg96p",
+      "sort_order": 6,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793440081378",
+      "name": "Jackets",
+      "slug": "jackets",
+      "parent_id": "cat-1793437193969",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793440063/notions/categories/k1fhezrgxtdmvxoqnkaz.png",
+      "image_public_id": "notions/categories/k1fhezrgxtdmvxoqnkaz",
+      "sort_order": 7,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793440327680",
+      "name": "Dhothis",
+      "slug": "dhothis",
+      "parent_id": "cat-1793437193969",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793440284/notions/categories/zgtyzb7aolhnlnpoxkpo.png",
+      "image_public_id": "notions/categories/zgtyzb7aolhnlnpoxkpo",
+      "sort_order": 8,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793440450286",
+      "name": "Kurta",
+      "slug": "kurta",
+      "parent_id": "cat-1793437193969",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793440445/notions/categories/n0y4tvvppab9llu7mwns.png",
+      "image_public_id": "notions/categories/n0y4tvvppab9llu7mwns",
+      "sort_order": 9,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793440624451",
+      "name": "Sandals",
+      "slug": "sandals",
+      "parent_id": "cat-1793367161674",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793440616/notions/categories/fmgim3x8metoagk75z1v.png",
+      "image_public_id": "notions/categories/fmgim3x8metoagk75z1v",
+      "sort_order": 10,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793440788676",
+      "name": "Caps",
+      "slug": "caps",
+      "parent_id": "cat-1793437305536",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793440783/notions/categories/mppjiv5z5hdekot1j5a1.png",
+      "image_public_id": "notions/categories/mppjiv5z5hdekot1j5a1",
+      "sort_order": 11,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793440889860",
+      "name": "Bracelet ",
+      "slug": "bracelet",
+      "parent_id": "cat-1793437305536",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793440944/notions/categories/j8duoxilyz7bcvsbk4se.png",
+      "image_public_id": "notions/categories/j8duoxilyz7bcvsbk4se",
+      "sort_order": 13,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793441024574",
+      "name": "Chain",
+      "slug": "chain",
+      "parent_id": "cat-1793437305536",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793441013/notions/categories/vi0btemzblbvslgri92a.png",
+      "image_public_id": "notions/categories/vi0btemzblbvslgri92a",
+      "sort_order": 13,
+      "is_published": true
+    },
+    {
+      "id": "cat-1793444407969",
+      "name": "Ring",
+      "slug": "ring",
+      "parent_id": "cat-1793437305536",
+      "description": "",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793444375/notions/categories/bygxx4xgmti4jinw7ciw.png",
+      "image_public_id": "notions/categories/bygxx4xgmti4jinw7ciw",
+      "sort_order": 14,
+      "is_published": true
     }
   ],
   "sizes": [
@@ -28,10 +193,73 @@
       "id": "sz-1793368706624",
       "category_id": "cat-1793367161674",
       "category_name": "Foot wear",
-      "name": "5",
+      "name": "8",
       "sort_order": 1,
       "is_active": true,
       "created_at": "2026-10-30T13:58:26.624Z"
+    },
+    {
+      "id": "sz-1793438440517",
+      "category_id": "cat-1793437193969",
+      "category_name": "Men’s Apparel",
+      "name": "S",
+      "sort_order": 1,
+      "is_active": true,
+      "created_at": "2026-10-31T09:20:40.517Z"
+    },
+    {
+      "id": "sz-1793438455950",
+      "category_id": "cat-1793437193969",
+      "category_name": "Men’s Apparel",
+      "name": "M",
+      "sort_order": 2,
+      "is_active": true,
+      "created_at": "2026-10-31T09:20:55.950Z"
+    },
+    {
+      "id": "sz-1793438460906",
+      "category_id": "cat-1793437193969",
+      "category_name": "Men’s Apparel",
+      "name": "L",
+      "sort_order": 3,
+      "is_active": true,
+      "created_at": "2026-10-31T09:21:00.906Z"
+    },
+    {
+      "id": "sz-1793438465615",
+      "category_id": "cat-1793437193969",
+      "category_name": "Men’s Apparel",
+      "name": "XL",
+      "sort_order": 4,
+      "is_active": true,
+      "created_at": "2026-10-31T09:21:05.615Z"
+    },
+    {
+      "id": "sz-1793438473172",
+      "category_id": "cat-1793437193969",
+      "category_name": "Men’s Apparel",
+      "name": "XXL",
+      "sort_order": 5,
+      "is_active": true,
+      "created_at": "2026-10-31T09:21:13.172Z"
+    },
+    {
+      "id": "sz-1793438483490",
+      "category_id": "cat-1793367161674",
+      "category_name": "Foot wear",
+      "name": "6",
+      "sort_order": 2,
+      "is_active": true,
+      "created_at": "2026-10-31T09:21:23.490Z"
+    },
+    {
+      "id": "sz-1793438497466",
+      "category_id": "cat-1793367161674",
+      "category_name": "Foot wear",
+      "name": "9",
+      "sort_order": 3,
+      "is_active": true,
+      "created_at": "2026-10-31T09:21:37.466Z"
     }
   ],
   "products": [
@@ -43,9 +271,9 @@
       "category_id": "cat-1793367161674",
       "category_slug": "foot-wear",
       "category_name": "Foot wear",
-      "subcategory_id": "cat-1793367958202",
-      "subcategory_slug": "shoes",
-      "subcategory_name": "Shoes",
+      "subcategory_id": "cat-1793368991690",
+      "subcategory_slug": "shoe",
+      "subcategory_name": "Shoe",
       "sku": "NOT-9083",
       "price": 1499,
       "compare_at_price": 1999,
@@ -77,11 +305,25 @@
       ],
       "variants": [
         {
-          "id": "var-1793368863938-0",
+          "id": "var-1793441083064-0",
           "product_id": "prod-1793368849863",
           "size": "5",
           "inventory_quantity": 10,
           "is_available": true
+        },
+        {
+          "id": "var-1793441083064-1",
+          "product_id": "prod-1793368849863",
+          "size": "6",
+          "inventory_quantity": 30,
+          "is_available": true
+        },
+        {
+          "id": "var-1793441083064-2",
+          "product_id": "prod-1793368849863",
+          "size": "9",
+          "inventory_quantity": 0,
+          "is_available": false
         }
       ],
       "colors": [
@@ -89,7 +331,7 @@
           "color_id": "col-1793368028683",
           "name": "White",
           "hex": "#FFFFFF",
-          "stock": 10,
+          "stock": 40,
           "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png",
           "image_public_id": "notions/products/colors/mofbxbyqtqqx91m7gzfv",
           "images": [
@@ -98,12 +340,6 @@
               "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png",
               "public_id": "notions/products/colors/mofbxbyqtqqx91m7gzfv",
               "sort_order": 1
-            },
-            {
-              "id": "img-1793368886892-71xz",
-              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368886/notions/products/colors/bo5qd6w79wsbom03b0zr.png",
-              "public_id": "notions/products/colors/bo5qd6w79wsbom03b0zr",
-              "sort_order": 2
             }
           ],
           "sizes": [
@@ -111,6 +347,16 @@
               "size_id": "sz-1793368706624",
               "size": "5",
               "stock": 10
+            },
+            {
+              "size_id": "sz-1793438483490",
+              "size": "6",
+              "stock": 30
+            },
+            {
+              "size_id": "sz-1793438497466",
+              "size": "9",
+              "stock": 0
             }
           ]
         }
@@ -120,7 +366,944 @@
       "sizes": [],
       "material": "100% Premium Cotton",
       "care_instructions": "Machine wash cold gentle cycle, do not bleach.",
-      "created_at": "2026-10-30T14:00:49.863Z"
+      "created_at": "2026-10-30T14:00:49.863Z",
+      "specifications": []
+    },
+    {
+      "id": "prod-1793438408856",
+      "name": "Men's Classic Crew Neck T-Shirt",
+      "slug": "men-s-classic-crew-neck-t-shirt",
+      "description": "A timeless everyday essential featuring a clean crew neckline, classic short sleeves, and a comfortable regular fit.",
+      "category_id": "cat-1793437193969",
+      "category_slug": "men-s-apparel",
+      "category_name": "Men’s Apparel",
+      "subcategory_id": "cat-1793437988881",
+      "subcategory_slug": "t-shirt",
+      "subcategory_name": "T-shirt",
+      "sku": "NOT-1944",
+      "price": 499,
+      "compare_at_price": 999,
+      "is_bestseller": false,
+      "is_featured": true,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 4.7,
+      "rating_count": 24,
+      "images": [
+        {
+          "id": "img-1793438340365-j7y0",
+          "product_id": "",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793438340/notions/products/colors/wdto1jdbguktxl6ywgig.png",
+          "image_public_id": "notions/products/colors/wdto1jdbguktxl6ywgig",
+          "alt_text": "Men's Classic Crew Neck T-Shirt",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "var-1793438536644-0",
+          "product_id": "prod-1793438408856",
+          "size": "S",
+          "inventory_quantity": 20,
+          "is_available": true
+        },
+        {
+          "id": "var-1793438536644-1",
+          "product_id": "prod-1793438408856",
+          "size": "M",
+          "inventory_quantity": 20,
+          "is_available": true
+        },
+        {
+          "id": "var-1793438536644-2",
+          "product_id": "prod-1793438408856",
+          "size": "L",
+          "inventory_quantity": 30,
+          "is_available": true
+        },
+        {
+          "id": "var-1793438536644-3",
+          "product_id": "prod-1793438408856",
+          "size": "XL",
+          "inventory_quantity": 0,
+          "is_available": false
+        }
+      ],
+      "colors": [
+        {
+          "color_id": "col-1793356927031",
+          "name": "Olive green",
+          "hex": "#143728",
+          "stock": 70,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793438340/notions/products/colors/wdto1jdbguktxl6ywgig.png",
+          "image_public_id": "notions/products/colors/wdto1jdbguktxl6ywgig",
+          "images": [
+            {
+              "id": "img-1793438340365-j7y0",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793438340/notions/products/colors/wdto1jdbguktxl6ywgig.png",
+              "public_id": "notions/products/colors/wdto1jdbguktxl6ywgig",
+              "sort_order": 1
+            }
+          ],
+          "sizes": [
+            {
+              "size_id": "sz-1793438440517",
+              "size": "S",
+              "stock": 20
+            },
+            {
+              "size_id": "sz-1793438455950",
+              "size": "M",
+              "stock": 20
+            },
+            {
+              "size_id": "sz-1793438460906",
+              "size": "L",
+              "stock": 30
+            },
+            {
+              "size_id": "sz-1793438465615",
+              "size": "XL",
+              "stock": 0
+            }
+          ]
+        }
+      ],
+      "product_mode": "variant",
+      "stock": 50,
+      "sizes": [],
+      "material": "100% Premium Cotton",
+      "care_instructions": "Machine wash cold gentle cycle, do not bleach.",
+      "specifications": [
+        {
+          "id": "spec-1793438369214",
+          "key": "Product Type",
+          "value": "T-Shirt",
+          "sort_order": 1
+        },
+        {
+          "id": "spec-1793438377365",
+          "key": "Neck Type",
+          "value": "Crew Neck",
+          "sort_order": 2
+        }
+      ],
+      "created_at": "2026-10-31T09:20:08.856Z"
+    },
+    {
+      "id": "prod-1793441678644",
+      "name": "Blue Formal Shirt",
+      "slug": "blue-formal-shirt",
+      "description": "A timeless men's button-up shirt featuring a clean design, classic collar, and versatile style for formal and smart-casual occasions.",
+      "category_id": "cat-1793437193969",
+      "category_slug": "men-s-apparel",
+      "category_name": "Men’s Apparel",
+      "subcategory_id": "cat-1793438873673",
+      "subcategory_slug": "shirts",
+      "subcategory_name": "Shirts",
+      "sku": "NOT-1406",
+      "price": 999,
+      "compare_at_price": 1499,
+      "is_bestseller": false,
+      "is_featured": false,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 5,
+      "rating_count": 0,
+      "images": [
+        {
+          "id": "img-1793441652575-ktuz",
+          "product_id": "",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793441652/notions/products/colors/tgycwbdshux42hqj4lcd.png",
+          "image_public_id": "notions/products/colors/tgycwbdshux42hqj4lcd",
+          "alt_text": "Blue Formal Shirt",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "var-1793441762403-0",
+          "product_id": "prod-1793441678644",
+          "size": "S",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793441762403-1",
+          "product_id": "prod-1793441678644",
+          "size": "M",
+          "inventory_quantity": 20,
+          "is_available": true
+        },
+        {
+          "id": "var-1793441762403-2",
+          "product_id": "prod-1793441678644",
+          "size": "L",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793441762403-3",
+          "product_id": "prod-1793441678644",
+          "size": "XL",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793441762403-4",
+          "product_id": "prod-1793441678644",
+          "size": "XXL",
+          "inventory_quantity": 20,
+          "is_available": true
+        }
+      ],
+      "colors": [
+        {
+          "color_id": "col-1793441702166",
+          "name": "Light blue",
+          "hex": "#579FD6",
+          "stock": 30,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793441728/notions/products/colors/phwelmgqxywweouq9baw.png",
+          "image_public_id": "notions/products/colors/phwelmgqxywweouq9baw",
+          "images": [
+            {
+              "id": "img-1793441728548-sy0q",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793441728/notions/products/colors/phwelmgqxywweouq9baw.png",
+              "public_id": "notions/products/colors/phwelmgqxywweouq9baw",
+              "sort_order": 1
+            }
+          ],
+          "sizes": [
+            {
+              "size_id": "sz-1793438440517",
+              "size": "S",
+              "stock": 0
+            },
+            {
+              "size_id": "sz-1793438455950",
+              "size": "M",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438460906",
+              "size": "L",
+              "stock": 0
+            },
+            {
+              "size_id": "sz-1793438465615",
+              "size": "XL",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438473172",
+              "size": "XXL",
+              "stock": 10
+            }
+          ]
+        },
+        {
+          "color_id": "col-1793356927031",
+          "name": "Olive green",
+          "hex": "#143728",
+          "stock": 40,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793441753/notions/products/colors/akjrdpduyha9zx4kcxr8.png",
+          "image_public_id": "notions/products/colors/akjrdpduyha9zx4kcxr8",
+          "images": [
+            {
+              "id": "img-1793441753641-qrnb",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793441753/notions/products/colors/akjrdpduyha9zx4kcxr8.png",
+              "public_id": "notions/products/colors/akjrdpduyha9zx4kcxr8",
+              "sort_order": 1
+            }
+          ],
+          "sizes": [
+            {
+              "size_id": "sz-1793438440517",
+              "size": "S",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438455950",
+              "size": "M",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438460906",
+              "size": "L",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438465615",
+              "size": "XL",
+              "stock": 0
+            },
+            {
+              "size_id": "sz-1793438473172",
+              "size": "XXL",
+              "stock": 10
+            }
+          ]
+        }
+      ],
+      "product_mode": "variant",
+      "stock": 0,
+      "sizes": [],
+      "material": "",
+      "care_instructions": "",
+      "specifications": [],
+      "created_at": "2026-10-31T10:14:38.644Z"
+    },
+    {
+      "id": "prod-1793442763612",
+      "name": "Trouser",
+      "slug": "trouser",
+      "description": "",
+      "category_id": "cat-1793437193969",
+      "category_slug": "men-s-apparel",
+      "category_name": "Men’s Apparel",
+      "subcategory_id": "cat-1793439772925",
+      "subcategory_slug": "trousers",
+      "subcategory_name": "Trousers",
+      "sku": "NOT-3189",
+      "price": 699,
+      "compare_at_price": 1499,
+      "is_bestseller": false,
+      "is_featured": false,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 5,
+      "rating_count": 0,
+      "images": [
+        {
+          "id": "img-1793442711526-7jyy",
+          "product_id": "",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793442711/notions/products/colors/ungwdniwg9c0xi90ef1b.png",
+          "image_public_id": "notions/products/colors/ungwdniwg9c0xi90ef1b",
+          "alt_text": "Trouser",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "var-1793442752967-0",
+          "product_id": "",
+          "size": "S",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793442752967-1",
+          "product_id": "",
+          "size": "M",
+          "inventory_quantity": 20,
+          "is_available": true
+        },
+        {
+          "id": "var-1793442752967-2",
+          "product_id": "",
+          "size": "L",
+          "inventory_quantity": 20,
+          "is_available": true
+        },
+        {
+          "id": "var-1793442752967-3",
+          "product_id": "",
+          "size": "XL",
+          "inventory_quantity": 20,
+          "is_available": true
+        },
+        {
+          "id": "var-1793442752967-4",
+          "product_id": "",
+          "size": "XXL",
+          "inventory_quantity": 20,
+          "is_available": true
+        }
+      ],
+      "colors": [
+        {
+          "color_id": "col-1793442652888",
+          "name": "Black",
+          "hex": "#000000",
+          "stock": 60,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793442711/notions/products/colors/ungwdniwg9c0xi90ef1b.png",
+          "image_public_id": "notions/products/colors/ungwdniwg9c0xi90ef1b",
+          "images": [
+            {
+              "id": "img-1793442711526-7jyy",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793442711/notions/products/colors/ungwdniwg9c0xi90ef1b.png",
+              "public_id": "notions/products/colors/ungwdniwg9c0xi90ef1b",
+              "sort_order": 1
+            }
+          ],
+          "sizes": [
+            {
+              "size_id": "sz-1793438440517",
+              "size": "S",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438455950",
+              "size": "M",
+              "stock": 20
+            },
+            {
+              "size_id": "sz-1793438460906",
+              "size": "L",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438465615",
+              "size": "XL",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438473172",
+              "size": "XXL",
+              "stock": 10
+            }
+          ]
+        },
+        {
+          "color_id": "col-1793442638095",
+          "name": "Cofee",
+          "hex": "#BEB07E",
+          "stock": 30,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793442748/notions/products/colors/zctkkqp39w7wg7b7vjif.png",
+          "image_public_id": "notions/products/colors/zctkkqp39w7wg7b7vjif",
+          "images": [
+            {
+              "id": "img-1793442748700-m78j",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793442748/notions/products/colors/zctkkqp39w7wg7b7vjif.png",
+              "public_id": "notions/products/colors/zctkkqp39w7wg7b7vjif",
+              "sort_order": 1
+            }
+          ],
+          "sizes": [
+            {
+              "size_id": "sz-1793438440517",
+              "size": "S",
+              "stock": 0
+            },
+            {
+              "size_id": "sz-1793438455950",
+              "size": "M",
+              "stock": 0
+            },
+            {
+              "size_id": "sz-1793438460906",
+              "size": "L",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438465615",
+              "size": "XL",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438473172",
+              "size": "XXL",
+              "stock": 10
+            }
+          ]
+        }
+      ],
+      "product_mode": "variant",
+      "stock": 0,
+      "sizes": [],
+      "material": "",
+      "care_instructions": "",
+      "specifications": [],
+      "created_at": "2026-10-31T10:32:43.612Z"
+    },
+    {
+      "id": "prod-1793442957088",
+      "name": "Shorts",
+      "slug": "shorts",
+      "description": "",
+      "category_id": "cat-1793437193969",
+      "category_slug": "men-s-apparel",
+      "category_name": "Men’s Apparel",
+      "subcategory_id": "cat-1793439954825",
+      "subcategory_slug": "shorts",
+      "subcategory_name": "Shorts",
+      "sku": "NOT-3143",
+      "price": 399,
+      "compare_at_price": 799,
+      "is_bestseller": false,
+      "is_featured": false,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 5,
+      "rating_count": 0,
+      "images": [
+        {
+          "id": "img-1793442944710-u0z1",
+          "product_id": "",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793442944/notions/products/colors/ya3xi0doytkcz1cvi5hw.png",
+          "image_public_id": "notions/products/colors/ya3xi0doytkcz1cvi5hw",
+          "alt_text": "Shorts",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "var-1793442952920-0",
+          "product_id": "",
+          "size": "S",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793442952920-1",
+          "product_id": "",
+          "size": "M",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793442952920-2",
+          "product_id": "",
+          "size": "L",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793442952920-3",
+          "product_id": "",
+          "size": "XL",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793442952920-4",
+          "product_id": "",
+          "size": "XXL",
+          "inventory_quantity": 10,
+          "is_available": true
+        }
+      ],
+      "colors": [
+        {
+          "color_id": "col-1793356927031",
+          "name": "Olive green",
+          "hex": "#143728",
+          "stock": 50,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793442944/notions/products/colors/ya3xi0doytkcz1cvi5hw.png",
+          "image_public_id": "notions/products/colors/ya3xi0doytkcz1cvi5hw",
+          "images": [
+            {
+              "id": "img-1793442944710-u0z1",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793442944/notions/products/colors/ya3xi0doytkcz1cvi5hw.png",
+              "public_id": "notions/products/colors/ya3xi0doytkcz1cvi5hw",
+              "sort_order": 1
+            }
+          ],
+          "sizes": [
+            {
+              "size_id": "sz-1793438440517",
+              "size": "S",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438455950",
+              "size": "M",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438460906",
+              "size": "L",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438465615",
+              "size": "XL",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438473172",
+              "size": "XXL",
+              "stock": 10
+            }
+          ]
+        }
+      ],
+      "product_mode": "variant",
+      "stock": 0,
+      "sizes": [],
+      "material": "",
+      "care_instructions": "",
+      "specifications": [],
+      "created_at": "2026-10-31T10:35:57.088Z"
+    },
+    {
+      "id": "prod-1793443346176",
+      "name": "Jeans",
+      "slug": "jeans",
+      "description": "",
+      "category_id": "cat-1793437193969",
+      "category_slug": "men-s-apparel",
+      "category_name": "Men’s Apparel",
+      "subcategory_id": "cat-1793439572409",
+      "subcategory_slug": "jeans",
+      "subcategory_name": "Jeans",
+      "sku": "NOT-8791",
+      "price": 899,
+      "compare_at_price": 1799,
+      "is_bestseller": false,
+      "is_featured": false,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 5,
+      "rating_count": 0,
+      "images": [
+        {
+          "id": "img-1793443336380-9ps3",
+          "product_id": "",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793443336/notions/products/colors/gxon7v8fppg6ffi3ybpl.png",
+          "image_public_id": "notions/products/colors/gxon7v8fppg6ffi3ybpl",
+          "alt_text": "Jeans",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "var-1793443342994-0",
+          "product_id": "",
+          "size": "S",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793443342994-1",
+          "product_id": "",
+          "size": "M",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793443342994-2",
+          "product_id": "",
+          "size": "L",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793443342994-3",
+          "product_id": "",
+          "size": "XL",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793443342994-4",
+          "product_id": "",
+          "size": "XXL",
+          "inventory_quantity": 10,
+          "is_available": true
+        }
+      ],
+      "colors": [
+        {
+          "color_id": "col-1793441702166",
+          "name": "Light blue",
+          "hex": "#579FD6",
+          "stock": 50,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793443336/notions/products/colors/gxon7v8fppg6ffi3ybpl.png",
+          "image_public_id": "notions/products/colors/gxon7v8fppg6ffi3ybpl",
+          "images": [
+            {
+              "id": "img-1793443336380-9ps3",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793443336/notions/products/colors/gxon7v8fppg6ffi3ybpl.png",
+              "public_id": "notions/products/colors/gxon7v8fppg6ffi3ybpl",
+              "sort_order": 1
+            }
+          ],
+          "sizes": [
+            {
+              "size_id": "sz-1793438440517",
+              "size": "S",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438455950",
+              "size": "M",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438460906",
+              "size": "L",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438465615",
+              "size": "XL",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438473172",
+              "size": "XXL",
+              "stock": 10
+            }
+          ]
+        }
+      ],
+      "product_mode": "variant",
+      "stock": 0,
+      "sizes": [],
+      "material": "",
+      "care_instructions": "",
+      "specifications": [],
+      "created_at": "2026-10-31T10:42:26.176Z"
+    },
+    {
+      "id": "prod-1793443554839",
+      "name": "Jacket",
+      "slug": "jacket",
+      "description": "",
+      "category_id": "cat-1793437193969",
+      "category_slug": "men-s-apparel",
+      "category_name": "Men’s Apparel",
+      "subcategory_id": "cat-1793440081378",
+      "subcategory_slug": "jackets",
+      "subcategory_name": "Jackets",
+      "sku": "NOT-6687",
+      "price": 899,
+      "compare_at_price": 1799,
+      "is_bestseller": false,
+      "is_featured": false,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 5,
+      "rating_count": 0,
+      "images": [
+        {
+          "id": "img-1793443544872-7skt",
+          "product_id": "",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793443545/notions/products/colors/vwzqgg36jalcgthqanad.png",
+          "image_public_id": "notions/products/colors/vwzqgg36jalcgthqanad",
+          "alt_text": "Jacket",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "var-1793443552033-0",
+          "product_id": "",
+          "size": "S",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793443552033-1",
+          "product_id": "",
+          "size": "M",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793443552033-2",
+          "product_id": "",
+          "size": "L",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793443552033-3",
+          "product_id": "",
+          "size": "XL",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793443552033-4",
+          "product_id": "",
+          "size": "XXL",
+          "inventory_quantity": 10,
+          "is_available": true
+        }
+      ],
+      "colors": [
+        {
+          "color_id": "col-1793441702166",
+          "name": "Light blue",
+          "hex": "#579FD6",
+          "stock": 50,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793443545/notions/products/colors/vwzqgg36jalcgthqanad.png",
+          "image_public_id": "notions/products/colors/vwzqgg36jalcgthqanad",
+          "images": [
+            {
+              "id": "img-1793443544872-7skt",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793443545/notions/products/colors/vwzqgg36jalcgthqanad.png",
+              "public_id": "notions/products/colors/vwzqgg36jalcgthqanad",
+              "sort_order": 1
+            }
+          ],
+          "sizes": [
+            {
+              "size_id": "sz-1793438440517",
+              "size": "S",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438455950",
+              "size": "M",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438460906",
+              "size": "L",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438465615",
+              "size": "XL",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438473172",
+              "size": "XXL",
+              "stock": 10
+            }
+          ]
+        }
+      ],
+      "product_mode": "variant",
+      "stock": 0,
+      "sizes": [],
+      "material": "",
+      "care_instructions": "",
+      "specifications": [],
+      "created_at": "2026-10-31T10:45:54.839Z"
+    },
+    {
+      "id": "prod-1793443948179",
+      "name": "Caps",
+      "slug": "caps",
+      "description": "",
+      "category_id": "cat-1793437305536",
+      "category_slug": "accessories",
+      "category_name": "⁠Accessories",
+      "subcategory_id": "cat-1793440788676",
+      "subcategory_slug": "caps",
+      "subcategory_name": "Caps",
+      "sku": "NOT-2456",
+      "price": 499,
+      "compare_at_price": 899,
+      "is_bestseller": false,
+      "is_featured": false,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 5,
+      "rating_count": 0,
+      "images": [
+        {
+          "id": "img-1793443932609-qxdn",
+          "product_id": "",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793443932/notions/products/colors/qffxneagfpycuolbeyd7.png",
+          "image_public_id": "notions/products/colors/qffxneagfpycuolbeyd7",
+          "alt_text": "Caps",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [],
+      "colors": [],
+      "product_mode": "normal",
+      "stock": 10,
+      "sizes": [],
+      "material": "",
+      "care_instructions": "",
+      "specifications": [],
+      "created_at": "2026-10-31T10:52:28.179Z"
+    },
+    {
+      "id": "prod-1793444460191",
+      "name": "Ring",
+      "slug": "ring",
+      "description": "",
+      "category_id": "cat-1793437305536",
+      "category_slug": "accessories",
+      "category_name": "⁠Accessories",
+      "subcategory_id": "cat-1793444407969",
+      "subcategory_slug": "ring",
+      "subcategory_name": "Ring",
+      "sku": "NOT-2322",
+      "price": 299,
+      "compare_at_price": 599,
+      "is_bestseller": false,
+      "is_featured": false,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 5,
+      "rating_count": 0,
+      "images": [
+        {
+          "id": "img-1793444453199-qgps",
+          "product_id": "",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793444453/notions/products/wiymp3kmipscdxzfiexp.png",
+          "image_public_id": "notions/products/wiymp3kmipscdxzfiexp",
+          "alt_text": "Ring",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [],
+      "colors": [],
+      "product_mode": "normal",
+      "stock": 20,
+      "sizes": [],
+      "material": "",
+      "care_instructions": "",
+      "specifications": [],
+      "created_at": "2026-10-31T11:01:00.191Z"
+    },
+    {
+      "id": "prod-1793444554708",
+      "name": "Chain",
+      "slug": "chain",
+      "description": "",
+      "category_id": "cat-1793437305536",
+      "category_slug": "accessories",
+      "category_name": "⁠Accessories",
+      "subcategory_id": "cat-1793441024574",
+      "subcategory_slug": "chain",
+      "subcategory_name": "Chain",
+      "sku": "NOT-3997",
+      "price": 499,
+      "compare_at_price": 999,
+      "is_bestseller": false,
+      "is_featured": false,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 5,
+      "rating_count": 0,
+      "images": [
+        {
+          "id": "img-1793444553078-rgqg",
+          "product_id": "",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793444553/notions/products/sli25pqdptmg2ujm8cxr.png",
+          "image_public_id": "notions/products/sli25pqdptmg2ujm8cxr",
+          "alt_text": "Chain",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [],
+      "colors": [],
+      "product_mode": "normal",
+      "stock": 20,
+      "sizes": [],
+      "material": "",
+      "care_instructions": "",
+      "specifications": [],
+      "created_at": "2026-10-31T11:02:34.708Z"
     }
   ],
   "banners": [
@@ -131,12 +1314,14 @@
       "subtitle": "NEW COLLECTION",
       "description": "Premium men's fashion for your everyday journey.",
       "cta_label": "Shop Now",
-      "cta_url": "/category/men",
+      "cta_url": "/category/shirts",
       "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793255871/notions/banners/cofpsusgwc22dunnsaat.png",
       "image_public_id": "notions/banners/cofpsusgwc22dunnsaat",
       "badge_text": "Style Beyond Trends • Men's Fashion Reimagined",
       "sort_order": 1,
-      "is_published": true
+      "is_published": true,
+      "destination_type": "category",
+      "destination_id": "cat-1793438873673"
     },
     {
       "id": "ban-essentials",
@@ -145,12 +1330,14 @@
       "subtitle": "MODERN ESSENTIALS",
       "description": "Sophisticated tailoring crafted for the discerning modern gentleman.",
       "cta_label": "Explore Collection",
-      "cta_url": "/category/men",
+      "cta_url": "/shop",
       "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793256048/notions/banners/appxyd8xy1pq3bxxaew9.png",
       "image_public_id": "notions/banners/appxyd8xy1pq3bxxaew9",
       "badge_text": "MODERN ESSENTIALS",
       "sort_order": 2,
-      "is_published": true
+      "is_published": true,
+      "destination_type": "custom",
+      "destination_id": null
     },
     {
       "id": "ban-footwear",
@@ -159,12 +1346,14 @@
       "subtitle": "FOOTWEAR",
       "description": "Premium shoes & sandals for every step.",
       "cta_label": "Shop Footwear",
-      "cta_url": "/category/footwear",
+      "cta_url": "/category/foot-wear",
       "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793256138/notions/banners/g8kbembaviffznm58puw.png",
       "image_public_id": "notions/banners/g8kbembaviffznm58puw",
       "sort_order": 3,
       "is_published": true,
-      "badge_text": ""
+      "badge_text": "",
+      "destination_type": "category",
+      "destination_id": "cat-1793367161674"
     },
     {
       "id": "ban-accessories",
@@ -173,12 +1362,14 @@
       "subtitle": "ACCESSORIES",
       "description": "Caps, Rings, Bracelets & Chains",
       "cta_label": "Explore Accessories",
-      "cta_url": "/category/accessories",
+      "cta_url": "/category/caps",
       "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793256214/notions/banners/vpxux9xqnjgsambzqee3.png",
       "image_public_id": "notions/banners/vpxux9xqnjgsambzqee3",
       "sort_order": 4,
       "is_published": true,
-      "badge_text": ""
+      "badge_text": "",
+      "destination_type": "category",
+      "destination_id": "cat-1793440788676"
     },
     {
       "id": "ban-new-arrivals",
@@ -193,6 +1384,38 @@
       "sort_order": 5,
       "is_published": true,
       "badge_text": ""
+    },
+    {
+      "id": "ban-1793436277518",
+      "section": "hero",
+      "title": "Step Into Timeless Style",
+      "subtitle": "NEW FOOTWEAR COLLECTION",
+      "description": "Discover premium footwear.",
+      "cta_label": "Shop Now",
+      "cta_url": "/category/foot-wear",
+      "destination_type": "category",
+      "destination_id": "cat-1793367161674",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793436143/notions/banners/egzswa6yip7pm4dwbksj.png",
+      "image_public_id": "notions/banners/egzswa6yip7pm4dwbksj",
+      "badge_text": "",
+      "sort_order": 6,
+      "is_published": true
+    },
+    {
+      "id": "ban-1793437001210",
+      "section": "hero",
+      "title": "Complete Your Look",
+      "subtitle": "PREMIUM ACCESSORIES COLLECTION",
+      "description": "Elevate your everyday style with premium caps.",
+      "cta_label": "Shop Now",
+      "cta_url": "/category/caps",
+      "destination_type": "category",
+      "destination_id": "cat-1793440788676",
+      "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793436986/notions/banners/kthocjyrmxmqx89db08o.png",
+      "image_public_id": "notions/banners/kthocjyrmxmqx89db08o",
+      "badge_text": "",
+      "sort_order": 8,
+      "is_published": true
     }
   ],
   "colors": [
@@ -230,6 +1453,27 @@
       "hex": "#FFFFFF",
       "is_active": true,
       "created_at": "2026-10-30T13:47:08.683Z"
+    },
+    {
+      "id": "col-1793441702166",
+      "name": "Light blue",
+      "hex": "#579FD6",
+      "is_active": true,
+      "created_at": "2026-10-31T10:15:02.166Z"
+    },
+    {
+      "id": "col-1793442638095",
+      "name": "Cofee",
+      "hex": "#BEB07E",
+      "is_active": true,
+      "created_at": "2026-10-31T10:30:38.095Z"
+    },
+    {
+      "id": "col-1793442652888",
+      "name": "Black",
+      "hex": "#000000",
+      "is_active": true,
+      "created_at": "2026-10-31T10:30:52.888Z"
     }
   ],
   "settings": {
