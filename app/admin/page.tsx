@@ -44,8 +44,25 @@ import {
   Palette,
   Ruler,
   ChevronLeft,
+  SlidersHorizontal,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react';
-import { Product, ProductVariant, ProductImage, Category, CategorySize, Banner, Order, SiteSettings, ProductColor, ProductColorVariant, ProductColorImage, ProductColorSizeVariant } from '@/types/database';
+import {
+  Product,
+  ProductVariant,
+  ProductImage,
+  Category,
+  CategorySize,
+  Banner,
+  Order,
+  SiteSettings,
+  ProductColor,
+  ProductColorVariant,
+  ProductColorImage,
+  ProductColorSizeVariant,
+  ProductSpecification,
+} from '@/types/database';
 import ColorManagement from '@/components/admin/ColorManagement';
 import SizeManagement from '@/components/admin/SizeManagement';
 import SubcategoryManagement from '@/components/admin/SubcategoryManagement';
@@ -254,22 +271,23 @@ export default function AdminDashboardPage() {
       category_id: defaultCat?.id || '',
       category_slug: defaultCat?.slug || '',
       category_name: defaultCat?.name || '',
-      price: 1499,
-      compare_at_price: 1999,
+      price: 0,
+      compare_at_price: 0,
       product_mode: 'variant',
-      stock: 50,
+      stock: 0,
       sizes: [],
       is_bestseller: false,
-      is_featured: true,
+      is_featured: false,
       is_new_arrival: true,
       is_published: true,
-      rating_score: 4.7,
-      rating_count: 24,
-      material: '100% Premium Cotton',
-      care_instructions: 'Machine wash cold gentle cycle, do not bleach.',
+      rating_score: 5.0,
+      rating_count: 0,
+      material: '',
+      care_instructions: '',
       images: [],
       variants: [],
       colors: [],
+      specifications: [],
     });
     setCustomImageUrl('');
     setShowProductModal(true);
@@ -1568,6 +1586,7 @@ export default function AdminDashboardPage() {
                                   product_mode: isVar ? 'variant' : 'normal',
                                   stock: p.stock !== undefined ? p.stock : (p.variants?.reduce((sum, v) => sum + (v.inventory_quantity || 0), 0) ?? 25),
                                   sizes: p.sizes || p.variants?.map((v) => v.size) || [],
+                                  specifications: p.specifications ? [...p.specifications] : [],
                                 });
                                 setCustomImageUrl('');
                                 setShowProductModal(true);
@@ -2017,7 +2036,6 @@ export default function AdminDashboardPage() {
             />
           )}
 
-
           {/* ====================================================
               5. BANNERS & HOMEPAGE CMS TAB (Phase 2)
           ==================================================== */}
@@ -2464,10 +2482,11 @@ export default function AdminDashboardPage() {
                   </label>
                   <input
                     type="number"
+                    min="0"
                     required
-                    value={editingProduct.price || 0}
+                    value={editingProduct.price !== undefined && editingProduct.price !== null ? editingProduct.price : 0}
                     onChange={(e) =>
-                      setEditingProduct({ ...editingProduct, price: Number(e.target.value) })
+                      setEditingProduct({ ...editingProduct, price: e.target.value === '' ? 0 : Number(e.target.value) })
                     }
                     className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-xl font-bold"
                   />
@@ -2479,12 +2498,12 @@ export default function AdminDashboardPage() {
                   </label>
                   <input
                     type="number"
-                    value={editingProduct.compare_at_price || ''}
-                    placeholder="Optional (for % OFF)"
+                    min="0"
+                    value={editingProduct.compare_at_price !== undefined && editingProduct.compare_at_price !== null ? editingProduct.compare_at_price : 0}
                     onChange={(e) =>
                       setEditingProduct({
                         ...editingProduct,
-                        compare_at_price: e.target.value ? Number(e.target.value) : null,
+                        compare_at_price: e.target.value === '' ? 0 : Number(e.target.value),
                       })
                     }
                     className="w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-xl"
@@ -3338,6 +3357,187 @@ export default function AdminDashboardPage() {
                   placeholder="Enter product description"
                   className="w-full px-3.5 py-2 text-sm border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
                 />
+              </div>
+
+              {/* 6. Product Specifications (Key-Value) */}
+              <div className="bg-gray-50/70 p-4 rounded-2xl border border-gray-200 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <SlidersHorizontal className="w-4 h-4 text-[#143728]" />
+                    <span className="text-xs font-bold text-gray-800 uppercase tracking-wider">
+                      Product Specifications ({editingProduct.specifications?.length || 0})
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = editingProduct.specifications || [];
+                      const newSpec: ProductSpecification = {
+                        id: `spec-${Date.now()}`,
+                        key: '',
+                        value: '',
+                        sort_order: current.length + 1,
+                      };
+                      setEditingProduct({
+                        ...editingProduct,
+                        specifications: [...current, newSpec],
+                      });
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#143728] hover:bg-[#0d261b] text-white rounded-xl text-xs font-semibold shadow-2xs transition cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Specification</span>
+                  </button>
+                </div>
+
+                {/* Assigned Specifications List */}
+                {editingProduct.specifications && editingProduct.specifications.length > 0 ? (
+                  <div className="space-y-2 pt-1">
+                    {/* Header labels */}
+                    <div className="hidden sm:grid sm:grid-cols-12 gap-2 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      <div className="col-span-5">Specification (Key) *</div>
+                      <div className="col-span-6">Value *</div>
+                      <div className="col-span-1 text-right">Actions</div>
+                    </div>
+
+                    {editingProduct.specifications.map((spec, sIdx) => {
+                      const isFirst = sIdx === 0;
+                      const isLast = sIdx === editingProduct.specifications!.length - 1;
+                      const isDuplicate = editingProduct.specifications!.some(
+                        (other, oIdx) =>
+                          oIdx !== sIdx &&
+                          other.key?.trim() &&
+                          spec.key?.trim() &&
+                          other.key.trim().toLowerCase() === spec.key.trim().toLowerCase()
+                      );
+
+                      return (
+                        <div
+                          key={spec.id || sIdx}
+                          className={`flex flex-col sm:grid sm:grid-cols-12 gap-2 p-2.5 bg-white rounded-xl border shadow-2xs transition ${
+                            isDuplicate ? 'border-amber-400 bg-amber-50/20' : 'border-gray-200'
+                          }`}
+                        >
+                          {/* Key Input */}
+                          <div className="col-span-5">
+                            <label className="sm:hidden text-[10px] font-bold text-gray-500 block mb-0.5">
+                              Key:
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={spec.key || ''}
+                              onChange={(e) => {
+                                const updated = [...(editingProduct.specifications || [])];
+                                updated[sIdx] = { ...updated[sIdx], key: e.target.value };
+                                setEditingProduct({ ...editingProduct, specifications: updated });
+                              }}
+                              placeholder="Enter key"
+                              className="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:border-[#143728] focus:outline-none font-semibold text-gray-900"
+                            />
+                            {isDuplicate && (
+                              <span className="text-[10px] text-amber-600 block mt-0.5">
+                                Duplicate key
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Value Input */}
+                          <div className="col-span-6">
+                            <label className="sm:hidden text-[10px] font-bold text-gray-500 block mb-0.5">
+                              Value:
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={spec.value || ''}
+                              onChange={(e) => {
+                                const updated = [...(editingProduct.specifications || [])];
+                                updated[sIdx] = { ...updated[sIdx], value: e.target.value };
+                                setEditingProduct({ ...editingProduct, specifications: updated });
+                              }}
+                              placeholder="Enter value"
+                              className="w-full px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:border-[#143728] focus:outline-none"
+                            />
+                          </div>
+
+                          {/* Controls */}
+                          <div className="col-span-1 flex items-center justify-end gap-0.5 pt-1 sm:pt-0">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isFirst) return;
+                                const updated = [...(editingProduct.specifications || [])];
+                                const temp = updated[sIdx - 1];
+                                updated[sIdx - 1] = updated[sIdx];
+                                updated[sIdx] = temp;
+                                updated.forEach((item, i) => (item.sort_order = i + 1));
+                                setEditingProduct({ ...editingProduct, specifications: updated });
+                              }}
+                              disabled={isFirst}
+                              className="p-1 text-gray-400 hover:text-[#143728] rounded hover:bg-gray-100 disabled:opacity-20 cursor-pointer"
+                              title="Move Up"
+                            >
+                              <ChevronUp className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (isLast) return;
+                                const updated = [...(editingProduct.specifications || [])];
+                                const temp = updated[sIdx + 1];
+                                updated[sIdx + 1] = updated[sIdx];
+                                updated[sIdx] = temp;
+                                updated.forEach((item, i) => (item.sort_order = i + 1));
+                                setEditingProduct({ ...editingProduct, specifications: updated });
+                              }}
+                              disabled={isLast}
+                              className="p-1 text-gray-400 hover:text-[#143728] rounded hover:bg-gray-100 disabled:opacity-20 cursor-pointer"
+                              title="Move Down"
+                            >
+                              <ChevronDown className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = (editingProduct.specifications || []).filter((_, i) => i !== sIdx);
+                                updated.forEach((item, i) => (item.sort_order = i + 1));
+                                setEditingProduct({ ...editingProduct, specifications: updated });
+                              }}
+                              className="p-1 text-gray-400 hover:text-red-600 rounded hover:bg-red-50 cursor-pointer"
+                              title="Remove"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-white rounded-xl border border-dashed border-gray-300 text-center text-gray-400 text-xs space-y-2">
+                    <p>No specifications added yet for this product.</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newSpec: ProductSpecification = {
+                          id: `spec-${Date.now()}`,
+                          key: '',
+                          value: '',
+                          sort_order: 1,
+                        };
+                        setEditingProduct({
+                          ...editingProduct,
+                          specifications: [newSpec],
+                        });
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gray-100 hover:bg-[#143728] hover:text-white text-gray-800 rounded-xl text-xs font-semibold transition cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Specification</span>
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* 6. Visibility & Badges */}

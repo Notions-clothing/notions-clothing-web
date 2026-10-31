@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
@@ -19,24 +19,44 @@ export default function CartDrawer() {
     setIsCartOpen,
   } = useCart();
 
-  if (!isCartOpen) return null;
+  useEffect(() => {
+    if (isCartOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isCartOpen]);
 
   const freeShippingThreshold = 1999;
   const progressPercent = Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
   const diffToFree = Math.max(0, freeShippingThreshold - subtotal);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
+    <div
+      className={`fixed inset-0 z-50 overflow-hidden transition-opacity duration-300 ${
+        isCartOpen ? 'pointer-events-auto' : 'pointer-events-none'
+      }`}
+      aria-hidden={!isCartOpen}
+    >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
+        className={`fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300 ease-out ${
+          isCartOpen ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={() => setIsCartOpen(false)}
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-[#FAF9F5] shadow-2xl flex flex-col">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10 pointer-events-none">
+        <div
+          className={`w-full sm:w-[420px] max-w-full sm:max-w-md bg-[#FAF9F5] shadow-2xl flex flex-col h-[100dvh] max-h-[100dvh] pointer-events-auto transform transition-transform duration-300 ease-out ${
+            isCartOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
           {/* Header */}
-          <div className="px-6 py-5 border-b border-[#EAE5DC] flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-4 border-b border-[#EAE5DC] flex items-center justify-between shrink-0">
             <div className="flex items-center space-x-2">
               <ShoppingBag className="w-5 h-5 text-[#143728]" />
               <h2 className="text-base font-semibold text-[#181818] tracking-tight">
@@ -46,7 +66,7 @@ export default function CartDrawer() {
             <button
               type="button"
               onClick={() => setIsCartOpen(false)}
-              className="p-1.5 text-[#555555] hover:text-[#181818] transition cursor-pointer"
+              className="p-2 -mr-1 text-[#555555] hover:text-[#181818] transition cursor-pointer"
               aria-label="Close cart"
             >
               <X className="w-5 h-5" />

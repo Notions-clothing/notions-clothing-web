@@ -31,19 +31,19 @@ export default async function HomePage() {
         {/* Main Hero Banner Automatic Slider */}
         <HeroBanner banners={heroBanners} />
 
-        {/* Shop by Category Row */}
-        <ShopByCategory categories={categories} />
+        {/* Shop by Subcategory Row */}
+        <ShopByCategory categories={categories} title="Shop by Category" />
 
         {/* Two-Column Section: Modern Essentials Banner + Best Sellers Grid */}
-        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch">
             {/* Left Feature Banner */}
-            <div className="w-full lg:w-auto flex-shrink-0">
+            <div className="w-full lg:w-[360px] xl:w-[400px] flex-shrink-0 flex flex-col">
               <ModernEssentialsCard banner={essentialsBanner} />
             </div>
 
             {/* Right Best Sellers with Filter Tabs */}
-            <BestSellersSection initialProducts={products} />
+            <BestSellersSection initialProducts={products} categories={categories} />
           </div>
         </section>
 

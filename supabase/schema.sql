@@ -250,6 +250,10 @@ CREATE TABLE IF NOT EXISTS public.wishlists (
     UNIQUE(user_id, product_id)
 );
 
+-- 14. PRODUCT SPECIFICATIONS (DYNAMIC KEY-VALUE SPECIFICATIONS)
+-- Stored directly in products.specifications column as JSONB
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS specifications JSONB DEFAULT '[]'::jsonb;
+
 -- ==============================================================================
 -- ROW LEVEL SECURITY (RLS) POLICIES
 -- ==============================================================================

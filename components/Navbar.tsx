@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -18,10 +18,22 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Men', href: '/category/men' },
-    { name: 'Footwear', href: '/category/footwear' },
+    { name: 'Shop', href: '/shop' },
+    { name: 'Men’s Apparel', href: '/category/men-s-apparel' },
+    { name: 'Footwear', href: '/category/foot-wear' },
     { name: 'Accessories', href: '/category/accessories' },
     { name: 'New Arrivals', href: '/new-arrivals' },
     { name: 'Offers', href: '/offers' },
@@ -40,34 +52,31 @@ export default function Navbar() {
       <header className="sticky top-0 z-40 bg-[#FAF9F5] border-b border-[#EAE5DC] transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-18 sm:h-20">
-            {/* Mobile: Hamburger */}
-            <div className="flex items-center lg:hidden">
+            {/* Left: Mobile Hamburger + Brand Logo */}
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="p-2 -ml-2 text-[#181818] hover:text-[#143728] focus:outline-none cursor-pointer"
+                className="lg:hidden p-2 -ml-2 text-[#181818] hover:text-[#143728] focus:outline-none cursor-pointer"
                 aria-label="Open navigation menu"
               >
                 <Menu className="w-6 h-6" />
               </button>
-            </div>
 
-            {/* Logo */}
-            <div className="flex-shrink-0 flex items-center justify-center lg:justify-start">
               <Link href="/" className="inline-block relative">
                 <Image
                   src="/logo.png"
                   alt="NOTIONS® — Opulent Clothing"
-                  width={150}
-                  height={44}
-                  className="h-8 sm:h-9 md:h-10 w-auto object-contain"
+                  width={170}
+                  height={48}
+                  className="h-9 sm:h-10 md:h-11 w-auto object-contain"
                   priority
                 />
               </Link>
             </div>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center space-x-7 text-[13px] tracking-wide font-medium text-[#2B2B2B]">
+            <nav className="hidden lg:flex items-center space-x-5 xl:space-x-7 text-[13px] tracking-wide font-medium text-[#2B2B2B]">
               {navLinks.map((link) => {
                 const isActive =
                   pathname === link.href ||
@@ -156,105 +165,115 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile search drop down */}
-          {mobileSearchOpen && (
-            <div className="md:hidden py-3 border-t border-[#EAE5DC]">
-              <form onSubmit={handleSearchSubmit} className="relative">
-                <input
-                  type="text"
-                  placeholder="Search for shirts, jeans, shoes..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-[#F3EFE6] text-[#181818] placeholder-[#807D75] text-xs pl-9 pr-4 py-2.5 rounded-full border border-transparent focus:border-[#CFC8BA] focus:outline-none"
-                  autoFocus
-                />
-                <Search className="w-4 h-4 text-[#807D75] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </form>
-            </div>
-          )}
+          {/* Mobile search drop down with smooth unfold coming animation */}
+          <div
+            className={`md:hidden overflow-hidden transition-all duration-300 ease-out ${
+              mobileSearchOpen
+                ? 'max-h-20 opacity-100 py-3 border-t border-[#EAE5DC]'
+                : 'max-h-0 opacity-0 py-0 border-transparent pointer-events-none'
+            }`}
+          >
+            <form
+              onSubmit={handleSearchSubmit}
+              className={`relative transform transition-all duration-300 ease-out ${
+                mobileSearchOpen ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-2 opacity-0 scale-98'
+              }`}
+            >
+              <input
+                type="text"
+                placeholder="Search for shirts, jeans, shoes..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-[#F3EFE6] text-[#181818] placeholder-[#807D75] text-xs pl-9 pr-4 py-2.5 rounded-full border border-transparent focus:border-[#CFC8BA] focus:outline-none"
+              />
+              <Search className="w-4 h-4 text-[#807D75] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </form>
+          </div>
         </div>
       </header>
 
       {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
-          />
+      <div
+        className={`fixed inset-0 z-50 lg:hidden overflow-hidden transition-opacity duration-300 ${
+          mobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'
+        }`}
+        aria-hidden={!mobileMenuOpen}
+      >
+        {/* Backdrop */}
+        <div
+          className={`fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity duration-300 ease-out ${
+            mobileMenuOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => setMobileMenuOpen(false)}
+        />
 
-          {/* Drawer content */}
-          <div className="relative w-4/5 max-w-xs bg-[#FAF9F5] h-full shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-10">
-            <div>
-              <div className="flex items-center justify-between pb-6 border-b border-[#EAE5DC]">
-                <Image
-                  src="/logo.png"
-                  alt="NOTIONS®"
-                  width={120}
-                  height={34}
-                  className="h-7 w-auto object-contain"
-                />
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 text-[#333333] hover:text-[#143728] cursor-pointer"
-                  aria-label="Close menu"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <nav className="mt-6 flex flex-col space-y-4">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="text-base font-medium text-[#181818] hover:text-[#143728] py-2 border-b border-[#F0EDE6] flex items-center justify-between"
-                  >
-                    <span>{link.name}</span>
-                    <span className="text-xs text-[#999999]">→</span>
-                  </Link>
-                ))}
-              </nav>
-
-              <div className="mt-8 pt-6 border-t border-[#EAE5DC] space-y-3 text-sm">
-                <Link
-                  href="/account"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 text-[#333333] hover:text-[#143728]"
-                >
-                  <User className="w-4 h-4" />
-                  <span>My Account</span>
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setIsWishlistOpen(true);
-                  }}
-                  className="w-full flex items-center space-x-3 text-[#333333] hover:text-[#143728] cursor-pointer text-left"
-                >
-                  <Heart className="w-4 h-4" />
-                  <span>Wishlist ({wishlistCount})</span>
-                </button>
-                <Link
-                  href="/admin"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 text-[#333333] hover:text-[#143728]"
-                >
-                  <span className="text-xs uppercase tracking-wider text-[#736E65]">Admin Portal</span>
-                </Link>
-              </div>
+        {/* Drawer content with smooth slide animation */}
+        <div
+          className={`relative w-4/5 max-w-xs bg-[#FAF9F5] h-full shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-10 transform transition-transform duration-300 ease-out ${
+            mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <div>
+            <div className="flex items-center justify-between pb-6 border-b border-[#EAE5DC]">
+              <Image
+                src="/logo.png"
+                alt="NOTIONS®"
+                width={136}
+                height={38}
+                className="h-8 w-auto object-contain"
+              />
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 text-[#333333] hover:text-[#143728] cursor-pointer"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <div className="pt-6 border-t border-[#EAE5DC] text-xs text-[#888888]">
-              <p>© {new Date().getFullYear()} NOTIONS®. Opulent Clothing.</p>
+            <nav className="mt-6 flex flex-col space-y-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-base font-medium text-[#181818] hover:text-[#143728] py-2 border-b border-[#F0EDE6] flex items-center justify-between"
+                >
+                  <span>{link.name}</span>
+                  <span className="text-xs text-[#999999]">→</span>
+                </Link>
+              ))}
+            </nav>
+
+            <div className="mt-8 pt-6 border-t border-[#EAE5DC] space-y-3 text-sm">
+              <Link
+                href="/account"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center space-x-3 text-[#333333] hover:text-[#143728]"
+              >
+                <User className="w-4 h-4" />
+                <span>My Account</span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setIsWishlistOpen(true);
+                }}
+                className="w-full flex items-center space-x-3 text-[#333333] hover:text-[#143728] cursor-pointer text-left"
+              >
+                <Heart className="w-4 h-4" />
+                <span>Wishlist ({wishlistCount})</span>
+              </button>
             </div>
           </div>
+
+          <div className="pt-6 border-t border-[#EAE5DC] text-xs text-[#888888]">
+            <p>© {new Date().getFullYear()} NOTIONS®. Opulent Clothing.</p>
+          </div>
         </div>
-      )}
+      </div>
     </>
   );
 }

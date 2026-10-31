@@ -75,6 +75,13 @@ export interface ProductImage {
   is_primary: boolean;
 }
 
+export interface ProductSpecification {
+  id?: string;
+  key: string;
+  value: string;
+  sort_order?: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -103,6 +110,7 @@ export interface Product {
   colors?: ProductColorVariant[];
   material?: string;
   care_instructions?: string;
+  specifications?: ProductSpecification[];
   created_at: string;
 }
 
