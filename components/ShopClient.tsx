@@ -145,7 +145,7 @@ export default function ShopClient({ initialProducts, categories }: ShopClientPr
         // Price Tier Filter
         if (priceTier !== 'all') {
           const tier = priceTiers.find((t) => t.id === priceTier);
-          if (tier) {
+          if (tier && tier.min !== undefined && tier.max !== undefined) {
             if (product.price < tier.min || product.price > tier.max) return false;
           }
         }

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { ChevronDown, SlidersHorizontal } from 'lucide-react';
 
 interface CategorySortSelectProps {
@@ -11,13 +11,10 @@ interface CategorySortSelectProps {
 
 export default function CategorySortSelect({ categorySlug, currentSort }: CategorySortSelectProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
-    const params = new URLSearchParams(searchParams ? searchParams.toString() : '');
-    params.set('sort', val);
-    router.push(`/category/${categorySlug}?${params.toString()}`);
+    router.push(`/category/${categorySlug}?sort=${val}`);
   };
 
   return (
