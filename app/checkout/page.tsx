@@ -99,6 +99,33 @@ export default function CheckoutPage() {
         throw new Error(orderData.error || 'Failed to initialize order');
       }
 
+      const saveOrderLocally = (confirmedOrder: any) => {
+        try {
+          const o = confirmedOrder || {
+            order_number: orderData.orderNumber,
+            customer_name: formData.fullName,
+            customer_email: formData.email,
+            customer_phone: formData.phone,
+            shipping_address: {
+              street: formData.apartment ? `${formData.street}, ${formData.apartment}` : formData.street,
+              city: formData.city,
+              state: formData.state,
+              postal_code: formData.postalCode,
+              country: 'India',
+            },
+            subtotal: orderData.subtotal,
+            shipping_amount: orderData.shippingAmount,
+            total_amount: orderData.amount,
+            payment_status: 'paid',
+            status: 'confirmed',
+            created_at: new Date().toISOString(),
+            items: orderData.items,
+          };
+          sessionStorage.setItem(`notions_order_${orderData.orderNumber}`, JSON.stringify(o));
+          localStorage.setItem('notions_last_order', JSON.stringify(o));
+        } catch (e) {}
+      };
+
       // 2. Load Razorpay script
       const scriptLoaded = await loadRazorpayScript();
 
@@ -135,6 +162,7 @@ export default function CheckoutPage() {
 
         const verifyData = await verifyRes.json();
         if (verifyData.success) {
+          saveOrderLocally(verifyData.order);
           clearCart();
           router.push(`/order-confirmation/${orderData.orderNumber}`);
           return;
@@ -150,7 +178,16 @@ export default function CheckoutPage() {
         description: `Order #${orderData.orderNumber}`,
         image: '/logo.png',
         order_id: orderData.razorpayOrderId,
+        prefill: {
+          name: formData.fullName,
+          email: formData.email,
+          contact: formData.phone,
+        },
+        theme: {
+          color: '#143728',
+        },
         handler: async function (response: any) {
+          // 4. Verify payment signature on backend
           const verifyRes = await fetch('/api/checkout/verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -182,30 +219,31 @@ export default function CheckoutPage() {
 
           const verifyData = await verifyRes.json();
           if (verifyData.success) {
+            saveOrderLocally(verifyData.order);
             clearCart();
             router.push(`/order-confirmation/${orderData.orderNumber}`);
           } else {
-            setErrorMsg(verifyData.error || 'Payment signature verification failed.');
+            setErrorMsg(verifyData.error || 'Payment verification failed. Please contact concierge.');
+            setLoading(false);
           }
         },
-        prefill: {
-          name: formData.fullName,
-          email: formData.email,
-          contact: formData.phone,
-        },
-        theme: {
-          color: '#143728',
+        modal: {
+          ondismiss: function () {
+            setLoading(false);
+          },
         },
       };
 
       const rzp = new window.Razorpay(options);
-      rzp.on('payment.failed', function (resp: any) {
-        setErrorMsg(`Payment was not completed: ${resp.error.description}`);
+      rzp.on('payment.failed', function (response: any) {
+        setErrorMsg(response.error.description || 'Payment failed or was cancelled by user.');
+        setLoading(false);
       });
+
       rzp.open();
     } catch (err: any) {
-      setErrorMsg(err.message || 'An error occurred during checkout.');
-    } finally {
+      console.error(err);
+      setErrorMsg(err.message || 'Something went wrong during checkout. Please try again.');
       setLoading(false);
     }
   };
@@ -214,90 +252,90 @@ export default function CheckoutPage() {
     <div className="min-h-screen flex flex-col bg-[#FAF9F5]">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-6">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="mb-8">
           <Link
-            href="/"
-            className="inline-flex items-center space-x-1.5 text-xs text-[#6B665E] hover:text-[#143728] transition"
+            href="/cart"
+            className="inline-flex items-center text-xs font-semibold text-[#143728] hover:underline space-x-1"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Continue Shopping</span>
+            <span>Return to Shopping Bag</span>
           </Link>
-          <h1 className="font-serif text-3xl font-bold text-[#181818] mt-3">
-            Secure Atelier Checkout
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#181818] mt-3">
+            Secure Checkout
           </h1>
+          <p className="text-xs text-[#5C574F] mt-1">
+            Complete your details below to finalize your acquisition.
+          </p>
         </div>
 
         {errorMsg && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-3 text-red-800 text-xs">
+          <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{errorMsg}</span>
           </div>
         )}
 
         {items.length === 0 ? (
-          <div className="py-20 text-center bg-white rounded-xl border border-[#EDE8DE] p-8 max-w-md mx-auto">
-            <h3 className="font-serif text-xl text-[#181818] mb-2">Your Bag is Empty</h3>
-            <p className="text-xs text-[#737373] mb-6">
-              Please add items to your cart before proceeding to checkout.
-            </p>
+          <div className="text-center py-16 bg-white rounded-2xl border border-[#EDE8DE] p-8">
+            <p className="text-sm text-[#736E65] mb-4">Your bag is currently empty.</p>
             <Link
-              href="/"
+              href="/shop"
               className="inline-block px-6 py-2.5 bg-[#143728] text-white text-xs font-semibold rounded-full hover:bg-[#0d281c] transition"
             >
-              Discover Collection
+              Continue Shopping
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleCheckoutSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-            {/* Left Column: Customer and Shipping Form */}
-            <div className="lg:col-span-7 space-y-8">
+          <form onSubmit={handleCheckoutSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left Column: Delivery Details Form */}
+            <div className="lg:col-span-7 space-y-6">
               {/* Contact Information */}
               <div className="bg-white p-6 sm:p-8 rounded-2xl border border-[#EDE8DE] space-y-4 shadow-2xs">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-[#143728]">
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-[#143728] pb-2 border-b border-[#EDE8DE]">
                   1. Contact Information
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div>
-                    <label className="block text-[#444444] font-medium mb-1.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-medium text-[#181818] mb-1">
                       Full Name *
                     </label>
                     <input
                       type="text"
                       name="fullName"
                       required
-                      placeholder="e.g. Vikram Malhotra"
                       value={formData.fullName}
                       onChange={handleChange}
-                      className="w-full p-2.5 rounded-lg border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728]"
+                      placeholder="e.g. Arvind Swaminathan"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728] transition"
                     />
                   </div>
                   <div>
-                    <label className="block text-[#444444] font-medium mb-1.5">
+                    <label className="block text-xs font-medium text-[#181818] mb-1">
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="concierge@example.com"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728] transition"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-[#181818] mb-1">
                       Phone Number *
                     </label>
                     <input
                       type="tel"
                       name="phone"
                       required
-                      placeholder="+91 98765 43210"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full p-2.5 rounded-lg border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728]"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-[#444444] font-medium mb-1.5">
-                      Email Address (for order & invoice dispatch) *
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      required
-                      placeholder="vikram@example.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full p-2.5 rounded-lg border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728]"
+                      placeholder="+91 98765 43210"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728] transition"
                     />
                   </div>
                 </div>
@@ -305,89 +343,80 @@ export default function CheckoutPage() {
 
               {/* Shipping Address */}
               <div className="bg-white p-6 sm:p-8 rounded-2xl border border-[#EDE8DE] space-y-4 shadow-2xs">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-[#143728]">
-                  2. Delivery Address
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-[#143728] pb-2 border-b border-[#EDE8DE]">
+                  2. Shipping Address
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div className="sm:col-span-2">
-                    <label className="block text-[#444444] font-medium mb-1.5">
-                      Street Address *
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-[#181818] mb-1">
+                      Street Address / House No. *
                     </label>
                     <input
                       type="text"
                       name="street"
                       required
-                      placeholder="Flat / Villa / House No., Street"
                       value={formData.street}
                       onChange={handleChange}
-                      className="w-full p-2.5 rounded-lg border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728]"
+                      placeholder="Flat 402, Signature Towers, 12th Main"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728] transition"
                     />
                   </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-[#444444] font-medium mb-1.5">
+                  <div>
+                    <label className="block text-xs font-medium text-[#181818] mb-1">
                       Apartment, Suite, Landmark (Optional)
                     </label>
                     <input
                       type="text"
                       name="apartment"
-                      placeholder="Near Landmark"
                       value={formData.apartment}
                       onChange={handleChange}
-                      className="w-full p-2.5 rounded-lg border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728]"
+                      placeholder="Near Defense Colony Park"
+                      className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728] transition"
                     />
                   </div>
-                  <div>
-                    <label className="block text-[#444444] font-medium mb-1.5">
-                      City *
-                    </label>
-                    <input
-                      type="text"
-                      name="city"
-                      required
-                      placeholder="Bengaluru"
-                      value={formData.city}
-                      onChange={handleChange}
-                      className="w-full p-2.5 rounded-lg border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[#444444] font-medium mb-1.5">
-                      State *
-                    </label>
-                    <input
-                      type="text"
-                      name="state"
-                      required
-                      placeholder="Karnataka"
-                      value={formData.state}
-                      onChange={handleChange}
-                      className="w-full p-2.5 rounded-lg border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[#444444] font-medium mb-1.5">
-                      PIN Code *
-                    </label>
-                    <input
-                      type="text"
-                      name="postalCode"
-                      required
-                      placeholder="560038"
-                      value={formData.postalCode}
-                      onChange={handleChange}
-                      className="w-full p-2.5 rounded-lg border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[#444444] font-medium mb-1.5">
-                      Country
-                    </label>
-                    <input
-                      type="text"
-                      disabled
-                      value="India"
-                      className="w-full p-2.5 rounded-lg border border-[#DDD7CC] bg-[#F5F2EB] text-[#777777]"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-[#181818] mb-1">
+                        City *
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        required
+                        value={formData.city}
+                        onChange={handleChange}
+                        placeholder="Bengaluru"
+                        className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728] transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[#181818] mb-1">
+                        State *
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        required
+                        value={formData.state}
+                        onChange={handleChange}
+                        placeholder="Karnataka"
+                        className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728] transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[#181818] mb-1">
+                        Postal PIN Code *
+                      </label>
+                      <input
+                        type="text"
+                        name="postalCode"
+                        required
+                        value={formData.postalCode}
+                        onChange={handleChange}
+                        placeholder="560038"
+                        className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#DDD7CC] bg-[#FAF9F5] focus:outline-none focus:border-[#143728] transition"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -472,7 +501,7 @@ export default function CheckoutPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 px-6 bg-[#143728] hover:bg-[#0d281c] text-white text-xs font-semibold tracking-wider uppercase rounded-full flex items-center justify-center space-x-2 transition shadow-md disabled:bg-[#8FA39A]"
+                  className="w-full py-4 px-6 bg-[#143728] hover:bg-[#0d281c] text-white text-xs font-semibold tracking-wider uppercase rounded-full flex items-center justify-center space-x-2 transition shadow-md disabled:bg-[#8FA39A] cursor-pointer"
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>{loading ? 'Securing Transaction...' : `Pay ₹${totalAmount.toLocaleString('en-IN')} via Razorpay`}</span>

@@ -188,7 +188,7 @@ export default function HeroBanner({ banners: initialBanners, banner: singleBann
     <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-6">
       {/* Fixed-Height Container with Horizontal Slider Track */}
       <div
-        className="relative w-full rounded-2xl overflow-hidden bg-[#F6F2E9] h-[480px] sm:h-[520px] lg:h-[560px] shadow-xs select-none"
+        className="relative w-full rounded-2xl overflow-hidden bg-[#F6F2E9] h-[520px] sm:h-[520px] lg:h-[560px] shadow-xs select-none"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -213,7 +213,7 @@ export default function HeroBanner({ banners: initialBanners, banner: singleBann
             return (
               <div
                 key={`hero-slide-${item.id || 'slide'}-${idx}`}
-                className="relative w-full h-full shrink-0 flex items-center overflow-hidden"
+                className="relative w-full h-full shrink-0 flex items-end sm:items-center overflow-hidden"
               >
                 {/* Background Image */}
                 <Image
@@ -222,63 +222,63 @@ export default function HeroBanner({ banners: initialBanners, banner: singleBann
                   fill
                   priority={total > 1 ? idx === 1 : idx === 0}
                   sizes="(max-width: 1280px) 100vw, 1280px"
-                  className="object-cover object-[64%_16%] md:object-[center_16%]"
+                  className="object-cover object-[68%_12%] md:object-[center_16%]"
                 />
 
-                {/* Readability gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#FAF7F0]/85 via-[#FAF7F0]/50 to-transparent w-full md:w-3/4 pointer-events-none z-5" />
+                {/* Readability gradient overlay: soft bottom gradient on mobile so background image stays clearly visible, left-to-right gradient on desktop */}
+                <div className="absolute bottom-0 inset-x-0 h-[220px] sm:inset-0 sm:h-full bg-gradient-to-t from-[#FAF7F0]/80 via-[#FAF7F0]/25 to-transparent sm:bg-gradient-to-r sm:from-[#FAF7F0]/85 sm:via-[#FAF7F0]/50 sm:to-transparent w-full sm:w-3/4 pointer-events-none z-5" />
 
                 {/* Editorial Content Overlay */}
-                <div className="relative z-10 w-full px-6 sm:px-10 lg:px-16 py-8 sm:py-10 flex flex-col justify-between">
-                  <div className="max-w-[320px] sm:max-w-[420px]">
+                <div className="relative z-10 w-full px-5 sm:px-10 lg:px-16 pb-6 pt-16 sm:py-10 flex flex-col justify-end sm:justify-between">
+                  <div className="max-w-[340px] sm:max-w-[420px]">
                     {itemSubtitle && (
-                      <span className="inline-block text-[11px] sm:text-xs font-medium tracking-[0.24em] text-[#7A756B] uppercase mb-2.5">
+                      <span className="inline-block text-[10px] sm:text-xs font-medium tracking-[0.24em] text-[#7A756B] uppercase mb-1.5 sm:mb-2.5">
                         {itemSubtitle}
                       </span>
                     )}
 
-                    <h1 className="font-serif text-[34px] sm:text-[46px] lg:text-[54px] text-[#161616] leading-[1.06] tracking-tight mb-3 sm:mb-4">
+                    <h1 className="font-serif text-[30px] sm:text-[46px] lg:text-[54px] text-[#161616] leading-[1.08] tracking-tight mb-2 sm:mb-4">
                       {renderFormattedTitle(itemTitle)}
                     </h1>
 
                     {itemDescription && (
-                      <p className="text-xs sm:text-[15px] text-[#3B3730] mb-5 sm:mb-6 leading-relaxed font-normal">
+                      <p className="text-xs sm:text-[15px] text-[#3B3730] mb-4 sm:mb-6 leading-relaxed font-normal">
                         {itemDescription}
                       </p>
                     )}
 
                     <Link
                       href={itemCtaUrl}
-                      className="inline-flex items-center space-x-2.5 px-6 sm:px-7 py-2.5 sm:py-3 bg-[#143728] hover:bg-[#0c2419] text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all duration-200 cursor-pointer"
+                      className="inline-flex items-center space-x-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-[#143728] hover:bg-[#0c2419] text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-all duration-200 cursor-pointer"
                     >
                       <span>{itemCtaLabel}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
 
                     {/* 3 Editorial Benefit Indicators */}
-                    <div className="flex items-center gap-4 sm:gap-6 mt-6 sm:mt-8 pt-3 sm:pt-4 text-[11px] text-[#2E2B26]">
-                      <div className="flex items-center gap-2">
-                        <ShieldCheck className="w-5 h-5 text-[#143728] stroke-[1.6] shrink-0" />
+                    <div className="flex items-center gap-3 sm:gap-6 mt-5 sm:mt-8 pt-3 sm:pt-4 text-[10px] sm:text-[11px] text-[#2E2B26]">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-[#143728] stroke-[1.6] shrink-0" />
                         <div className="leading-[1.2] font-medium">
                           <span className="block">Premium</span>
                           <span className="block text-[#5A554C]">Quality</span>
                         </div>
                       </div>
 
-                      <div className="h-7 w-px bg-[#D5CFC2]" />
+                      <div className="h-6 sm:h-7 w-px bg-[#D5CFC2]" />
 
-                      <div className="flex items-center gap-2">
-                        <Shirt className="w-5 h-5 text-[#143728] stroke-[1.6] shrink-0" />
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <Shirt className="w-4 h-4 sm:w-5 sm:h-5 text-[#143728] stroke-[1.6] shrink-0" />
                         <div className="leading-[1.2] font-medium">
                           <span className="block">Trendy</span>
                           <span className="block text-[#5A554C]">Collections</span>
                         </div>
                       </div>
 
-                      <div className="h-7 w-px bg-[#D5CFC2]" />
+                      <div className="h-6 sm:h-7 w-px bg-[#D5CFC2]" />
 
-                      <div className="flex items-center gap-2">
-                        <RotateCcw className="w-5 h-5 text-[#143728] stroke-[1.6] shrink-0" />
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 text-[#143728] stroke-[1.6] shrink-0" />
                         <div className="leading-[1.2] font-medium">
                           <span className="block">Easy</span>
                           <span className="block text-[#5A554C]">Returns</span>
