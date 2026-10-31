@@ -405,7 +405,7 @@
           "id": "var-1793438536644-0",
           "product_id": "prod-1793438408856",
           "size": "S",
-          "inventory_quantity": 20,
+          "inventory_quantity": 19,
           "is_available": true
         },
         {
@@ -435,7 +435,7 @@
           "color_id": "col-1793356927031",
           "name": "Olive green",
           "hex": "#143728",
-          "stock": 70,
+          "stock": 69,
           "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793438340/notions/products/colors/wdto1jdbguktxl6ywgig.png",
           "image_public_id": "notions/products/colors/wdto1jdbguktxl6ywgig",
           "images": [
@@ -450,7 +450,7 @@
             {
               "size_id": "sz-1793438440517",
               "size": "S",
-              "stock": 20
+              "stock": 19
             },
             {
               "size_id": "sz-1793438455950",
@@ -1490,5 +1490,49 @@
     "instagram_url": "https://instagram.com/notionsclothing",
     "whatsapp_number": "+919876543210"
   },
-  "orders": []
+  "orders": [
+    {
+      "id": "ord-1793458566752",
+      "order_number": "NOT-543713",
+      "customer_name": "mrithul m",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "customer_phone": "+918086202359",
+      "shipping_address": {
+        "street": "Azhijilam, sd",
+        "city": "Malappuram",
+        "state": "Kerala",
+        "postal_code": "673633",
+        "country": "India"
+      },
+      "subtotal": 499,
+      "shipping_amount": 99,
+      "discount_amount": 0,
+      "total_amount": 598,
+      "currency": "INR",
+      "status": "confirmed",
+      "payment_status": "paid",
+      "tracking_carrier": "",
+      "tracking_number": "",
+      "notes": "",
+      "created_at": "2026-10-31T14:56:06.752Z",
+      "items": [
+        {
+          "product_id": "prod-1793438408856",
+          "product_name": "Men's Classic Crew Neck T-Shirt",
+          "sku": "NOT-1944",
+          "variant_label": "S",
+          "selected_size_id": "sz-1793438440517",
+          "selected_color": "Olive green",
+          "selected_color_id": "col-1793356927031",
+          "selected_color_hex": "#143728",
+          "unit_price": 499,
+          "quantity": 1,
+          "line_total": 499,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793438340/notions/products/colors/wdto1jdbguktxl6ywgig.png"
+        }
+      ],
+      "razorpay_order_id": "order_TuYWfYPkP65QNR",
+      "razorpay_payment_id": "pay_TuYWmYUAWXCdKy"
+    }
+  ]
 }

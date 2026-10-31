@@ -660,7 +660,28 @@ export async function updateSiteSettings(settings: Partial<SiteSettings>): Promi
 // ----------------------------------------------------
 export async function getOrdersAdmin(): Promise<Order[]> {
   const store = readLocalStore();
-  return store.orders || [];
+  let orders: Order[] = store.orders || [];
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+      if (!error && Array.isArray(data) && data.length > 0) {
+        const existingNumbers = new Set(orders.map((o) => o.order_number));
+        for (const sbOrder of data) {
+          if (!existingNumbers.has(sbOrder.order_number)) {
+            orders.push({
+              ...sbOrder,
+              items: sbOrder.items || [],
+            });
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Failed to query orders from Supabase:', e);
+    }
+  }
+
+  return orders;
 }
 
 export async function deleteOrder(id: string): Promise<boolean> {
@@ -778,6 +799,36 @@ export async function saveOrder(order: Partial<Order>): Promise<Order> {
       }
     }
   }
+
+  if (supabase) {
+    try {
+      await supabase.from('orders').upsert({
+        id: newOrder.id,
+        order_number: newOrder.order_number,
+        customer_name: newOrder.customer_name,
+        customer_email: newOrder.customer_email,
+        customer_phone: newOrder.customer_phone,
+        shipping_address: newOrder.shipping_address,
+        subtotal: newOrder.subtotal,
+        shipping_amount: newOrder.shipping_amount,
+        discount_amount: newOrder.discount_amount || 0,
+        total_amount: newOrder.total_amount,
+        currency: newOrder.currency || 'INR',
+        status: newOrder.status,
+        payment_status: newOrder.payment_status,
+        tracking_carrier: newOrder.tracking_carrier || '',
+        tracking_number: newOrder.tracking_number || '',
+        notes: newOrder.notes || '',
+        created_at: newOrder.created_at,
+        items: newOrder.items,
+        razorpay_order_id: newOrder.razorpay_order_id || '',
+        razorpay_payment_id: newOrder.razorpay_payment_id || '',
+      }, { onConflict: 'order_number' });
+    } catch (e) {
+      console.error('Supabase saveOrder non-blocking sync error:', e);
+    }
+  }
+
   writeLocalStore(store);
   return newOrder;
 }
