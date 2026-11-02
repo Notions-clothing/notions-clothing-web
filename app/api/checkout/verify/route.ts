@@ -1,16 +1,40 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { saveOrder } from '@/lib/db';
+import { saveOrder, confirmStockReservationAndDeduct, getProductBySlug } from '@/lib/db';
 import { sendOrderConfirmationEmail } from '@/lib/email';
 
 export async function POST(request: Request) {
   try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      orderData,
-    } = await request.json();
+    const body = await request.json();
+
+    const razorpay_order_id = body.razorpay_order_id;
+    const razorpay_payment_id = body.razorpay_payment_id;
+    const razorpay_signature = body.razorpay_signature;
+    const reservation_token =
+      body.reservation_token || body.reservationToken || body.orderData?.reservationToken;
+
+    // Support both flat payload structure and nested orderData wrapper
+    const nestedData = body.orderData || body;
+    const orderNumber =
+      nestedData.orderNumber ||
+      nestedData.order_number ||
+      body.orderNumber ||
+      `NOT-${Date.now().toString().slice(-6)}`;
+
+    const customer = nestedData.customer || body.customer || {};
+    const items = nestedData.items || body.items || [];
+    const subtotal = nestedData.subtotal ?? body.subtotal ?? 0;
+    const shippingAmount =
+      nestedData.shippingAmount ??
+      nestedData.shippingFee ??
+      body.shippingAmount ??
+      body.shippingFee ??
+      0;
+    const totalAmount =
+      nestedData.totalAmount ??
+      nestedData.amount ??
+      body.totalAmount ??
+      subtotal + shippingAmount;
 
     const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
 
@@ -29,29 +53,127 @@ export async function POST(request: Request) {
       }
     }
 
-    // Persist verified order in local database
+    // Atomically confirm the stock reservation and permanently deduct stock
+    const confirmResult = await confirmStockReservationAndDeduct({
+      reservationToken: reservation_token,
+      razorpayOrderId: razorpay_order_id,
+      orderNumber,
+      orderData: {
+        ...nestedData,
+        orderNumber,
+        customer,
+        items,
+        subtotal,
+        shippingAmount,
+        totalAmount,
+      },
+    });
+
+    if (!confirmResult.success && !confirmResult.alreadyProcessed) {
+      return NextResponse.json(
+        {
+          error:
+            confirmResult.error ||
+            'Your checkout reservation expired and the remaining item was claimed. Please contact support.',
+        },
+        { status: 409 }
+      );
+    }
+
+    // Normalize and enrich order items with product details and images
+    const enrichedItems = await Promise.all(
+      items.map(async (item: any) => {
+        const prodId = item.product_id || item.productId || item.product?.id || '';
+        let realProduct = null;
+        if (prodId) {
+          try {
+            realProduct = await getProductBySlug(prodId);
+          } catch (e) {}
+        }
+
+        const name =
+          item.product_name ||
+          item.productName ||
+          item.name ||
+          realProduct?.name ||
+          'Product';
+
+        const colorHex = item.selected_color_hex || item.selectedColorHex;
+        const colorName = item.selected_color || item.selectedColor;
+
+        let img =
+          item.image_url ||
+          item.imageUrl ||
+          item.image ||
+          item.selectedColorImage;
+
+        if (!img && realProduct) {
+          if (colorName && realProduct.colors) {
+            const matchedColor = realProduct.colors.find(
+              (c: any) => c.name?.toLowerCase() === colorName.toLowerCase()
+            );
+            if (matchedColor?.images?.[0]?.image_url) {
+              img = matchedColor.images[0].image_url;
+            }
+          }
+          if (!img && realProduct.images?.[0]?.image_url) {
+            img = realProduct.images[0].image_url;
+          }
+        }
+
+        const unitPrice = Number(
+          item.unit_price ??
+          item.unitPrice ??
+          item.price ??
+          realProduct?.price ??
+          0
+        );
+
+        const qty = Number(item.quantity || 1);
+
+        return {
+          product_id: prodId,
+          product_name: name,
+          sku: item.sku || realProduct?.sku || '',
+          variant_label: item.variant_label || item.variantLabel || item.selectedSize || 'Standard',
+          selected_size_id: item.selected_size_id || item.selectedSizeId,
+          selected_color: colorName,
+          selected_color_id: item.selected_color_id || item.selectedColorId,
+          selected_color_hex: colorHex,
+          unit_price: unitPrice,
+          quantity: qty,
+          line_total: unitPrice * qty,
+          image_url: img || '',
+        };
+      })
+    );
+
+    // Persist verified order in database with idempotency protection
     const confirmedOrder = await saveOrder({
-      order_number: orderData.orderNumber,
-      customer_name: orderData.customer.name,
-      customer_email: orderData.customer.email,
-      customer_phone: orderData.customer.phone,
-      shipping_address: orderData.customer.shipping_address,
-      subtotal: orderData.subtotal,
-      shipping_amount: orderData.shippingAmount,
-      total_amount: orderData.amount,
+      order_number: orderNumber,
+      customer_name: customer.name || body.customer_name || body.customerName || 'Guest Customer',
+      customer_email: (customer.email || body.customer_email || body.customerEmail || '').trim(),
+      customer_phone: customer.phone || body.customer_phone || body.customerPhone || '',
+      shipping_address: customer.shipping_address || body.shipping_address,
+      subtotal,
+      shipping_amount: shippingAmount,
+      total_amount: totalAmount,
       currency: 'INR',
       status: 'confirmed',
       payment_status: 'paid',
-      items: orderData.items,
+      items: enrichedItems,
       razorpay_order_id: razorpay_order_id || '',
       razorpay_payment_id: razorpay_payment_id || '',
     });
 
-    // Trigger Brevo confirmation email safely without blocking order completion
+    // Trigger confirmation email safely without blocking order completion
     try {
-      await sendOrderConfirmationEmail(confirmedOrder);
+      const emailRes = await sendOrderConfirmationEmail(confirmedOrder);
+      if (!emailRes.success) {
+        console.warn('[Order confirmation email warning]:', emailRes.message);
+      }
     } catch (emailErr) {
-      console.error('Brevo confirmation email dispatch failed:', emailErr);
+      console.error('Confirmation email dispatch failed:', emailErr);
     }
 
     return NextResponse.json({

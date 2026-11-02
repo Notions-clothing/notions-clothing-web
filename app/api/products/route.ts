@@ -9,6 +9,8 @@ export async function GET(request: Request) {
   const categorySlug = searchParams.get('category') || undefined;
   const subcategorySlug = searchParams.get('subcategory') || undefined;
   const subcategoryId = searchParams.get('subcategoryId') || undefined;
+  const brandId = searchParams.get('brandId') || undefined;
+  const brandSlug = searchParams.get('brandSlug') || searchParams.get('brand') || undefined;
   const sort = searchParams.get('sort') || undefined;
   const isBestseller = searchParams.get('isBestseller') === 'true';
   const isFeatured = searchParams.get('isFeatured') === 'true';
@@ -32,6 +34,8 @@ export async function GET(request: Request) {
       categorySlug,
       subcategorySlug,
       subcategoryId,
+      brandId,
+      brandSlug,
       sort,
       isBestseller: isBestseller || undefined,
       isFeatured: isFeatured || undefined,
@@ -45,6 +49,8 @@ export async function GET(request: Request) {
     categorySlug,
     subcategorySlug,
     subcategoryId,
+    brandId,
+    brandSlug,
     sort,
     isBestseller: isBestseller || undefined,
     isFeatured: isFeatured || undefined,

@@ -3,36 +3,61 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
-export default function SplashScreen() {
+interface SplashScreenProps {
+  onComplete?: () => void;
+}
+
+export default function SplashScreen({ onComplete }: SplashScreenProps) {
   const [visible, setVisible] = useState(false);
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
-    // Only show once per session
-    const hasSeenSplash = sessionStorage.getItem('notions_splash_seen');
-    if (!hasSeenSplash) {
+    try {
+      const alreadySeen =
+        localStorage.getItem('notions_splash_seen') === 'true' ||
+        sessionStorage.getItem('notions_splash_seen') === 'true';
+
+      if (alreadySeen) {
+        document.documentElement.classList.remove('notions-intro-pending');
+        if (onComplete) onComplete();
+        return;
+      }
+
+      // First time visit: display pre-intro animation
       setVisible(true);
+      document.documentElement.classList.add('notions-intro-pending');
+
       const fadeTimer = setTimeout(() => {
         setFading(true);
       }, 1000);
 
       const hideTimer = setTimeout(() => {
         setVisible(false);
-        sessionStorage.setItem('notions_splash_seen', 'true');
+        try {
+          localStorage.setItem('notions_splash_seen', 'true');
+          sessionStorage.setItem('notions_splash_seen', 'true');
+        } catch (e) {}
+        document.documentElement.classList.remove('notions-intro-pending');
+        if (onComplete) onComplete();
       }, 1500);
 
       return () => {
         clearTimeout(fadeTimer);
         clearTimeout(hideTimer);
       };
+    } catch (e) {
+      document.documentElement.classList.remove('notions-intro-pending');
+      if (onComplete) onComplete();
     }
-  }, []);
+  }, [onComplete]);
 
+  // If already seen or not visible, do not render any splash DOM
   if (!visible) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-[#FAF9F5] transition-opacity duration-500 ease-out ${
+      id="notions-pre-intro"
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#FAF9F5] transition-opacity duration-500 ease-out ${
         fading ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >

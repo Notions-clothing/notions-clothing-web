@@ -104,12 +104,19 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Product Details */}
         <div className="p-3.5 space-y-1.5">
-          {/* Title */}
-          <Link href={`/product/${product.slug}`}>
-            <h3 className="text-xs sm:text-sm font-medium text-[#181818] hover:text-[#143728] transition line-clamp-1">
-              {product.name}
-            </h3>
-          </Link>
+          {/* Brand & Title */}
+          <div className="space-y-0.5">
+            {product.brand_name && (
+              <span className="text-[10px] uppercase font-bold tracking-wider text-[#143728] block truncate">
+                {product.brand_name}
+              </span>
+            )}
+            <Link href={`/product/${product.slug}`}>
+              <h3 className="text-xs sm:text-sm font-medium text-[#181818] hover:text-[#143728] transition line-clamp-1">
+                {product.name}
+              </h3>
+            </Link>
+          </div>
 
           {/* Pricing Row */}
           <div className="flex items-center space-x-1.5 flex-wrap">

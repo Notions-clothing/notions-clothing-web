@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart, ShieldCheck, Truck, RotateCcw, Plus, Minus, Check, ShoppingBag, AlertCircle } from 'lucide-react';
+import { Heart, ShieldCheck, Truck, RotateCcw, Plus, Minus, Check, ShoppingBag, AlertCircle, Award } from 'lucide-react';
 import { Product } from '@/types/database';
 import { useCart } from '@/context/cart-context';
 import { useWishlist } from '@/context/wishlist-context';
@@ -288,8 +288,20 @@ export default function ProductDetailClient({
         {/* Product Info Column (5 cols on desktop) */}
         <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
           <div>
-            {/* Category / Collection Tag */}
-            <div className="flex items-center space-x-2 text-xs uppercase tracking-widest text-[#736E65] mb-2 font-semibold">
+            {/* Category / Collection Tag & Brand */}
+            <div className="flex items-center gap-2 flex-wrap text-xs uppercase tracking-widest text-[#736E65] mb-2 font-semibold">
+              {product.brand_name && (
+                <>
+                  <Link
+                    href={`/brands/${product.brand_slug || product.brand_id}`}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#143728]/10 hover:bg-[#143728]/20 text-[#143728] font-bold tracking-wider transition"
+                  >
+                    <Award className="w-3 h-3" />
+                    <span>{product.brand_name}</span>
+                  </Link>
+                  <span>•</span>
+                </>
+              )}
               <span>{product.category_name || 'Opulent Clothing'}</span>
               {product.subcategory_name && (
                 <>

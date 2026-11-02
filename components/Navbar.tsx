@@ -7,12 +7,23 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Search, User, Heart, ShoppingBag, Menu, X } from 'lucide-react';
 import { useCart } from '@/context/cart-context';
 import { useWishlist } from '@/context/wishlist-context';
+import { useAuth } from '@/context/auth-context';
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { totalItems, setIsCartOpen } = useCart();
   const { count: wishlistCount, setIsWishlistOpen } = useWishlist();
+  const { user, openAccountModal } = useAuth();
+
+  const handleAccountClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (user) {
+      router.push('/account');
+    } else {
+      openAccountModal('login');
+    }
+  };
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,25 +62,25 @@ export default function Navbar() {
     <>
       <header className="sticky top-0 z-40 bg-[#FAF9F5] border-b border-[#EAE5DC] transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-18 sm:h-20">
+          <div className="flex items-center justify-between h-20 sm:h-21 lg:h-22">
             {/* Left: Mobile Hamburger + Brand Logo */}
-            <div className="flex items-center space-x-1 sm:space-x-2">
+            <div className="flex items-center sm:space-x-3">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(true)}
-                className="lg:hidden p-2 -ml-2 text-[#181818] hover:text-[#143728] focus:outline-none cursor-pointer"
+                className="lg:hidden p-2 -ml-1 text-[#181818] hover:text-[#143728] focus:outline-none cursor-pointer flex items-center justify-center"
                 aria-label="Open navigation menu"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-6.5 h-6.5" />
               </button>
 
-              <Link href="/" className="inline-block relative">
+              <Link href="/" className="inline-flex items-center relative">
                 <Image
                   src="/logo.png"
                   alt="NOTIONS® — Opulent Clothing"
-                  width={170}
-                  height={48}
-                  className="h-9 sm:h-10 md:h-11 w-auto object-contain"
+                  width={240}
+                  height={68}
+                  className="h-9 xs:h-[50px] w-auto object-contain"
                   priority
                 />
               </Link>
@@ -101,7 +112,7 @@ export default function Navbar() {
             </nav>
 
             {/* Search Input (Desktop) */}
-            <div className="hidden md:flex items-center flex-1 max-w-[280px] lg:max-w-[320px] mx-4 lg:mx-6">
+            <div className="hidden md:flex items-center flex-1 max-w-[210px] lg:max-w-[240px] xl:max-w-[260px] mx-3 lg:mx-5">
               <form onSubmit={handleSearchSubmit} className="w-full relative">
                 <input
                   type="text"
@@ -115,7 +126,7 @@ export default function Navbar() {
             </div>
 
             {/* Right Icons: Account, Wishlist, Cart */}
-            <div className="flex items-center space-x-3 sm:space-x-5 text-[#242424]">
+            <div className="flex items-center space-x-3.5 sm:space-x-5 text-[#242424]">
               {/* Mobile Search Button */}
               <button
                 type="button"
@@ -123,17 +134,22 @@ export default function Navbar() {
                 className="md:hidden p-1.5 text-[#242424] hover:text-[#143728] cursor-pointer"
                 aria-label="Search"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-5.5 h-5.5" />
               </button>
 
               {/* Account */}
-              <Link
-                href="/account"
-                className="p-1.5 hover:text-[#143728] transition"
-                aria-label="My Account"
+              <button
+                type="button"
+                onClick={handleAccountClick}
+                className="p-1.5 hover:text-[#143728] transition cursor-pointer relative"
+                aria-label={user ? "My Account" : "Sign In"}
+                title={user ? `Signed in as ${user.full_name}` : "Sign In"}
               >
-                <User className="w-5 h-5" />
-              </Link>
+                <User className="w-5.5 h-5.5 sm:w-5 sm:h-5" />
+                {user && (
+                  <span className="absolute bottom-1 right-1 w-2 h-2 bg-emerald-600 rounded-full border border-white" />
+                )}
+              </button>
 
               {/* Wishlist Drawer Trigger */}
               <button
@@ -142,7 +158,7 @@ export default function Navbar() {
                 className="p-1.5 hover:text-[#143728] transition relative cursor-pointer"
                 aria-label="Open Wishlist"
               >
-                <Heart className="w-5 h-5" />
+                <Heart className="w-5.5 h-5.5 sm:w-5 sm:h-5" />
                 {wishlistCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-[#143728] text-white text-[10px] font-semibold w-4 h-4 rounded-full flex items-center justify-center">
                     {wishlistCount}
@@ -157,7 +173,7 @@ export default function Navbar() {
                 className="p-1.5 hover:text-[#143728] transition relative cursor-pointer"
                 aria-label="Shopping Cart"
               >
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="w-5.5 h-5.5 sm:w-5 sm:h-5" />
                 <span className="absolute -top-1 -right-1 bg-[#143728] text-white text-[10px] font-semibold min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
                   {totalItems}
                 </span>
@@ -247,14 +263,17 @@ export default function Navbar() {
             </nav>
 
             <div className="mt-8 pt-6 border-t border-[#EAE5DC] space-y-3 text-sm">
-              <Link
-                href="/account"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-3 text-[#333333] hover:text-[#143728]"
+              <button
+                type="button"
+                onClick={(e) => {
+                  setMobileMenuOpen(false);
+                  handleAccountClick(e);
+                }}
+                className="w-full flex items-center space-x-3 text-[#333333] hover:text-[#143728] text-left cursor-pointer"
               >
                 <User className="w-4 h-4" />
-                <span>My Account</span>
-              </Link>
+                <span>{user ? `My Account (${user.full_name?.split(' ')[0] || 'Member'})` : 'Sign In / Register'}</span>
+              </button>
               <button
                 type="button"
                 onClick={() => {

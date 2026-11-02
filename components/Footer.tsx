@@ -41,7 +41,7 @@ export default function Footer() {
                 alt="NOTIONS® — Opulent Clothing"
                 width={160}
                 height={46}
-                className="h-9 w-auto object-contain"
+                className="h-9  w-auto object-contain"
               />
             </Link>
             <p className="text-[#666666] leading-relaxed max-w-sm text-xs">

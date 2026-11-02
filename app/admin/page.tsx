@@ -47,8 +47,11 @@ import {
   SlidersHorizontal,
   ChevronUp,
   ChevronDown,
+  Sparkles,
+  Award,
 } from 'lucide-react';
 import {
+  Brand,
   Product,
   ProductVariant,
   ProductImage,
@@ -66,10 +69,12 @@ import {
 import ColorManagement from '@/components/admin/ColorManagement';
 import SizeManagement from '@/components/admin/SizeManagement';
 import SubcategoryManagement from '@/components/admin/SubcategoryManagement';
+import BrandManagement from '@/components/admin/BrandManagement';
 import BannerManagement from '@/components/admin/BannerManagement';
+import BrandShowcaseManagement from '@/components/admin/BrandShowcaseManagement';
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 
-type AdminTab = 'dashboard' | 'products' | 'categories' | 'subcategories' | 'colors' | 'sizes' | 'orders' | 'banners' | 'settings';
+type AdminTab = 'dashboard' | 'products' | 'categories' | 'subcategories' | 'brands' | 'colors' | 'sizes' | 'orders' | 'banners' | 'brand_showcase' | 'settings';
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
@@ -78,6 +83,7 @@ export default function AdminDashboardPage() {
   // Store Data State
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [colors, setColors] = useState<ProductColor[]>([]);
   const [sizes, setSizes] = useState<CategorySize[]>([]);
@@ -110,6 +116,17 @@ export default function AdminDashboardPage() {
   const [loginError, setLoginError] = useState('');
   const [loggingIn, setLoggingIn] = useState(false);
 
+  // Admin Forgot Password State
+  const [showAdminForgot, setShowAdminForgot] = useState(false);
+  const [adminForgotStep, setAdminForgotStep] = useState<1 | 2 | 3 | 4>(1);
+  const [adminForgotEmail, setAdminForgotEmail] = useState('');
+  const [adminForgotOtp, setAdminForgotOtp] = useState('');
+  const [adminForgotNewPassword, setAdminForgotNewPassword] = useState('');
+  const [adminForgotConfirmPassword, setAdminForgotConfirmPassword] = useState('');
+  const [adminForgotLoading, setAdminForgotLoading] = useState(false);
+  const [adminForgotError, setAdminForgotError] = useState('');
+  const [adminForgotSuccess, setAdminForgotSuccess] = useState('');
+
   // Product Filters & Modal State
   const [productSearch, setProductSearch] = useState('');
   const [productCategoryFilter, setProductCategoryFilter] = useState('all');
@@ -133,6 +150,7 @@ export default function AdminDashboardPage() {
   const [orderSearch, setOrderSearch] = useState('');
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [copiedSql, setCopiedSql] = useState(false);
+  const [copiedDim, setCopiedDim] = useState(false);
 
   // Delete Confirmation Modal State (Products, Categories, Orders, Discard Mode)
   const [deleteModalState, setDeleteModalState] = useState<{
@@ -160,7 +178,7 @@ export default function AdminDashboardPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [prodRes, catRes, banRes, ordRes, setRes, colRes, sizeRes] = await Promise.all([
+      const [prodRes, catRes, banRes, ordRes, setRes, colRes, sizeRes, brandRes] = await Promise.all([
         fetch('/api/admin/products'),
         fetch('/api/admin/categories'),
         fetch('/api/admin/banners'),
@@ -168,6 +186,7 @@ export default function AdminDashboardPage() {
         fetch('/api/admin/settings'),
         fetch('/api/admin/colors'),
         fetch('/api/admin/sizes'),
+        fetch('/api/admin/brands'),
       ]);
 
       if (prodRes.ok) setProducts(await prodRes.json());
@@ -176,6 +195,7 @@ export default function AdminDashboardPage() {
       if (ordRes.ok) setOrders(await ordRes.json());
       if (colRes.ok) setColors(await colRes.json());
       if (sizeRes?.ok) setSizes(await sizeRes.json());
+      if (brandRes?.ok) setBrands(await brandRes.json());
       if (setRes.ok) {
         const loadedSettings = await setRes.json();
         if (loadedSettings && Object.keys(loadedSettings).length > 0) {
@@ -705,9 +725,23 @@ export default function AdminDashboardPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1.5 uppercase tracking-wide">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAdminForgot(true);
+                    setAdminForgotStep(1);
+                    setAdminForgotError('');
+                    setAdminForgotSuccess('');
+                  }}
+                  className="text-xs text-[#143728] hover:underline font-medium cursor-pointer"
+                >
+                  Forgot password?
+                </button>
+              </div>
               <input
                 type="password"
                 required
@@ -737,6 +771,259 @@ export default function AdminDashboardPage() {
             </button>
           </form>
 
+          {/* Admin Forgot Password Modal */}
+          {showAdminForgot && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div
+                className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+                onClick={() => setShowAdminForgot(false)}
+              />
+              <div className="relative z-10 w-full max-w-md bg-white rounded-2xl border border-gray-200 shadow-2xl p-6 sm:p-7 space-y-4">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                  <div className="flex items-center gap-2 text-[#143728]">
+                    <Shield className="w-5 h-5" />
+                    <h3 className="font-semibold text-base text-gray-900">Admin Password Recovery</h3>
+                  </div>
+                  <button
+                    onClick={() => setShowAdminForgot(false)}
+                    className="p-1 text-gray-400 hover:text-gray-600 rounded-lg"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {adminForgotError && (
+                  <div className="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+                    <span>{adminForgotError}</span>
+                  </div>
+                )}
+
+                {adminForgotSuccess && (
+                  <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl border border-emerald-200 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+                    <span>{adminForgotSuccess}</span>
+                  </div>
+                )}
+
+                {/* Step 1: Enter Admin Email */}
+                {adminForgotStep === 1 && (
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      setAdminForgotError('');
+                      setAdminForgotSuccess('');
+                      if (!adminForgotEmail.trim()) {
+                        setAdminForgotError('Please enter the administrative email.');
+                        return;
+                      }
+                      setAdminForgotLoading(true);
+                      try {
+                        const res = await fetch('/api/auth/forgot-password', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ email: adminForgotEmail.trim(), role: 'admin' }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok || !data.success) {
+                          setAdminForgotError(data.error || 'Failed to dispatch reset code.');
+                        } else {
+                          setAdminForgotSuccess(data.message || 'Verification code sent to administrative email.');
+                          setAdminForgotStep(2);
+                        }
+                      } catch {
+                        setAdminForgotError('Network error. Please try again.');
+                      } finally {
+                        setAdminForgotLoading(false);
+                      }
+                    }}
+                    className="space-y-4"
+                  >
+                    <p className="text-xs text-gray-500">
+                      Enter the registered administrator email address to receive a secure 6-digit verification code.
+                    </p>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        Admin Email
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={adminForgotEmail}
+                        onChange={(e) => setAdminForgotEmail(e.target.value)}
+                        placeholder="siyadsidu760@gmail.com"
+                        className="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={adminForgotLoading}
+                      className="w-full py-2.5 bg-[#143728] text-white text-xs font-semibold rounded-xl hover:bg-[#0d261b] transition disabled:opacity-60"
+                    >
+                      {adminForgotLoading ? 'Sending Verification Code...' : 'Send 6-Digit OTP'}
+                    </button>
+                  </form>
+                )}
+
+                {/* Step 2: Verify 6-digit OTP */}
+                {adminForgotStep === 2 && (
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      setAdminForgotError('');
+                      if (!adminForgotOtp.trim() || adminForgotOtp.trim().length !== 6) {
+                        setAdminForgotError('Please enter the 6-digit code received via email.');
+                        return;
+                      }
+                      setAdminForgotLoading(true);
+                      try {
+                        const res = await fetch('/api/auth/verify-otp', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            email: adminForgotEmail.trim(),
+                            otp: adminForgotOtp.trim(),
+                            role: 'admin',
+                          }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok || !data.success) {
+                          setAdminForgotError(data.error || 'Invalid verification code.');
+                        } else {
+                          setAdminForgotError('');
+                          setAdminForgotStep(3);
+                        }
+                      } catch {
+                        setAdminForgotError('Network error. Please try again.');
+                      } finally {
+                        setAdminForgotLoading(false);
+                      }
+                    }}
+                    className="space-y-4"
+                  >
+                    <p className="text-xs text-gray-500">
+                      Enter the 6-digit OTP sent to <strong>{adminForgotEmail}</strong>.
+                    </p>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        6-Digit OTP Code
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={6}
+                        required
+                        value={adminForgotOtp}
+                        onChange={(e) => setAdminForgotOtp(e.target.value.replace(/\D/g, ''))}
+                        placeholder="123456"
+                        className="w-full px-3.5 py-2.5 text-center font-mono font-bold tracking-[0.3em] text-sm bg-gray-50 border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={adminForgotLoading}
+                      className="w-full py-2.5 bg-[#143728] text-white text-xs font-semibold rounded-xl hover:bg-[#0d261b] transition disabled:opacity-60"
+                    >
+                      {adminForgotLoading ? 'Verifying...' : 'Verify Code'}
+                    </button>
+                  </form>
+                )}
+
+                {/* Step 3: Enter New Password */}
+                {adminForgotStep === 3 && (
+                  <form
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      setAdminForgotError('');
+                      if (adminForgotNewPassword.length < 6) {
+                        setAdminForgotError('Password must be at least 6 characters.');
+                        return;
+                      }
+                      if (adminForgotNewPassword !== adminForgotConfirmPassword) {
+                        setAdminForgotError('Passwords do not match.');
+                        return;
+                      }
+                      setAdminForgotLoading(true);
+                      try {
+                        const res = await fetch('/api/auth/reset-password', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            email: adminForgotEmail.trim(),
+                            otp: adminForgotOtp.trim(),
+                            newPassword: adminForgotNewPassword,
+                            role: 'admin',
+                          }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok || !data.success) {
+                          setAdminForgotError(data.error || 'Failed to update admin password.');
+                        } else {
+                          setAdminForgotStep(4);
+                          setAdminForgotSuccess('Admin password updated successfully.');
+                        }
+                      } catch {
+                        setAdminForgotError('Network error. Please try again.');
+                      } finally {
+                        setAdminForgotLoading(false);
+                      }
+                    }}
+                    className="space-y-3.5"
+                  >
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        New Admin Password
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={adminForgotNewPassword}
+                        onChange={(e) => setAdminForgotNewPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        required
+                        value={adminForgotConfirmPassword}
+                        onChange={(e) => setAdminForgotConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-3.5 py-2.5 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={adminForgotLoading}
+                      className="w-full py-2.5 bg-[#143728] text-white text-xs font-semibold rounded-xl hover:bg-[#0d261b] transition disabled:opacity-60"
+                    >
+                      {adminForgotLoading ? 'Saving Password...' : 'Save New Password'}
+                    </button>
+                  </form>
+                )}
+
+                {/* Step 4: Success */}
+                {adminForgotStep === 4 && (
+                  <div className="text-center py-4 space-y-3">
+                    <p className="text-xs text-gray-600">
+                      Your administrator password has been updated. You can now log in immediately.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setShowAdminForgot(false)}
+                      className="w-full py-2.5 bg-[#143728] text-white text-xs font-semibold rounded-xl hover:bg-[#0d261b]"
+                    >
+                      Return to Sign In
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="mt-8 pt-6 border-t border-gray-100 text-center">
             <Link
               href="/"
@@ -759,10 +1046,12 @@ export default function AdminDashboardPage() {
     { id: 'products', label: 'Products', icon: Package, badge: products.length },
     { id: 'categories', label: 'Categories', icon: Layers, badge: mainCategoriesCount },
     { id: 'subcategories', label: 'Subcategories', icon: FolderTree, badge: subcategoriesCount },
+    { id: 'brands', label: 'Brands', icon: Award, badge: brands.length },
     { id: 'colors', label: 'Product Colors', icon: Palette, badge: colors.length },
     { id: 'sizes', label: 'Product Sizes', icon: Ruler, badge: sizes.length },
     { id: 'orders', label: 'Orders', icon: ShoppingBag, badge: orders.length },
     { id: 'banners', label: 'Banners & CMS', icon: ImageIcon, badge: banners.length },
+    { id: 'brand_showcase', label: 'Brand Showcase', icon: Sparkles },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -981,7 +1270,7 @@ export default function AdminDashboardPage() {
       {/* ====================================================
           MOBILE BOTTOM NAVIGATION BAR
       ==================================================== */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 z-30 grid grid-cols-9 py-1.5 px-0.5 shadow-lg">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 z-30 flex overflow-x-auto py-1.5 px-1 shadow-lg no-scrollbar">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -989,13 +1278,13 @@ export default function AdminDashboardPage() {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center justify-center py-1 rounded-lg transition ${
+              className={`flex flex-col items-center justify-center py-1 px-2.5 shrink-0 rounded-lg transition ${
                 isActive ? 'text-[#143728] font-bold' : 'text-gray-500 font-medium'
               }`}
             >
               <Icon className={`w-4 h-4 ${isActive ? 'text-[#143728]' : 'text-gray-400'}`} />
-              <span className="text-[10px] mt-1 truncate max-w-full px-0.5">
-                {item.id === 'banners' ? 'Banners' : item.id === 'sizes' ? 'Sizes' : item.id === 'colors' ? 'Colors' : item.id === 'subcategories' ? 'Subcats' : item.label}
+              <span className="text-[10px] mt-1 whitespace-nowrap">
+                {item.id === 'banners' ? 'Banners' : item.id === 'brand_showcase' ? 'Showcase' : item.id === 'brands' ? 'Brands' : item.id === 'sizes' ? 'Sizes' : item.id === 'colors' ? 'Colors' : item.id === 'subcategories' ? 'Subcats' : item.label}
               </span>
             </button>
           );
@@ -1010,7 +1299,7 @@ export default function AdminDashboardPage() {
         <div className="hidden lg:flex h-16 bg-white border-b border-gray-200 px-8 items-center justify-between sticky top-0 z-20">
           <div>
             <h1 className="text-lg font-bold text-gray-900 capitalize">
-              {activeTab === 'banners' ? 'Banners & Homepage CMS' : activeTab === 'colors' ? 'Product Colors' : activeTab === 'sizes' ? 'Product Sizes' : activeTab === 'subcategories' ? 'Product Subcategories' : activeTab}
+              {activeTab === 'banners' ? 'Banners & Homepage CMS' : activeTab === 'brand_showcase' ? 'Brand Showcase Section' : activeTab === 'brands' ? 'Brand Management' : activeTab === 'colors' ? 'Product Colors' : activeTab === 'sizes' ? 'Product Sizes' : activeTab === 'subcategories' ? 'Product Subcategories' : activeTab}
             </h1>
           </div>
 
@@ -1478,6 +1767,11 @@ export default function AdminDashboardPage() {
                               <h3 className="text-sm sm:text-base font-bold text-gray-900 truncate">
                                 {p.name}
                               </h3>
+                              {p.brand_name && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#143728]/10 text-[#143728] border border-[#143728]/20">
+                                  {p.brand_name}
+                                </span>
+                              )}
                               <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-gray-100 text-gray-600">
                                 {p.category_name || p.category_slug}
                               </span>
@@ -1623,6 +1917,19 @@ export default function AdminDashboardPage() {
           {activeTab === 'subcategories' && (
             <SubcategoryManagement
               categories={categories}
+              onRefresh={loadData}
+              showNotification={showNotification}
+              handleFileUpload={handleFileUpload}
+            />
+          )}
+
+          {/* ====================================================
+              BRAND MANAGEMENT TAB
+          ==================================================== */}
+          {activeTab === 'brands' && (
+            <BrandManagement
+              brands={brands}
+              products={products}
               onRefresh={loadData}
               showNotification={showNotification}
               handleFileUpload={handleFileUpload}
@@ -2051,6 +2358,18 @@ export default function AdminDashboardPage() {
           )}
 
           {/* ====================================================
+              BRAND SHOWCASE SECTION CMS TAB
+          ==================================================== */}
+          {activeTab === 'brand_showcase' && (
+            <BrandShowcaseManagement
+              brands={brands}
+              categories={categories}
+              showNotification={showNotification}
+              handleFileUpload={handleFileUpload}
+            />
+          )}
+
+          {/* ====================================================
               6. STORE SETTINGS & INTEGRATIONS TAB
           ==================================================== */}
           {activeTab === 'settings' && (
@@ -2259,7 +2578,7 @@ export default function AdminDashboardPage() {
 
                       <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-between">
                         <div>
-                          <p className="font-bold text-gray-900">Brevo Transactional Email</p>
+                          <p className="font-bold text-gray-900">Transactional Email Service</p>
                           <p className="text-gray-500 mt-0.5">Order confirmation emails</p>
                         </div>
                         <span className="px-2.5 py-1 rounded-full bg-gray-200 text-gray-700 font-bold text-[10px]">
@@ -2290,7 +2609,7 @@ export default function AdminDashboardPage() {
       {showProductModal && editingProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
           <div className="bg-white rounded-2xl border border-gray-200 max-w-2xl w-full p-5 sm:p-7 shadow-2xl max-h-[92vh] overflow-y-auto font-sans">
-            <div className="flex items-center justify-between pb-4 border-b border-gray-200 mb-5">
+            <div className="flex items-center justify-between pb-4 border-b border-gray-200 mb-4">
               <div>
                 <h3 className="text-lg font-bold text-gray-900">
                   {editingProduct.id ? 'Edit Product' : 'Add New Product'}
@@ -2305,6 +2624,54 @@ export default function AdminDashboardPage() {
                 className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl"
               >
                 <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Top Recommended Image Dimension Note with Copy Button */}
+            <div className="flex items-center justify-between gap-3 p-3 bg-amber-50/90 border border-amber-200/90 rounded-xl mb-5 shadow-2xs">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-900 flex items-center justify-center shrink-0">
+                  <ImageIcon className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs font-semibold text-amber-950">Recommended Image Dimension:</span>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-white border border-amber-300 font-mono text-xs font-black text-amber-950 shadow-2xs">
+                      290*300
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-amber-800/80 mt-0.5">
+                    Upload photos in 290 × 300 px for optimal aspect ratio, sharpness & uniform catalog cards.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText('290*300');
+                  setCopiedDim(true);
+                  showNotification('Copied 290*300 to clipboard!');
+                  setTimeout(() => setCopiedDim(false), 2000);
+                }}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-2xs cursor-pointer shrink-0 select-none border ${
+                  copiedDim
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                    : 'bg-white hover:bg-amber-100/70 text-amber-900 border-amber-300'
+                }`}
+                title="Copy dimension 290*300"
+              >
+                {copiedDim ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-amber-800" />
+                    <span>Copy 290*300</span>
+                  </>
+                )}
               </button>
             </div>
 
@@ -2388,29 +2755,60 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              {/* 1. Name & Category */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-gray-700 mb-1">
-                    Product Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Enter product name"
-                    value={editingProduct.name || ''}
-                    onChange={(e) =>
-                      setEditingProduct({
-                        ...editingProduct,
-                        name: e.target.value,
-                        slug: e.target.value
-                          .toLowerCase()
-                          .replace(/[^a-z0-9]+/g, '-')
-                          .replace(/(^-|-$)/g, ''),
-                      })
-                    }
-                    className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
-                  />
+              {/* 1. Name, Brand & Category */}
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="block font-semibold text-gray-700 mb-1">
+                      Product Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Enter product name"
+                      value={editingProduct.name || ''}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          name: e.target.value,
+                          slug: e.target.value
+                            .toLowerCase()
+                            .replace(/[^a-z0-9]+/g, '-')
+                            .replace(/(^-|-$)/g, ''),
+                        })
+                      }
+                      className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-gray-700 mb-1">
+                      Brand (Optional)
+                    </label>
+                    <select
+                      value={editingProduct.brand_id || ''}
+                      onChange={(e) => {
+                        const brandIdVal = e.target.value;
+                        const matchedBrand = brands.find((b) => b.id === brandIdVal);
+                        setEditingProduct({
+                          ...editingProduct,
+                          brand_id: matchedBrand ? matchedBrand.id : null,
+                          brand_name: matchedBrand ? matchedBrand.name : null,
+                          brand_slug: matchedBrand ? matchedBrand.slug : null,
+                        });
+                      }}
+                      className="w-full px-3.5 py-2.5 text-sm border border-gray-300 rounded-xl bg-white focus:border-[#143728] focus:outline-none"
+                    >
+                      <option value="">-- No Brand (Independent) --</option>
+                      {brands
+                        .filter((b) => b.is_active !== false)
+                        .map((b) => (
+                          <option key={b.id} value={b.id}>
+                            {b.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -3272,60 +3670,103 @@ export default function AdminDashboardPage() {
 
                                   {/* Stock input grid for each active size */}
                                   {(cv.sizes && cv.sizes.length > 0) ? (
-                                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 pt-1">
-                                      {cv.sizes.map((sz, szIdx) => (
-                                        <div
-                                          key={sz.size_id || szIdx}
-                                          className="bg-gray-50 p-2 rounded-lg border border-gray-200 text-center"
-                                        >
-                                          <span className="text-[10px] font-bold text-gray-500 uppercase block mb-1">
-                                            Size {sz.size}
-                                          </span>
-                                          <div className="flex items-center justify-center gap-1">
-                                            <span className="text-[10px] text-gray-400">Qty:</span>
-                                            <input
-                                              type="number"
-                                              min="0"
-                                              value={sz.stock}
-                                              onChange={(e) => {
-                                                const updatedColors = [...(editingProduct.colors || [])];
-                                                const currentSizes = [...(updatedColors[cIdx].sizes || [])];
-                                                currentSizes[szIdx] = {
-                                                  ...currentSizes[szIdx],
-                                                  stock: Math.max(0, Number(e.target.value) || 0),
-                                                };
-                                                const totalStock = currentSizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0);
-                                                updatedColors[cIdx] = {
-                                                  ...updatedColors[cIdx],
-                                                  sizes: currentSizes,
-                                                  stock: totalStock,
-                                                };
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                                      {cv.sizes.map((sz, szIdx) => {
+                                        const updateSizeStock = (newStock: number) => {
+                                          const updatedColors = [...(editingProduct.colors || [])];
+                                          const currentSizes = [...(updatedColors[cIdx].sizes || [])];
+                                          currentSizes[szIdx] = {
+                                            ...currentSizes[szIdx],
+                                            stock: Math.max(0, newStock),
+                                          };
+                                          const totalStock = currentSizes.reduce((sum, s) => sum + (Number(s.stock) || 0), 0);
+                                          updatedColors[cIdx] = {
+                                            ...updatedColors[cIdx],
+                                            sizes: currentSizes,
+                                            stock: totalStock,
+                                          };
 
-                                                const sizeMap: { [key: string]: number } = {};
-                                                updatedColors.forEach((c) => {
-                                                  (c.sizes || []).forEach((s) => {
-                                                    sizeMap[s.size] = (sizeMap[s.size] || 0) + (Number(s.stock) || 0);
-                                                  });
-                                                });
-                                                const updatedVariants: ProductVariant[] = Object.keys(sizeMap).map((sName, i) => ({
-                                                  id: `var-${Date.now()}-${i}`,
-                                                  product_id: editingProduct.id || '',
-                                                  size: sName,
-                                                  inventory_quantity: sizeMap[sName],
-                                                  is_available: sizeMap[sName] > 0,
-                                                }));
+                                          const sizeMap: { [key: string]: number } = {};
+                                          updatedColors.forEach((c) => {
+                                            (c.sizes || []).forEach((s) => {
+                                              sizeMap[s.size] = (sizeMap[s.size] || 0) + (Number(s.stock) || 0);
+                                            });
+                                          });
+                                          const updatedVariants: ProductVariant[] = Object.keys(sizeMap).map((sName, i) => ({
+                                            id: `var-${Date.now()}-${i}`,
+                                            product_id: editingProduct.id || '',
+                                            size: sName,
+                                            inventory_quantity: sizeMap[sName],
+                                            is_available: sizeMap[sName] > 0,
+                                          }));
 
-                                                setEditingProduct({
-                                                  ...editingProduct,
-                                                  colors: updatedColors,
-                                                  variants: updatedVariants,
-                                                });
-                                              }}
-                                              className="w-14 px-1.5 py-0.5 text-xs border border-gray-300 rounded font-bold text-center bg-white"
-                                            />
+                                          setEditingProduct({
+                                            ...editingProduct,
+                                            colors: updatedColors,
+                                            variants: updatedVariants,
+                                          });
+                                        };
+
+                                        const stockCount = Number(sz.stock) || 0;
+
+                                        return (
+                                          <div
+                                            key={sz.size_id || szIdx}
+                                            className={`p-2.5 rounded-xl border transition-all flex flex-col justify-between gap-2.5 ${
+                                              stockCount > 0
+                                                ? 'bg-white border-emerald-400 shadow-2xs ring-1 ring-emerald-400/20'
+                                                : 'bg-gray-50/80 border-gray-200'
+                                            }`}
+                                          >
+                                            {/* Top Row: Size Badge + Stock Status */}
+                                            <div className="flex items-center justify-between gap-1.5">
+                                              <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-gray-100 text-gray-800 text-[11px] font-bold uppercase tracking-wider whitespace-nowrap">
+                                                Size {sz.size}
+                                              </span>
+                                              {stockCount > 0 ? (
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold text-emerald-700 bg-emerald-50 whitespace-nowrap">
+                                                  In Stock
+                                                </span>
+                                              ) : (
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium text-gray-400 bg-gray-100 whitespace-nowrap">
+                                                  Out
+                                                </span>
+                                              )}
+                                            </div>
+
+                                            {/* Quantity Stepper Input */}
+                                            <div className="flex items-center justify-between bg-white rounded-lg border border-gray-300 focus-within:border-[#143728] focus-within:ring-1 focus-within:ring-[#143728] p-1 shadow-2xs transition">
+                                              <button
+                                                type="button"
+                                                onClick={() => updateSizeStock(Math.max(0, stockCount - 1))}
+                                                disabled={stockCount <= 0}
+                                                className="w-7 h-7 rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-30 disabled:hover:bg-gray-100 text-gray-700 flex items-center justify-center font-bold text-xs cursor-pointer transition select-none shrink-0"
+                                                title="Decrease stock"
+                                              >
+                                                −
+                                              </button>
+                                              <div className="flex-1 min-w-0 flex items-center justify-center px-1">
+                                                <input
+                                                  type="number"
+                                                  min="0"
+                                                  value={sz.stock}
+                                                  onChange={(e) => updateSizeStock(Math.max(0, Number(e.target.value) || 0))}
+                                                  className="w-full text-center text-xs font-bold text-gray-900 bg-transparent focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                  placeholder="0"
+                                                />
+                                              </div>
+                                              <button
+                                                type="button"
+                                                onClick={() => updateSizeStock(stockCount + 1)}
+                                                className="w-7 h-7 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center font-bold text-xs cursor-pointer transition select-none shrink-0"
+                                                title="Increase stock"
+                                              >
+                                                +
+                                              </button>
+                                            </div>
                                           </div>
-                                        </div>
-                                      ))}
+                                        );
+                                      })}
                                     </div>
                                   ) : (
                                     <p className="text-[11px] text-gray-400 italic">

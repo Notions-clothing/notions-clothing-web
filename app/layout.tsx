@@ -3,8 +3,10 @@ import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/cart-context";
 import { WishlistProvider } from "@/context/wishlist-context";
+import { AuthProvider } from "@/context/auth-context";
 import CartDrawer from "@/components/CartDrawer";
 import WishlistDrawer from "@/components/WishlistDrawer";
+import AccountModal from "@/components/AccountModal";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -39,15 +41,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${playfair.variable} ${plusJakarta.variable}`}>
-      <body className="min-h-screen flex flex-col bg-[#FAF9F5] text-[#181818] antialiased">
-        <WishlistProvider>
-          <CartProvider>
-            {children}
-            <CartDrawer />
-            <WishlistDrawer />
-          </CartProvider>
-        </WishlistProvider>
+    <html lang="en" className={`${playfair.variable} ${plusJakarta.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var s=localStorage.getItem('notions_splash_seen')||sessionStorage.getItem('notions_splash_seen');if(!s){document.documentElement.classList.add('notions-intro-pending');}}catch(e){}`,
+          }}
+        />
+      </head>
+      <body className="min-h-screen flex flex-col bg-[#FAF9F5] text-[#181818] antialiased" suppressHydrationWarning>
+        <AuthProvider>
+          <WishlistProvider>
+            <CartProvider>
+              {children}
+              <CartDrawer />
+              <WishlistDrawer />
+              <AccountModal />
+            </CartProvider>
+          </WishlistProvider>
+        </AuthProvider>
       </body>
     </html>
   );

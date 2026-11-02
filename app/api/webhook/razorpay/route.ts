@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { getOrdersAdmin, saveOrder } from '@/lib/db';
+import {
+  getOrdersAdmin,
+  saveOrder,
+  confirmStockReservationAndDeduct,
+  releaseStockReservation,
+} from '@/lib/db';
 import { sendOrderConfirmationEmail } from '@/lib/email';
 
 const processedEvents = new Set<string>();
@@ -37,6 +42,11 @@ export async function POST(request: Request) {
       const payment = event.payload.payment.entity;
       const rzpOrderId = payment.order_id;
 
+      // Confirm stock reservation and deduct stock atomically
+      await confirmStockReservationAndDeduct({
+        razorpayOrderId: rzpOrderId,
+      });
+
       const orders = await getOrdersAdmin();
       const matchedOrder = orders.find((o) => o.razorpay_order_id === rzpOrderId);
 
@@ -48,12 +58,17 @@ export async function POST(request: Request) {
           razorpay_payment_id: payment.id,
         });
 
-        // Trigger Brevo email
+        // Trigger confirmation email
         await sendOrderConfirmationEmail(updated);
       }
     } else if (event.event === 'payment.failed') {
       const payment = event.payload.payment.entity;
       const rzpOrderId = payment.order_id;
+
+      // Automatically release the reserved stock immediately
+      await releaseStockReservation({
+        razorpayOrderId: rzpOrderId,
+      });
 
       const orders = await getOrdersAdmin();
       const matchedOrder = orders.find((o) => o.razorpay_order_id === rzpOrderId);

@@ -46,3 +46,14 @@ body {
 html {
   scroll-behavior: smooth;
 }
+
+/* Pre-intro sequence: prevent homepage flashing before animation */
+html.notions-intro-pending #homepage-content-wrapper {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#homepage-content-wrapper {
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
