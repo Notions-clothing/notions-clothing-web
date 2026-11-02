@@ -41,10 +41,10 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { full_name, phone } = body;
+    const { full_name, fullName, phone } = body;
 
     const updated = await updateCustomerProfile(session.id, {
-      full_name: full_name?.trim(),
+      fullName: (fullName || full_name)?.trim(),
       phone: phone?.trim(),
     });
 

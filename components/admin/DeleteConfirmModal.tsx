@@ -12,7 +12,8 @@ export interface DeleteConfirmModalProps {
   cancelText?: string;
   isDeleting?: boolean;
   onConfirm: () => void | Promise<void>;
-  onClose: () => void;
+  onClose?: () => void;
+  onCancel?: () => void;
 }
 
 export default function DeleteConfirmModal({
@@ -25,18 +26,21 @@ export default function DeleteConfirmModal({
   isDeleting = false,
   onConfirm,
   onClose,
+  onCancel,
 }: DeleteConfirmModalProps) {
+  const handleClose = onClose || onCancel || (() => {});
+
   // Close on Escape key
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !isDeleting) {
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, isDeleting, onClose]);
+  }, [isOpen, isDeleting, handleClose]);
 
   if (!isOpen) return null;
 
@@ -45,7 +49,7 @@ export default function DeleteConfirmModal({
       {/* Backdrop */}
       <div
         className="fixed inset-0"
-        onClick={() => !isDeleting && onClose()}
+        onClick={() => !isDeleting && handleClose()}
         aria-hidden="true"
       />
 
@@ -54,7 +58,7 @@ export default function DeleteConfirmModal({
         {/* Close Button */}
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           disabled={isDeleting}
           className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition disabled:opacity-40 cursor-pointer"
           title="Close dialog"

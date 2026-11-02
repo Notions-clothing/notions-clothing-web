@@ -333,7 +333,7 @@ export default function AccountPage() {
                       <p className="text-[11px] text-[#7A756D]">Placed on {new Date(guestOrderResult.created_at).toLocaleDateString()}</p>
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-                      {guestOrderResult.order_status}
+                      {guestOrderResult.status || 'Confirmed'}
                     </span>
                   </div>
 
@@ -366,7 +366,7 @@ export default function AccountPage() {
                       className="inline-flex items-center gap-1.5 text-xs text-[#143728] font-medium hover:underline pt-1"
                     >
                       <Truck size={14} />
-                      <span>Track Shipment via {guestOrderResult.courier_name || 'Courier'}</span>
+                      <span>Track Shipment via {guestOrderResult.tracking_carrier || 'Courier'}</span>
                       <ExternalLink size={12} />
                     </a>
                   )}
@@ -499,7 +499,7 @@ export default function AccountPage() {
                                   {order.payment_status === 'paid' ? 'Paid' : 'Payment Pending'}
                                 </span>
                                 <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#FAF9F5] text-[#143728] border border-[#EAE5DC]">
-                                  {order.order_status}
+                                  {order.status || 'Confirmed'}
                                 </span>
                               </div>
                               <p className="text-xs text-[#7A756D]">
@@ -529,11 +529,11 @@ export default function AccountPage() {
                           </div>
 
                           {/* Shipping / Tracking Bar if available */}
-                          {order.courier_name && (
+                          {(order.tracking_carrier || order.tracking_number) && (
                             <div className="bg-[#FAF9F5] px-6 py-2.5 border-b border-[#F0EDE6] flex flex-wrap items-center justify-between text-xs gap-2">
                               <div className="flex items-center gap-2 text-[#143728] font-medium">
                                 <Truck size={15} />
-                                <span>Courier: {order.courier_name}</span>
+                                <span>Courier: {order.tracking_carrier || 'Express'}</span>
                                 {order.tracking_number && (
                                   <span className="font-mono text-[11px] text-[#7A756D]">
                                     ({order.tracking_number})
@@ -599,18 +599,20 @@ export default function AccountPage() {
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs pt-2">
                                 <div className="p-4 bg-white rounded-xl border border-[#EAE5DC] space-y-1">
                                   <span className="font-bold text-[#143728] block mb-1">Delivery Address</span>
-                                  <p className="font-medium text-[#181818]">{order.shipping_name}</p>
-                                  <p className="text-[#555555]">{order.shipping_address_line1}</p>
-                                  {order.shipping_address_line2 && <p className="text-[#555555]">{order.shipping_address_line2}</p>}
-                                  <p className="text-[#555555]">{order.shipping_city}, {order.shipping_state} - {order.shipping_postal_code}</p>
-                                  <p className="text-[#7A756D] pt-1">Phone: {order.shipping_phone}</p>
+                                  <p className="font-medium text-[#181818]">{order.customer_name || 'Guest Customer'}</p>
+                                  <p className="text-[#555555]">{order.shipping_address?.street || ''}</p>
+                                  <p className="text-[#555555]">
+                                    {[order.shipping_address?.city, order.shipping_address?.state].filter(Boolean).join(', ')}
+                                    {order.shipping_address?.postal_code ? ` - ${order.shipping_address.postal_code}` : ''}
+                                  </p>
+                                  {order.customer_phone && <p className="text-[#7A756D] pt-1">Phone: {order.customer_phone}</p>}
                                 </div>
 
                                 <div className="p-4 bg-white rounded-xl border border-[#EAE5DC] space-y-2">
                                   <span className="font-bold text-[#143728] block mb-1">Payment & Breakdown</span>
                                   <div className="flex justify-between text-[#555555]">
                                     <span>Subtotal</span>
-                                    <span>₹{order.subtotal_amount?.toLocaleString('en-IN')}</span>
+                                    <span>₹{(order.subtotal || 0).toLocaleString('en-IN')}</span>
                                   </div>
                                   <div className="flex justify-between text-[#555555]">
                                     <span>Shipping</span>

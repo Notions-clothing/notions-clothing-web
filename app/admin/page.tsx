@@ -801,7 +801,7 @@ export default function AdminDashboardPage() {
 
                 {adminForgotSuccess && (
                   <div className="p-3 bg-emerald-50 text-emerald-800 text-xs rounded-xl border border-emerald-200 flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" />
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
                     <span>{adminForgotSuccess}</span>
                   </div>
                 )}

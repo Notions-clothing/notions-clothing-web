@@ -48,6 +48,7 @@ export interface ProductColor {
 export interface ProductColorImage {
   id: string;
   url: string;
+  image_url?: string;
   public_id?: string;
   sort_order?: number;
 }

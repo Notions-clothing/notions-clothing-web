@@ -572,7 +572,7 @@ export default function BrandManagement({
         message="Deleting this brand will remove it from the brand registry. Existing products assigned to this brand will remain in your catalog with their brand association cleared."
         isDeleting={deleteModalState.isDeleting}
         onConfirm={confirmDeleteBrand}
-        onCancel={() =>
+        onClose={() =>
           setDeleteModalState({ isOpen: false, brand: null, isDeleting: false })
         }
       />
