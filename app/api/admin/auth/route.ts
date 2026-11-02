@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdminPassword } from '@/lib/db';
 
 const COOKIE_NAME = 'notions_admin_auth';
 
@@ -7,11 +8,11 @@ export async function POST(req: NextRequest) {
     const { username, password } = await req.json();
 
     const expectedUser = process.env.ADMIN_USERNAME || 'admin';
-    const expectedPass = process.env.ADMIN_PASSWORD || 'notions@admin2026';
+    const isPasswordValid = await verifyAdminPassword(password);
 
-    if (username === expectedUser && password === expectedPass) {
+    if (username === expectedUser && isPasswordValid) {
       const response = NextResponse.json({ success: true, message: 'Authenticated successfully' });
-      
+
       // Set secure HTTP-only cookie valid for 7 days
       response.cookies.set({
         name: COOKIE_NAME,
@@ -44,4 +45,3 @@ export async function DELETE() {
   response.cookies.delete(COOKIE_NAME);
   return response;
 }
-

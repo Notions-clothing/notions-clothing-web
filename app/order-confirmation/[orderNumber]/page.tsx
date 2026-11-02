@@ -133,41 +133,52 @@ export default function OrderConfirmationPage() {
                 Purchased Items
               </h3>
               <div className="divide-y divide-[#EDE8DE]">
-                {order.items.map((item) => (
-                  <div key={item.id || item.product_name} className="py-3 flex items-center justify-between text-xs">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-14 relative bg-[#F5F3EF] rounded overflow-hidden flex-shrink-0">
-                        {item.image_url ? (
-                          <Image src={item.image_url} alt={item.product_name} fill className="object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-[10px] text-[#888888]">N</div>
-                        )}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-[#181818]">{item.product_name}</h4>
-                        <p className="text-[#7A756D] text-[11px] flex items-center flex-wrap gap-1 mt-0.5">
-                          {item.variant_label && <span>Size: {item.variant_label}</span>}
-                          {item.selected_color && (
-                            <span className="flex items-center gap-1">
-                              •
-                              {item.selected_color_hex && (
-                                <span
-                                  className="inline-block w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs"
-                                  style={{ backgroundColor: item.selected_color_hex }}
-                                />
-                              )}
-                              <span className="text-[#181818] font-medium">{item.selected_color}</span>
-                            </span>
+                {order.items.map((item: any, idx: number) => {
+                  const unitPrice = Number(item.unit_price ?? item.unitPrice ?? item.price ?? 0);
+                  const qty = Number(item.quantity ?? 1);
+                  const lineTotal = Number(item.line_total ?? unitPrice * qty);
+                  const prodName = item.product_name || item.productName || item.name || 'Men’s Apparel';
+                  const imgUrl = item.image_url || item.imageUrl || item.image || item.selectedColorImage;
+                  const sizeLabel = item.variant_label || item.variantLabel || item.selectedSize || item.size;
+                  const colorName = item.selected_color || item.selectedColor || item.color;
+                  const colorHex = item.selected_color_hex || item.selectedColorHex;
+
+                  return (
+                    <div key={item.id || item.product_id || idx} className="py-3 flex items-center justify-between text-xs">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-14 relative bg-[#F5F3EF] rounded overflow-hidden flex-shrink-0">
+                          {imgUrl ? (
+                            <Image src={imgUrl} alt={prodName} fill className="object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-[10px] text-[#888888] font-bold">N</div>
                           )}
-                          <span>• Qty: {item.quantity}</span>
-                        </p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-[#181818]">{prodName}</h4>
+                          <p className="text-[#7A756D] text-[11px] flex items-center flex-wrap gap-1 mt-0.5">
+                            {sizeLabel && <span>Size: {sizeLabel}</span>}
+                            {colorName && (
+                              <span className="flex items-center gap-1">
+                                •
+                                {colorHex && (
+                                  <span
+                                    className="inline-block w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs"
+                                    style={{ backgroundColor: colorHex }}
+                                  />
+                                )}
+                                <span className="text-[#181818] font-medium">{colorName}</span>
+                              </span>
+                            )}
+                            <span>• Qty: {qty}</span>
+                          </p>
+                        </div>
                       </div>
+                      <span className="font-bold text-[#181818]">
+                        ₹{lineTotal.toLocaleString('en-IN')}
+                      </span>
                     </div>
-                    <span className="font-bold text-[#181818]">
-                      ₹{(item.unit_price * item.quantity).toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

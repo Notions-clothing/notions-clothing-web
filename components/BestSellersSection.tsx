@@ -140,37 +140,42 @@ export default function BestSellersSection({ initialProducts, categories }: Best
       <div>
         {/* Header with Title and Category Tabs */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 sm:pb-4 border-b border-[#EAE5DC] gap-2.5 sm:gap-4 mb-4 sm:mb-5">
-          <div className="flex items-center justify-between w-full sm:w-auto">
+          <div className="flex items-center justify-between w-full sm:w-auto shrink-0">
             <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#181818] tracking-tight whitespace-nowrap shrink-0">
               Best Sellers
             </h2>
             <Link
               href={viewAllUrl}
-              className="sm:hidden text-xs font-semibold text-[#143728] hover:underline"
+              className="sm:hidden text-xs font-semibold text-[#143728] hover:underline shrink-0"
             >
               View All →
             </Link>
           </div>
 
-          {/* Filter Pills */}
-          <div className="flex items-center space-x-1.5 sm:space-x-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none text-xs min-w-0 w-full sm:w-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
-                  activeTab === tab
-                    ? 'bg-[#181818] text-white font-medium'
-                    : 'text-[#666666] hover:text-[#181818] hover:bg-[#EFEBE0]'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
+          {/* Categories & Fixed View All on Desktop */}
+          <div className="flex items-center justify-between sm:justify-end gap-2.5 sm:gap-3 min-w-0 flex-1">
+            {/* Scrollable Filter Pills */}
+            <div className="flex items-center space-x-1.5 sm:space-x-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none text-xs min-w-0 flex-1 sm:flex-initial">
+              {tabs.map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-3 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
+                    activeTab === tab
+                      ? 'bg-[#181818] text-white font-medium'
+                      : 'text-[#666666] hover:text-[#181818] hover:bg-[#EFEBE0]'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+
+            {/* Fixed View All button on Desktop */}
             <Link
               href={viewAllUrl}
-              className="hidden sm:inline text-xs font-medium text-[#143728] hover:underline whitespace-nowrap pl-2 shrink-0"
+              className="hidden sm:inline-flex items-center text-xs font-semibold text-[#143728] hover:underline whitespace-nowrap pl-2.5 border-l border-[#EAE5DC] shrink-0"
             >
               View All →
             </Link>

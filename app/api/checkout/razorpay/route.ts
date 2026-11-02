@@ -1,10 +1,15 @@
 import { NextResponse } from 'next/server';
-import { getProductBySlug, getSiteSettings } from '@/lib/db';
+import {
+  getProductBySlug,
+  getSiteSettings,
+  createStockReservation,
+  linkRazorpayOrderIdToReservation,
+} from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { items, customer } = body;
+    const { items, customer, existingReservationToken } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
@@ -14,77 +19,67 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing customer contact details' }, { status: 400 });
     }
 
-    // Server-side authoritative price and stock validation
+    const orderNumber = `NOT-${Date.now().toString().slice(-6)}`;
+
+    // 1. Authoritative Database-Level Stock Locking & Reservation
+    const reservationResult = await createStockReservation({
+      items: items.map((item) => ({
+        productId: item.productId || item.product?.id || item.product?.slug,
+        selectedColor: item.selectedColor,
+        selectedColorId: item.selectedColorId,
+        selectedColorHex: item.selectedColorHex,
+        selectedSize: item.selectedSize,
+        selectedSizeId: item.selectedSizeId,
+        variant_label: item.selectedSize || 'Standard',
+        quantity: Math.max(1, parseInt(item.quantity, 10) || 1),
+      })),
+      customerEmail: customer.email,
+      orderNumber,
+      existingReservationToken,
+      durationMinutes: 10,
+    });
+
+    if (!reservationResult.success || !reservationResult.reservation) {
+      return NextResponse.json(
+        {
+          error: reservationResult.error || 'One or more items are currently out of stock or reserved.',
+          isReserved: reservationResult.isReserved,
+          availableStock: reservationResult.availableStock,
+        },
+        { status: 409 }
+      );
+    }
+
+    const reservation = reservationResult.reservation;
+    const reservationToken = reservation.reservation_token;
+
+    // 2. Compute validated totals from the reserved items
     let subtotal = 0;
     const validatedItems = [];
 
-    for (const item of items) {
-      const realProduct = await getProductBySlug(item.productId || item.product?.id || item.product?.slug);
-      if (!realProduct) {
-        return NextResponse.json({ error: `Product not found: ${item.productId}` }, { status: 400 });
-      }
+    for (const resvItem of reservation.items) {
+      const realProduct = await getProductBySlug(resvItem.product_id, reservationToken);
+      const unitPrice = realProduct?.price ?? resvItem.unit_price ?? 0;
+      const lineTotal = unitPrice * resvItem.quantity;
+      subtotal += lineTotal;
 
-      const qty = Math.max(1, parseInt(item.quantity, 10) || 1);
-      const unitPrice = realProduct.price;
-      subtotal += unitPrice * qty;
-
-      // Validate stock for specific color+size combination
-      if (item.selectedColor && Array.isArray(realProduct.colors) && realProduct.colors.length > 0) {
-        const colVariant = realProduct.colors.find(
-          (c) =>
-            c.name.toLowerCase() === item.selectedColor.toLowerCase() ||
-            c.color_id === item.selectedColor ||
-            (item.selectedColorId && c.color_id === item.selectedColorId)
-        );
-        if (colVariant) {
-          if (Array.isArray(colVariant.sizes) && colVariant.sizes.length > 0) {
-            const sz = colVariant.sizes.find(
-              (s) =>
-                s.size.toLowerCase() === (item.selectedSize || '').toLowerCase() ||
-                (item.selectedSizeId && s.size_id === item.selectedSizeId)
-            );
-            if (sz && sz.stock < qty) {
-              return NextResponse.json(
-                {
-                  error: `Insufficient stock for ${realProduct.name} (${colVariant.name}, Size ${sz.size}). Only ${sz.stock} available.`,
-                },
-                { status: 400 }
-              );
-            }
-          } else if (colVariant.stock < qty) {
-            return NextResponse.json(
-              {
-                error: `Insufficient stock for ${realProduct.name} (${colVariant.name}). Only ${colVariant.stock} available.`,
-              },
-              { status: 400 }
-            );
-          }
-        }
-      } else {
-        // Normal Product stock validation
-        if (realProduct.stock !== undefined && realProduct.stock < qty) {
-          return NextResponse.json(
-            {
-              error: `Insufficient stock for ${realProduct.name}. Only ${realProduct.stock} available.`,
-            },
-            { status: 400 }
-          );
-        }
-      }
+      const matchingClientItem = items.find(
+        (i) => (i.productId || i.product?.id || i.product?.slug) === resvItem.product_id
+      );
 
       validatedItems.push({
-        product_id: realProduct.id,
-        product_name: realProduct.name,
-        sku: realProduct.sku,
-        variant_label: item.selectedSize || 'Standard',
-        selected_size_id: item.selectedSizeId,
-        selected_color: item.selectedColor,
-        selected_color_id: item.selectedColorId,
-        selected_color_hex: item.selectedColorHex,
+        product_id: resvItem.product_id,
+        product_name: resvItem.product_name,
+        sku: resvItem.sku || realProduct?.sku || '',
+        variant_label: resvItem.variant_label || 'Standard',
+        selected_size_id: resvItem.selected_size_id,
+        selected_color: resvItem.selected_color,
+        selected_color_id: resvItem.selected_color_id,
+        selected_color_hex: resvItem.selected_color_hex,
         unit_price: unitPrice,
-        quantity: qty,
-        line_total: unitPrice * qty,
-        image_url: item.selectedColorImage || realProduct.images?.[0]?.image_url,
+        quantity: resvItem.quantity,
+        line_total: lineTotal,
+        image_url: matchingClientItem?.selectedColorImage || realProduct?.images?.[0]?.image_url,
       });
     }
 
@@ -94,7 +89,6 @@ export async function POST(request: Request) {
 
     const shippingAmount = subtotal >= freeThreshold || subtotal === 0 ? 0 : flatRate;
     const totalAmount = subtotal + shippingAmount;
-    const orderNumber = `NOT-${Date.now().toString().slice(-6)}`;
 
     const razorpayKeyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
     const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -119,6 +113,7 @@ export async function POST(request: Request) {
             notes: {
               customer_name: customer.name,
               customer_email: customer.email,
+              reservation_token: reservationToken,
             },
           }),
         });
@@ -135,10 +130,15 @@ export async function POST(request: Request) {
       }
     }
 
+    // Link Razorpay Order ID to the active stock reservation
+    await linkRazorpayOrderIdToReservation(reservationToken, razorpayOrderId);
+
     return NextResponse.json({
       success: true,
       orderNumber,
       razorpayOrderId,
+      reservationToken,
+      expiresAt: reservation.expires_at,
       keyId: razorpayKeyId || 'rzp_test_placeholder',
       amount: totalAmount,
       amountInPaise: Math.round(totalAmount * 100),

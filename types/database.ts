@@ -1,3 +1,19 @@
+export interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  logo_url?: string | null;
+  logo_public_id?: string | null;
+  banner_url?: string | null;
+  banner_public_id?: string | null;
+  website_url?: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -93,6 +109,9 @@ export interface Product {
   subcategory_id?: string;
   subcategory_slug?: string;
   subcategory_name?: string;
+  brand_id?: string | null;
+  brand_name?: string | null;
+  brand_slug?: string | null;
   sku: string;
   price: number;
   compare_at_price?: number | null;
@@ -186,11 +205,16 @@ export interface Order {
   payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
   tracking_carrier?: string;
   tracking_number?: string;
+  tracking_url?: string;
   notes?: string;
   created_at: string;
   items: OrderItem[];
   razorpay_order_id?: string;
   razorpay_payment_id?: string;
+  customer_id?: string;
+  confirmation_email_sent_at?: string;
+  status_email_sent_at?: string;
+  last_emailed_status?: string;
 }
 
 export interface SiteSettings {
@@ -206,4 +230,87 @@ export interface SiteSettings {
   announcement_bar: string;
   instagram_url?: string;
   whatsapp_number?: string;
+}
+
+export interface BrandShowcase {
+  id: string;
+  is_enabled: boolean;
+  section_label: string;
+  heading: string;
+  description: string;
+  brand_logo_url?: string | null;
+  brand_logo_public_id?: string | null;
+  background_image_url?: string | null;
+  background_image_public_id?: string | null;
+  button_text: string;
+  category_id?: string | null;
+  category_slug?: string | null;
+  brand_id?: string | null;
+  brand_slug?: string | null;
+  updated_at?: string;
+}
+
+export interface StockReservationItem {
+  product_id: string;
+  product_name: string;
+  sku?: string;
+  variant_label?: string;
+  selected_size_id?: string;
+  selected_color?: string;
+  selected_color_id?: string;
+  selected_color_hex?: string;
+  quantity: number;
+  unit_price?: number;
+}
+
+export interface StockReservation {
+  id: string;
+  reservation_token: string;
+  order_number: string;
+  razorpay_order_id?: string;
+  customer_email: string;
+  items: StockReservationItem[];
+  status: 'active' | 'confirmed' | 'released' | 'expired';
+  expires_at: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface CustomerAddress {
+  id: string;
+  customer_id: string;
+  name: string;
+  phone: string;
+  street: string;
+  apartment?: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  is_default: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface Customer {
+  id: string;
+  email: string;
+  password_hash?: string;
+  password_salt?: string;
+  full_name: string;
+  phone?: string;
+  addresses?: CustomerAddress[];
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface PasswordResetOtp {
+  id: string;
+  email: string;
+  role: 'customer' | 'admin';
+  otp_hash: string;
+  attempts: number;
+  expires_at: string;
+  created_at: string;
+  used: boolean;
 }

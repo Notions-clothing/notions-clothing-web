@@ -308,7 +308,7 @@
           "id": "var-1793441083064-0",
           "product_id": "prod-1793368849863",
           "size": "5",
-          "inventory_quantity": 10,
+          "inventory_quantity": 6,
           "is_available": true
         },
         {
@@ -331,7 +331,7 @@
           "color_id": "col-1793368028683",
           "name": "White",
           "hex": "#FFFFFF",
-          "stock": 40,
+          "stock": 36,
           "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png",
           "image_public_id": "notions/products/colors/mofbxbyqtqqx91m7gzfv",
           "images": [
@@ -346,7 +346,7 @@
             {
               "size_id": "sz-1793368706624",
               "size": "5",
-              "stock": 10
+              "stock": 6
             },
             {
               "size_id": "sz-1793438483490",
@@ -471,7 +471,7 @@
         }
       ],
       "product_mode": "variant",
-      "stock": 50,
+      "stock": 48,
       "sizes": [],
       "material": "100% Premium Cotton",
       "care_instructions": "Machine wash cold gentle cycle, do not bleach.",
@@ -534,7 +534,7 @@
           "id": "var-1793441762403-1",
           "product_id": "prod-1793441678644",
           "size": "M",
-          "inventory_quantity": 20,
+          "inventory_quantity": 17,
           "is_available": true
         },
         {
@@ -564,7 +564,7 @@
           "color_id": "col-1793441702166",
           "name": "Light blue",
           "hex": "#579FD6",
-          "stock": 30,
+          "stock": 27,
           "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793441728/notions/products/colors/phwelmgqxywweouq9baw.png",
           "image_public_id": "notions/products/colors/phwelmgqxywweouq9baw",
           "images": [
@@ -584,7 +584,7 @@
             {
               "size_id": "sz-1793438455950",
               "size": "M",
-              "stock": 10
+              "stock": 7
             },
             {
               "size_id": "sz-1793438460906",
@@ -1304,6 +1304,154 @@
       "care_instructions": "",
       "specifications": [],
       "created_at": "2026-10-31T11:02:34.708Z"
+    },
+    {
+      "id": "prod-1793611883464",
+      "name": "Black Shirt",
+      "slug": "black-shirt",
+      "description": "Test Product",
+      "category_id": "cat-1793437193969",
+      "category_slug": "men-s-apparel",
+      "category_name": "Men’s Apparel",
+      "subcategory_id": "cat-1793438873673",
+      "subcategory_slug": "shirts",
+      "subcategory_name": "Shirts",
+      "brand_id": "brand-1793611745732",
+      "brand_name": "Tanay",
+      "brand_slug": "tanay",
+      "sku": "NOT-1373",
+      "price": 999,
+      "compare_at_price": 1999,
+      "is_bestseller": false,
+      "is_featured": false,
+      "is_new_arrival": true,
+      "is_published": true,
+      "rating_score": 5,
+      "rating_count": 0,
+      "images": [
+        {
+          "id": "img-1793611849863-sczb",
+          "product_id": "",
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png",
+          "image_public_id": "notions/products/colors/ucrhfc9ptrgbjk87dxwf",
+          "alt_text": "Black Shirt",
+          "sort_order": 1,
+          "is_primary": true
+        }
+      ],
+      "variants": [
+        {
+          "id": "var-1793611856873-0",
+          "product_id": "",
+          "size": "S",
+          "inventory_quantity": 3,
+          "is_available": true
+        },
+        {
+          "id": "var-1793611856873-1",
+          "product_id": "",
+          "size": "M",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793611856873-2",
+          "product_id": "",
+          "size": "L",
+          "inventory_quantity": 0,
+          "is_available": false
+        },
+        {
+          "id": "var-1793611856873-3",
+          "product_id": "",
+          "size": "XL",
+          "inventory_quantity": 10,
+          "is_available": true
+        },
+        {
+          "id": "var-1793611856873-4",
+          "product_id": "",
+          "size": "XXL",
+          "inventory_quantity": 10,
+          "is_available": true
+        }
+      ],
+      "colors": [
+        {
+          "color_id": "col-1793442652888",
+          "name": "Black",
+          "hex": "#000000",
+          "stock": 33,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png",
+          "image_public_id": "notions/products/colors/ucrhfc9ptrgbjk87dxwf",
+          "images": [
+            {
+              "id": "img-1793611849863-sczb",
+              "url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png",
+              "public_id": "notions/products/colors/ucrhfc9ptrgbjk87dxwf",
+              "sort_order": 1
+            }
+          ],
+          "sizes": [
+            {
+              "size_id": "sz-1793438440517",
+              "size": "S",
+              "stock": 3
+            },
+            {
+              "size_id": "sz-1793438455950",
+              "size": "M",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438460906",
+              "size": "L",
+              "stock": 0
+            },
+            {
+              "size_id": "sz-1793438465615",
+              "size": "XL",
+              "stock": 10
+            },
+            {
+              "size_id": "sz-1793438473172",
+              "size": "XXL",
+              "stock": 10
+            }
+          ]
+        }
+      ],
+      "product_mode": "variant",
+      "stock": 0,
+      "sizes": [],
+      "material": "",
+      "care_instructions": "",
+      "specifications": [
+        {
+          "id": "spec-1793611860262",
+          "key": "Brand",
+          "value": "Tanay",
+          "sort_order": 1
+        }
+      ],
+      "created_at": "2026-11-02T09:31:23.464Z"
+    }
+  ],
+  "brands": [
+    {
+      "id": "brand-1793611745732",
+      "name": "Tanay",
+      "slug": "tanay",
+      "description": "",
+      "logo_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611723/notions/brands/logos/s8rcicblvmvexrbhnh5x.png",
+      "logo_public_id": "notions/brands/logos/s8rcicblvmvexrbhnh5x",
+      "banner_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611736/notions/brands/banners/er9uu4qolc3xxrzitfmh.png",
+      "banner_public_id": "notions/brands/banners/er9uu4qolc3xxrzitfmh",
+      "website_url": "",
+      "is_active": true,
+      "sort_order": 1,
+      "created_at": "2026-11-02T09:29:05.732Z",
+      "updated_at": "2026-11-02T09:29:05.732Z"
     }
   ],
   "banners": [
@@ -1490,7 +1638,321 @@
     "instagram_url": "https://instagram.com/notionsclothing",
     "whatsapp_number": "+919876543210"
   },
+  "brand_showcase": {
+    "id": "brand-showcase-tanay",
+    "is_enabled": true,
+    "section_label": "OUR OWN BRAND",
+    "heading": "A Signature of Our Own",
+    "description": "Premium everyday wear crafted for modern men. Timeless style, trusted quality.",
+    "brand_logo_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793603771/notions/brand/zyqodo190bqwzy0lqbl3.png",
+    "brand_logo_public_id": "notions/brand/zyqodo190bqwzy0lqbl3",
+    "background_image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793603348/notions/brand/rdizwsznl4shiuvob2o3.png",
+    "background_image_public_id": "notions/brand/rdizwsznl4shiuvob2o3",
+    "button_text": "Explore TANAY",
+    "brand_id": "brand-1793611745732",
+    "brand_slug": "tanay",
+    "category_id": "",
+    "category_slug": "",
+    "updated_at": "2026-11-02T07:16:18.348Z"
+  },
   "orders": [
+    {
+      "id": "ord-1793628797757",
+      "order_number": "NOT-776346",
+      "customer_name": "mrithul m",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "customer_phone": "+918086202359",
+      "shipping_address": {
+        "street": "Azhijilam, sd",
+        "city": "Malappuram",
+        "state": "Kerala",
+        "postal_code": "673633",
+        "country": "India"
+      },
+      "subtotal": 999,
+      "shipping_amount": 99,
+      "discount_amount": 0,
+      "total_amount": 1098,
+      "currency": "INR",
+      "status": "confirmed",
+      "payment_status": "paid",
+      "tracking_carrier": "",
+      "tracking_number": "",
+      "notes": "",
+      "created_at": "2026-11-02T14:13:17.757Z",
+      "items": [
+        {
+          "product_id": "prod-1793611883464",
+          "product_name": "Black Shirt",
+          "sku": "NOT-1373",
+          "variant_label": "S",
+          "selected_size_id": "sz-1793438440517",
+          "selected_color": "Black",
+          "selected_color_id": "col-1793442652888",
+          "selected_color_hex": "#000000",
+          "unit_price": 999,
+          "quantity": 1,
+          "line_total": 999,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png"
+        }
+      ],
+      "razorpay_order_id": "order_TvKrg1bu1BmU8i",
+      "razorpay_payment_id": "pay_TvKrlpIwqWWbIJ"
+    },
+    {
+      "id": "ord-1793628536122",
+      "order_number": "NOT-512329",
+      "customer_name": "mrithul m",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "customer_phone": "+918086202359",
+      "shipping_address": {
+        "street": "Azhijilam, sd",
+        "city": "Malappuram",
+        "state": "Kerala",
+        "postal_code": "673633",
+        "country": "India"
+      },
+      "subtotal": 1499,
+      "shipping_amount": 99,
+      "discount_amount": 0,
+      "total_amount": 1598,
+      "currency": "INR",
+      "status": "confirmed",
+      "payment_status": "paid",
+      "tracking_carrier": "",
+      "tracking_number": "",
+      "notes": "",
+      "created_at": "2026-11-02T14:08:56.122Z",
+      "items": [
+        {
+          "product_id": "prod-1793368849863",
+          "product_name": "Shoe",
+          "sku": "NOT-9083",
+          "variant_label": "5",
+          "selected_color": "White",
+          "selected_color_hex": "#FFFFFF",
+          "unit_price": 1499,
+          "quantity": 1,
+          "line_total": 1499,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png"
+        }
+      ],
+      "razorpay_order_id": "order_TvKn1vXvB82h1k",
+      "razorpay_payment_id": "pay_TvKn86Tm8HToLr"
+    },
+    {
+      "id": "ord-1793628377681",
+      "order_number": "NOT-352309",
+      "customer_name": "mrithul m",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "customer_phone": "+918086202359",
+      "shipping_address": {
+        "street": "Azhijilam, sd",
+        "city": "Malappuram",
+        "state": "Kerala",
+        "postal_code": "673633",
+        "country": "India"
+      },
+      "subtotal": 999,
+      "shipping_amount": 99,
+      "discount_amount": 0,
+      "total_amount": 1098,
+      "currency": "INR",
+      "status": "confirmed",
+      "payment_status": "paid",
+      "tracking_carrier": "",
+      "tracking_number": "",
+      "notes": "",
+      "created_at": "2026-11-02T14:06:17.681Z",
+      "items": [
+        {
+          "product_id": "prod-1793611883464",
+          "product_name": "Black Shirt",
+          "sku": "NOT-1373",
+          "variant_label": "S",
+          "selected_size_id": "sz-1793438440517",
+          "selected_color": "Black",
+          "selected_color_id": "col-1793442652888",
+          "selected_color_hex": "#000000",
+          "unit_price": 999,
+          "quantity": 1,
+          "line_total": 999,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png"
+        }
+      ],
+      "razorpay_order_id": "order_TvKkEkZBWENjTb",
+      "razorpay_payment_id": "pay_TvKkNIrYUoxkFp"
+    },
+    {
+      "id": "ord-1793627954915",
+      "order_number": "NOT-934287",
+      "customer_name": "mrithul m",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "customer_phone": "+918086202359",
+      "shipping_address": {
+        "street": "Azhijilam, sd",
+        "city": "Malappuram",
+        "state": "Kerala",
+        "postal_code": "673633",
+        "country": "India"
+      },
+      "subtotal": 1499,
+      "shipping_amount": 99,
+      "discount_amount": 0,
+      "total_amount": 1598,
+      "currency": "INR",
+      "status": "confirmed",
+      "payment_status": "paid",
+      "tracking_carrier": "",
+      "tracking_number": "",
+      "notes": "",
+      "created_at": "2026-11-02T13:59:14.915Z",
+      "items": [
+        {
+          "product_id": "prod-1793368849863",
+          "product_name": "Shoe",
+          "sku": "NOT-9083",
+          "variant_label": "5",
+          "selected_color": "White",
+          "selected_color_hex": "#FFFFFF",
+          "unit_price": 1499,
+          "quantity": 1,
+          "line_total": 1499,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png"
+        }
+      ],
+      "razorpay_order_id": "order_TvKcqVnPf4kTiD",
+      "razorpay_payment_id": "pay_TvKcwBuGSdPzln"
+    },
+    {
+      "id": "ord-1793627542366",
+      "order_number": "NOT-513224",
+      "customer_name": "mrithul m",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "customer_phone": "+918086202359",
+      "shipping_address": {
+        "street": "Azhijilam, sd",
+        "city": "Malappuram",
+        "state": "Kerala",
+        "postal_code": "673633",
+        "country": "India"
+      },
+      "subtotal": 999,
+      "shipping_amount": 99,
+      "discount_amount": 0,
+      "total_amount": 1098,
+      "currency": "INR",
+      "status": "confirmed",
+      "payment_status": "paid",
+      "tracking_carrier": "",
+      "tracking_number": "",
+      "notes": "",
+      "created_at": "2026-11-02T13:52:22.366Z",
+      "items": [
+        {
+          "product_id": "prod-1793611883464",
+          "product_name": "Black Shirt",
+          "sku": "NOT-1373",
+          "variant_label": "S",
+          "selected_size_id": "sz-1793438440517",
+          "selected_color": "Black",
+          "selected_color_id": "col-1793442652888",
+          "selected_color_hex": "#000000",
+          "unit_price": 999,
+          "quantity": 1,
+          "line_total": 999,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png"
+        }
+      ],
+      "razorpay_order_id": "order_TvKVR3FRn174gV",
+      "razorpay_payment_id": "pay_TvKVWMLKWFkUfM"
+    },
+    {
+      "id": "ord-1793627088461",
+      "order_number": "NOT-064118",
+      "customer_name": "mrithul m",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "customer_phone": "+918086202359",
+      "shipping_address": {
+        "street": "Azhijilam, sd",
+        "city": "Malappuram",
+        "state": "Kerala",
+        "postal_code": "673633",
+        "country": "India"
+      },
+      "subtotal": 999,
+      "shipping_amount": 99,
+      "discount_amount": 0,
+      "total_amount": 1098,
+      "currency": "INR",
+      "status": "confirmed",
+      "payment_status": "paid",
+      "tracking_carrier": "",
+      "tracking_number": "",
+      "notes": "",
+      "created_at": "2026-11-02T13:44:48.461Z",
+      "items": [
+        {
+          "product_id": "prod-1793441678644",
+          "product_name": "Blue Formal Shirt",
+          "sku": "NOT-1406",
+          "variant_label": "M",
+          "selected_size_id": "sz-1793438455950",
+          "selected_color": "Light blue",
+          "selected_color_id": "col-1793441702166",
+          "selected_color_hex": "#579FD6",
+          "unit_price": 999,
+          "quantity": 1,
+          "line_total": 999,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793441728/notions/products/colors/phwelmgqxywweouq9baw.png"
+        }
+      ],
+      "razorpay_order_id": "order_TvKNWwKuw9KbYv",
+      "razorpay_payment_id": "pay_TvKNfBXIjet49W"
+    },
+    {
+      "id": "ord-1793614343230",
+      "order_number": "NOT-320197",
+      "customer_name": "mrithul m",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "customer_phone": "+918086202359",
+      "shipping_address": {
+        "street": "Azhijilam, sd",
+        "city": "Malappuram",
+        "state": "Kerala",
+        "postal_code": "673633",
+        "country": "India"
+      },
+      "subtotal": 999,
+      "shipping_amount": 99,
+      "discount_amount": 0,
+      "total_amount": 1098,
+      "currency": "INR",
+      "status": "confirmed",
+      "payment_status": "paid",
+      "tracking_carrier": "",
+      "tracking_number": "",
+      "notes": "",
+      "created_at": "2026-11-02T10:12:23.230Z",
+      "items": [
+        {
+          "product_id": "prod-1793611883464",
+          "product_name": "Black Shirt",
+          "sku": "NOT-1373",
+          "variant_label": "S",
+          "selected_size_id": "sz-1793438440517",
+          "selected_color": "Black",
+          "selected_color_id": "col-1793442652888",
+          "selected_color_hex": "#000000",
+          "unit_price": 999,
+          "quantity": 1,
+          "line_total": 999,
+          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png"
+        }
+      ],
+      "razorpay_order_id": "order_TvGlBTWWqxZUuH",
+      "razorpay_payment_id": "pay_TvGlJa5EblTlKt"
+    },
     {
       "id": "ord-1793458566752",
       "order_number": "NOT-543713",
@@ -1534,5 +1996,181 @@
       "razorpay_order_id": "order_TuYWfYPkP65QNR",
       "razorpay_payment_id": "pay_TuYWmYUAWXCdKy"
     }
-  ]
+  ],
+  "stock_reservations": [
+    {
+      "id": "resv-1793628776348-9kywx",
+      "reservation_token": "tok_1793628776348_bfb8faa8bd94b60b",
+      "order_number": "NOT-776346",
+      "razorpay_order_id": "order_TvKrg1bu1BmU8i",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "items": [
+        {
+          "product_id": "prod-1793611883464",
+          "product_name": "Black Shirt",
+          "sku": "NOT-1373",
+          "variant_label": "S",
+          "selected_size_id": "sz-1793438440517",
+          "selected_color": "Black",
+          "selected_color_id": "col-1793442652888",
+          "selected_color_hex": "#000000",
+          "quantity": 1,
+          "unit_price": 999
+        }
+      ],
+      "status": "confirmed",
+      "expires_at": "2026-11-02T14:22:56.348Z",
+      "created_at": "2026-11-02T14:12:56.348Z",
+      "updated_at": "2026-11-02T14:13:17.353Z"
+    },
+    {
+      "id": "resv-1793628512332-geqrs",
+      "reservation_token": "tok_1793628512331_52624d6e8677aae0",
+      "order_number": "NOT-512329",
+      "razorpay_order_id": "order_TvKn1vXvB82h1k",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "items": [
+        {
+          "product_id": "prod-1793368849863",
+          "product_name": "Shoe",
+          "sku": "NOT-9083",
+          "variant_label": "5",
+          "selected_color": "White",
+          "selected_color_hex": "#FFFFFF",
+          "quantity": 1,
+          "unit_price": 1499
+        }
+      ],
+      "status": "confirmed",
+      "expires_at": "2026-11-02T14:18:32.331Z",
+      "created_at": "2026-11-02T14:08:32.331Z",
+      "updated_at": "2026-11-02T14:08:55.866Z"
+    },
+    {
+      "id": "resv-1793628352312-7pqjw",
+      "reservation_token": "tok_1793628352312_a218e55ad38f08a4",
+      "order_number": "NOT-352309",
+      "razorpay_order_id": "order_TvKkEkZBWENjTb",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "items": [
+        {
+          "product_id": "prod-1793611883464",
+          "product_name": "Black Shirt",
+          "sku": "NOT-1373",
+          "variant_label": "S",
+          "selected_size_id": "sz-1793438440517",
+          "selected_color": "Black",
+          "selected_color_id": "col-1793442652888",
+          "selected_color_hex": "#000000",
+          "quantity": 1,
+          "unit_price": 999
+        }
+      ],
+      "status": "confirmed",
+      "expires_at": "2026-11-02T14:15:52.312Z",
+      "created_at": "2026-11-02T14:05:52.312Z",
+      "updated_at": "2026-11-02T14:06:17.394Z"
+    },
+    {
+      "id": "resv-1793627934290-gdhs9",
+      "reservation_token": "tok_1793627934289_25d08f9747921a1f",
+      "order_number": "NOT-934287",
+      "razorpay_order_id": "order_TvKcqVnPf4kTiD",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "items": [
+        {
+          "product_id": "prod-1793368849863",
+          "product_name": "Shoe",
+          "sku": "NOT-9083",
+          "variant_label": "5",
+          "selected_color": "White",
+          "selected_color_hex": "#FFFFFF",
+          "quantity": 1,
+          "unit_price": 1499
+        }
+      ],
+      "status": "confirmed",
+      "expires_at": "2026-11-02T14:08:54.289Z",
+      "created_at": "2026-11-02T13:58:54.289Z",
+      "updated_at": "2026-11-02T13:59:14.767Z"
+    },
+    {
+      "id": "resv-1793627513227-vs0en",
+      "reservation_token": "tok_1793627513226_5c66aeb7acabacd1",
+      "order_number": "NOT-513224",
+      "razorpay_order_id": "order_TvKVR3FRn174gV",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "items": [
+        {
+          "product_id": "prod-1793611883464",
+          "product_name": "Black Shirt",
+          "sku": "NOT-1373",
+          "variant_label": "S",
+          "selected_size_id": "sz-1793438440517",
+          "selected_color": "Black",
+          "selected_color_id": "col-1793442652888",
+          "selected_color_hex": "#000000",
+          "quantity": 1,
+          "unit_price": 999
+        }
+      ],
+      "status": "confirmed",
+      "expires_at": "2026-11-02T14:01:53.226Z",
+      "created_at": "2026-11-02T13:51:53.226Z",
+      "updated_at": "2026-11-02T13:52:21.850Z"
+    },
+    {
+      "id": "resv-1793627064121-z8o5b",
+      "reservation_token": "tok_1793627064120_21eda07b2ff19498",
+      "order_number": "NOT-064118",
+      "razorpay_order_id": "order_TvKNWwKuw9KbYv",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "items": [
+        {
+          "product_id": "prod-1793441678644",
+          "product_name": "Blue Formal Shirt",
+          "sku": "NOT-1406",
+          "variant_label": "M",
+          "selected_size_id": "sz-1793438455950",
+          "selected_color": "Light blue",
+          "selected_color_id": "col-1793441702166",
+          "selected_color_hex": "#579FD6",
+          "quantity": 1,
+          "unit_price": 999
+        }
+      ],
+      "status": "confirmed",
+      "expires_at": "2026-11-02T13:54:24.120Z",
+      "created_at": "2026-11-02T13:44:24.120Z",
+      "updated_at": "2026-11-02T13:44:48.183Z"
+    },
+    {
+      "id": "resv-1793626212437-cyfwi",
+      "reservation_token": "tok_1793626212436_a873a0d355840983",
+      "order_number": "NOT-212434",
+      "razorpay_order_id": "order_TvK8X4D2hpVhck",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "items": [
+        {
+          "product_id": "prod-1793441678644",
+          "product_name": "Blue Formal Shirt",
+          "sku": "NOT-1406",
+          "variant_label": "M",
+          "selected_size_id": "sz-1793438455950",
+          "selected_color": "Light blue",
+          "selected_color_id": "col-1793441702166",
+          "selected_color_hex": "#579FD6",
+          "quantity": 1,
+          "unit_price": 999
+        }
+      ],
+      "status": "confirmed",
+      "expires_at": "2026-11-02T13:40:12.436Z",
+      "created_at": "2026-11-02T13:30:12.436Z",
+      "updated_at": "2026-11-02T13:30:33.428Z"
+    }
+  ],
+  "customers": [],
+  "customer_addresses": [],
+  "password_reset_otps": []
 }
