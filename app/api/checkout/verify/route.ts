@@ -38,18 +38,27 @@ export async function POST(request: Request) {
 
     const razorpaySecret = process.env.RAZORPAY_KEY_SECRET;
 
-    // Cryptographic signature verification if secret is provided and not test sandbox
-    if (razorpaySecret && razorpay_signature && razorpay_signature !== 'sandbox_verified') {
-      const generatedSignature = crypto
-        .createHmac('sha256', razorpaySecret)
-        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-        .digest('hex');
-
-      if (generatedSignature !== razorpay_signature) {
+    // Cryptographic signature verification
+    if (razorpaySecret) {
+      if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
         return NextResponse.json(
-          { error: 'Invalid Razorpay payment signature.' },
+          { error: 'Missing required Razorpay payment credentials for verification.' },
           { status: 400 }
         );
+      }
+
+      if (razorpay_signature !== 'sandbox_verified') {
+        const generatedSignature = crypto
+          .createHmac('sha256', razorpaySecret)
+          .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+          .digest('hex');
+
+        if (generatedSignature !== razorpay_signature) {
+          return NextResponse.json(
+            { error: 'Invalid Razorpay payment signature. Payment verification failed.' },
+            { status: 400 }
+          );
+        }
       }
     }
 

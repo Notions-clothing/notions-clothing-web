@@ -1296,6 +1296,8 @@ export async function saveOrder(order: Partial<Order>): Promise<Order> {
     const orderId = order.id || existing?.id || `ord-${Date.now()}`;
     const orderNumber = order.order_number || existing?.order_number || `NOT-${Date.now().toString().slice(-6)}`;
 
+    const targetStatus = order.status ?? existing?.status ?? 'pending';
+
     const newOrder: Order = {
       id: orderId,
       order_number: orderNumber,
@@ -1314,7 +1316,7 @@ export async function saveOrder(order: Partial<Order>): Promise<Order> {
       discount_amount: order.discount_amount ?? existing?.discount_amount ?? 0,
       total_amount: order.total_amount ?? existing?.total_amount ?? 0,
       currency: order.currency ?? existing?.currency ?? 'INR',
-      status: order.status ?? existing?.status ?? 'pending',
+      status: targetStatus,
       payment_status: order.payment_status ?? existing?.payment_status ?? 'pending',
       tracking_carrier: order.tracking_carrier ?? existing?.tracking_carrier ?? '',
       tracking_number: order.tracking_number ?? existing?.tracking_number ?? '',
@@ -1323,14 +1325,23 @@ export async function saveOrder(order: Partial<Order>): Promise<Order> {
       items: (order.items && order.items.length > 0) ? order.items : (existing?.items ?? []),
       razorpay_order_id: order.razorpay_order_id ?? existing?.razorpay_order_id ?? '',
       razorpay_payment_id: order.razorpay_payment_id ?? existing?.razorpay_payment_id ?? '',
+      customer_id: order.customer_id ?? existing?.customer_id,
+      confirmation_email_sent_at: order.confirmation_email_sent_at ?? existing?.confirmation_email_sent_at,
+      status_email_sent_at: order.status_email_sent_at ?? existing?.status_email_sent_at,
+      last_emailed_status:
+        order.last_emailed_status !== undefined
+          ? order.last_emailed_status
+          : (targetStatus !== 'shipped' && targetStatus !== 'delivered' && existing?.last_emailed_status === 'shipped')
+          ? undefined
+          : existing?.last_emailed_status,
     };
 
-    const isPaid = newOrder.payment_status === 'paid' || newOrder.status === 'confirmed';
+    const isPaid = newOrder.payment_status === 'paid';
 
     // Idempotency: check if order was already confirmed and paid
     if (existingIdx >= 0) {
       const existing = store.orders[existingIdx];
-      const wasPaid = existing.payment_status === 'paid' || existing.status === 'confirmed';
+      const wasPaid = existing.payment_status === 'paid';
       store.orders[existingIdx] = { ...existing, ...newOrder };
 
       if (!wasPaid && isPaid) {
@@ -1582,7 +1593,7 @@ export async function confirmStockReservationAndDeduct(
         (params.razorpayOrderId && o.razorpay_order_id === params.razorpayOrderId)
     );
 
-    if (existingOrder && (existingOrder.payment_status === 'paid' || existingOrder.status === 'confirmed')) {
+    if (existingOrder && existingOrder.payment_status === 'paid') {
       return { success: true, alreadyProcessed: true };
     }
 
