@@ -308,7 +308,7 @@
           "id": "var-1793441083064-0",
           "product_id": "prod-1793368849863",
           "size": "5",
-          "inventory_quantity": 6,
+          "inventory_quantity": 1,
           "is_available": true
         },
         {
@@ -331,7 +331,7 @@
           "color_id": "col-1793368028683",
           "name": "White",
           "hex": "#FFFFFF",
-          "stock": 36,
+          "stock": 31,
           "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png",
           "image_public_id": "notions/products/colors/mofbxbyqtqqx91m7gzfv",
           "images": [
@@ -346,7 +346,7 @@
             {
               "size_id": "sz-1793368706624",
               "size": "5",
-              "stock": 6
+              "stock": 1
             },
             {
               "size_id": "sz-1793438483490",
@@ -1657,54 +1657,11 @@
   },
   "orders": [
     {
-      "id": "ord-1793628797757",
-      "order_number": "NOT-776346",
+      "id": "ord-1793690574589",
+      "order_number": "NOT-549626",
       "customer_name": "mrithul m",
       "customer_email": "mrithulmridhu6@gmail.com",
-      "customer_phone": "+918086202359",
-      "shipping_address": {
-        "street": "Azhijilam, sd",
-        "city": "Malappuram",
-        "state": "Kerala",
-        "postal_code": "673633",
-        "country": "India"
-      },
-      "subtotal": 999,
-      "shipping_amount": 99,
-      "discount_amount": 0,
-      "total_amount": 1098,
-      "currency": "INR",
-      "status": "confirmed",
-      "payment_status": "paid",
-      "tracking_carrier": "",
-      "tracking_number": "",
-      "notes": "",
-      "created_at": "2026-11-02T14:13:17.757Z",
-      "items": [
-        {
-          "product_id": "prod-1793611883464",
-          "product_name": "Black Shirt",
-          "sku": "NOT-1373",
-          "variant_label": "S",
-          "selected_size_id": "sz-1793438440517",
-          "selected_color": "Black",
-          "selected_color_id": "col-1793442652888",
-          "selected_color_hex": "#000000",
-          "unit_price": 999,
-          "quantity": 1,
-          "line_total": 999,
-          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png"
-        }
-      ],
-      "razorpay_order_id": "order_TvKrg1bu1BmU8i",
-      "razorpay_payment_id": "pay_TvKrlpIwqWWbIJ"
-    },
-    {
-      "id": "ord-1793628536122",
-      "order_number": "NOT-512329",
-      "customer_name": "mrithul m",
-      "customer_email": "mrithulmridhu6@gmail.com",
-      "customer_phone": "+918086202359",
+      "customer_phone": "8086202359",
       "shipping_address": {
         "street": "Azhijilam, sd",
         "city": "Malappuram",
@@ -1717,12 +1674,12 @@
       "discount_amount": 0,
       "total_amount": 1598,
       "currency": "INR",
-      "status": "confirmed",
+      "status": "shipped",
       "payment_status": "paid",
-      "tracking_carrier": "",
-      "tracking_number": "",
+      "tracking_carrier": "bluecart",
+      "tracking_number": "3477348234092",
       "notes": "",
-      "created_at": "2026-11-02T14:08:56.122Z",
+      "created_at": "2026-11-03T07:22:54.589Z",
       "items": [
         {
           "product_id": "prod-1793368849863",
@@ -1737,267 +1694,60 @@
           "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png"
         }
       ],
-      "razorpay_order_id": "order_TvKn1vXvB82h1k",
-      "razorpay_payment_id": "pay_TvKn86Tm8HToLr"
-    },
-    {
-      "id": "ord-1793628377681",
-      "order_number": "NOT-352309",
-      "customer_name": "mrithul m",
-      "customer_email": "mrithulmridhu6@gmail.com",
-      "customer_phone": "+918086202359",
-      "shipping_address": {
-        "street": "Azhijilam, sd",
-        "city": "Malappuram",
-        "state": "Kerala",
-        "postal_code": "673633",
-        "country": "India"
-      },
-      "subtotal": 999,
-      "shipping_amount": 99,
-      "discount_amount": 0,
-      "total_amount": 1098,
-      "currency": "INR",
-      "status": "confirmed",
-      "payment_status": "paid",
-      "tracking_carrier": "",
-      "tracking_number": "",
-      "notes": "",
-      "created_at": "2026-11-02T14:06:17.681Z",
-      "items": [
-        {
-          "product_id": "prod-1793611883464",
-          "product_name": "Black Shirt",
-          "sku": "NOT-1373",
-          "variant_label": "S",
-          "selected_size_id": "sz-1793438440517",
-          "selected_color": "Black",
-          "selected_color_id": "col-1793442652888",
-          "selected_color_hex": "#000000",
-          "unit_price": 999,
-          "quantity": 1,
-          "line_total": 999,
-          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png"
-        }
-      ],
-      "razorpay_order_id": "order_TvKkEkZBWENjTb",
-      "razorpay_payment_id": "pay_TvKkNIrYUoxkFp"
-    },
-    {
-      "id": "ord-1793627954915",
-      "order_number": "NOT-934287",
-      "customer_name": "mrithul m",
-      "customer_email": "mrithulmridhu6@gmail.com",
-      "customer_phone": "+918086202359",
-      "shipping_address": {
-        "street": "Azhijilam, sd",
-        "city": "Malappuram",
-        "state": "Kerala",
-        "postal_code": "673633",
-        "country": "India"
-      },
-      "subtotal": 1499,
-      "shipping_amount": 99,
-      "discount_amount": 0,
-      "total_amount": 1598,
-      "currency": "INR",
-      "status": "confirmed",
-      "payment_status": "paid",
-      "tracking_carrier": "",
-      "tracking_number": "",
-      "notes": "",
-      "created_at": "2026-11-02T13:59:14.915Z",
-      "items": [
-        {
-          "product_id": "prod-1793368849863",
-          "product_name": "Shoe",
-          "sku": "NOT-9083",
-          "variant_label": "5",
-          "selected_color": "White",
-          "selected_color_hex": "#FFFFFF",
-          "unit_price": 1499,
-          "quantity": 1,
-          "line_total": 1499,
-          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793368833/notions/products/colors/mofbxbyqtqqx91m7gzfv.png"
-        }
-      ],
-      "razorpay_order_id": "order_TvKcqVnPf4kTiD",
-      "razorpay_payment_id": "pay_TvKcwBuGSdPzln"
-    },
-    {
-      "id": "ord-1793627542366",
-      "order_number": "NOT-513224",
-      "customer_name": "mrithul m",
-      "customer_email": "mrithulmridhu6@gmail.com",
-      "customer_phone": "+918086202359",
-      "shipping_address": {
-        "street": "Azhijilam, sd",
-        "city": "Malappuram",
-        "state": "Kerala",
-        "postal_code": "673633",
-        "country": "India"
-      },
-      "subtotal": 999,
-      "shipping_amount": 99,
-      "discount_amount": 0,
-      "total_amount": 1098,
-      "currency": "INR",
-      "status": "confirmed",
-      "payment_status": "paid",
-      "tracking_carrier": "",
-      "tracking_number": "",
-      "notes": "",
-      "created_at": "2026-11-02T13:52:22.366Z",
-      "items": [
-        {
-          "product_id": "prod-1793611883464",
-          "product_name": "Black Shirt",
-          "sku": "NOT-1373",
-          "variant_label": "S",
-          "selected_size_id": "sz-1793438440517",
-          "selected_color": "Black",
-          "selected_color_id": "col-1793442652888",
-          "selected_color_hex": "#000000",
-          "unit_price": 999,
-          "quantity": 1,
-          "line_total": 999,
-          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png"
-        }
-      ],
-      "razorpay_order_id": "order_TvKVR3FRn174gV",
-      "razorpay_payment_id": "pay_TvKVWMLKWFkUfM"
-    },
-    {
-      "id": "ord-1793627088461",
-      "order_number": "NOT-064118",
-      "customer_name": "mrithul m",
-      "customer_email": "mrithulmridhu6@gmail.com",
-      "customer_phone": "+918086202359",
-      "shipping_address": {
-        "street": "Azhijilam, sd",
-        "city": "Malappuram",
-        "state": "Kerala",
-        "postal_code": "673633",
-        "country": "India"
-      },
-      "subtotal": 999,
-      "shipping_amount": 99,
-      "discount_amount": 0,
-      "total_amount": 1098,
-      "currency": "INR",
-      "status": "confirmed",
-      "payment_status": "paid",
-      "tracking_carrier": "",
-      "tracking_number": "",
-      "notes": "",
-      "created_at": "2026-11-02T13:44:48.461Z",
-      "items": [
-        {
-          "product_id": "prod-1793441678644",
-          "product_name": "Blue Formal Shirt",
-          "sku": "NOT-1406",
-          "variant_label": "M",
-          "selected_size_id": "sz-1793438455950",
-          "selected_color": "Light blue",
-          "selected_color_id": "col-1793441702166",
-          "selected_color_hex": "#579FD6",
-          "unit_price": 999,
-          "quantity": 1,
-          "line_total": 999,
-          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793441728/notions/products/colors/phwelmgqxywweouq9baw.png"
-        }
-      ],
-      "razorpay_order_id": "order_TvKNWwKuw9KbYv",
-      "razorpay_payment_id": "pay_TvKNfBXIjet49W"
-    },
-    {
-      "id": "ord-1793614343230",
-      "order_number": "NOT-320197",
-      "customer_name": "mrithul m",
-      "customer_email": "mrithulmridhu6@gmail.com",
-      "customer_phone": "+918086202359",
-      "shipping_address": {
-        "street": "Azhijilam, sd",
-        "city": "Malappuram",
-        "state": "Kerala",
-        "postal_code": "673633",
-        "country": "India"
-      },
-      "subtotal": 999,
-      "shipping_amount": 99,
-      "discount_amount": 0,
-      "total_amount": 1098,
-      "currency": "INR",
-      "status": "confirmed",
-      "payment_status": "paid",
-      "tracking_carrier": "",
-      "tracking_number": "",
-      "notes": "",
-      "created_at": "2026-11-02T10:12:23.230Z",
-      "items": [
-        {
-          "product_id": "prod-1793611883464",
-          "product_name": "Black Shirt",
-          "sku": "NOT-1373",
-          "variant_label": "S",
-          "selected_size_id": "sz-1793438440517",
-          "selected_color": "Black",
-          "selected_color_id": "col-1793442652888",
-          "selected_color_hex": "#000000",
-          "unit_price": 999,
-          "quantity": 1,
-          "line_total": 999,
-          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793611850/notions/products/colors/ucrhfc9ptrgbjk87dxwf.png"
-        }
-      ],
-      "razorpay_order_id": "order_TvGlBTWWqxZUuH",
-      "razorpay_payment_id": "pay_TvGlJa5EblTlKt"
-    },
-    {
-      "id": "ord-1793458566752",
-      "order_number": "NOT-543713",
-      "customer_name": "mrithul m",
-      "customer_email": "mrithulmridhu6@gmail.com",
-      "customer_phone": "+918086202359",
-      "shipping_address": {
-        "street": "Azhijilam, sd",
-        "city": "Malappuram",
-        "state": "Kerala",
-        "postal_code": "673633",
-        "country": "India"
-      },
-      "subtotal": 499,
-      "shipping_amount": 99,
-      "discount_amount": 0,
-      "total_amount": 598,
-      "currency": "INR",
-      "status": "confirmed",
-      "payment_status": "paid",
-      "tracking_carrier": "",
-      "tracking_number": "",
-      "notes": "",
-      "created_at": "2026-10-31T14:56:06.752Z",
-      "items": [
-        {
-          "product_id": "prod-1793438408856",
-          "product_name": "Men's Classic Crew Neck T-Shirt",
-          "sku": "NOT-1944",
-          "variant_label": "S",
-          "selected_size_id": "sz-1793438440517",
-          "selected_color": "Olive green",
-          "selected_color_id": "col-1793356927031",
-          "selected_color_hex": "#143728",
-          "unit_price": 499,
-          "quantity": 1,
-          "line_total": 499,
-          "image_url": "https://res.cloudinary.com/fb7zpbif/image/upload/v1793438340/notions/products/colors/wdto1jdbguktxl6ywgig.png"
-        }
-      ],
-      "razorpay_order_id": "order_TuYWfYPkP65QNR",
-      "razorpay_payment_id": "pay_TuYWmYUAWXCdKy"
+      "razorpay_order_id": "order_TvcPFPKk7g0pEB",
+      "razorpay_payment_id": "pay_TvcPPnSl5n3DpZ",
+      "confirmation_email_sent_at": "2026-11-03T07:22:55.484Z",
+      "status_email_sent_at": "2026-11-03T07:26:20.633Z",
+      "last_emailed_status": "shipped"
     }
   ],
   "stock_reservations": [
+    {
+      "id": "resv-1793690549628-if3m5",
+      "reservation_token": "tok_1793690549628_92556f5a87b38d6b",
+      "order_number": "NOT-549626",
+      "razorpay_order_id": "order_TvcPFPKk7g0pEB",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "items": [
+        {
+          "product_id": "prod-1793368849863",
+          "product_name": "Shoe",
+          "sku": "NOT-9083",
+          "variant_label": "5",
+          "selected_color": "White",
+          "selected_color_hex": "#FFFFFF",
+          "quantity": 1,
+          "unit_price": 1499
+        }
+      ],
+      "status": "confirmed",
+      "expires_at": "2026-11-03T07:32:29.628Z",
+      "created_at": "2026-11-03T07:22:29.628Z",
+      "updated_at": "2026-11-03T07:22:54.390Z"
+    },
+    {
+      "id": "resv-1793688099355-8r5zx",
+      "reservation_token": "tok_1793688099354_2a53b833000c6f55",
+      "order_number": "NOT-099353",
+      "razorpay_order_id": "order_Tvbi6p2BEzMzOJ",
+      "customer_email": "mrithulmridhu6@gmail.com",
+      "items": [
+        {
+          "product_id": "prod-1793368849863",
+          "product_name": "Shoe",
+          "sku": "NOT-9083",
+          "variant_label": "5",
+          "selected_color": "White",
+          "selected_color_hex": "#FFFFFF",
+          "quantity": 1,
+          "unit_price": 1499
+        }
+      ],
+      "status": "confirmed",
+      "expires_at": "2026-11-03T06:51:39.354Z",
+      "created_at": "2026-11-03T06:41:39.354Z",
+      "updated_at": "2026-11-03T06:42:01.633Z"
+    },
     {
       "id": "resv-1793628776348-9kywx",
       "reservation_token": "tok_1793628776348_bfb8faa8bd94b60b",
@@ -2170,7 +1920,46 @@
       "updated_at": "2026-11-02T13:30:33.428Z"
     }
   ],
-  "customers": [],
-  "customer_addresses": [],
-  "password_reset_otps": []
+  "customers": [
+    {
+      "id": "cust-1793687981387-0jx7",
+      "email": "mrithulmridhu6@gmail.com",
+      "password_hash": "db6f9a230e9de0b71343dc035a0c0fcc7884c26a9ae64d817de785767ecfff7dc40bf4f18cb46204b5eed863f37c8eaa30b97fc17ed41077252f3de1f5d645e2",
+      "password_salt": "30e4e733fd1f01e29e64ab91da273c15",
+      "full_name": "mrithul m",
+      "phone": "8086202359",
+      "addresses": [],
+      "created_at": "2026-11-03T06:39:41.387Z",
+      "updated_at": "2026-11-03T06:41:04.700Z"
+    }
+  ],
+  "customer_addresses": [
+    {
+      "id": "addr-1793688099068-xvpz",
+      "customer_id": "cust-1793687981387-0jx7",
+      "name": "mrithul m",
+      "phone": "8086202359",
+      "street": "Azhijilam",
+      "apartment": "sd",
+      "city": "Malappuram",
+      "state": "Kerala",
+      "postal_code": "673633",
+      "country": "India",
+      "is_default": true,
+      "created_at": "2026-11-03T06:41:39.068Z",
+      "updated_at": "2026-11-03T06:41:39.068Z"
+    }
+  ],
+  "password_reset_otps": [
+    {
+      "id": "otp-1793688029957-elvn",
+      "email": "mrithulmridhu6@gmail.com",
+      "role": "customer",
+      "otp_hash": "32596eb8ac0d3082db51dab14b50528a6c4670b791f56eb12e9649b818d2c4b9",
+      "attempts": 1,
+      "expires_at": "2026-11-03T06:50:29.957Z",
+      "created_at": "2026-11-03T06:40:29.957Z",
+      "used": true
+    }
+  ]
 }

@@ -152,6 +152,15 @@ export default function AdminDashboardPage() {
   const [copiedSql, setCopiedSql] = useState(false);
   const [copiedDim, setCopiedDim] = useState(false);
 
+  // Fulfill & Ship Order Modal State
+  const [shippingModalOrder, setShippingModalOrder] = useState<Order | null>(null);
+  const [shippingCarrier, setShippingCarrier] = useState('');
+  const [shippingTrackingNumber, setShippingTrackingNumber] = useState('');
+  const [shippingTrackingUrl, setShippingTrackingUrl] = useState('');
+  const [shippingFormError, setShippingFormError] = useState('');
+  const [isSubmittingShipping, setIsSubmittingShipping] = useState(false);
+  const [resendingEmailId, setResendingEmailId] = useState<string | null>(null);
+
   // Delete Confirmation Modal State (Products, Categories, Orders, Discard Mode)
   const [deleteModalState, setDeleteModalState] = useState<{
     isOpen: boolean;
@@ -520,24 +529,144 @@ export default function AdminDashboardPage() {
   };
 
   // ----------------------------------------------------
-  // ORDER ACTIONS
+  // ORDER ACTIONS & FULFILLMENT
   // ----------------------------------------------------
-  const handleUpdateOrder = async (order: Order, updates: Partial<Order>) => {
+  const ALL_ORDER_STATUSES: Array<{ value: Order['status']; label: string }> = [
+    { value: 'pending', label: 'Pending' },
+    { value: 'confirmed', label: 'Confirmed' },
+    { value: 'processing', label: 'Processing' },
+    { value: 'shipped', label: 'Shipped' },
+    { value: 'delivered', label: 'Delivered' },
+    { value: 'cancelled', label: 'Cancelled' },
+  ];
+
+  const getAllowedStatusOptions = () => ALL_ORDER_STATUSES;
+
+  const handleUpdateOrder = async (order: Order, updates: Partial<Order> & { send_shipping_email?: boolean }) => {
     try {
-      const updatedOrder = { ...order, ...updates };
-      setOrders((prev) => prev.map((o) => (o.id === order.id ? updatedOrder : o)));
       const res = await fetch('/api/admin/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedOrder),
+        body: JSON.stringify({
+          id: order.id,
+          order_number: order.order_number,
+          ...updates,
+        }),
       });
 
-      if (res.ok) {
-        showNotification(`Order #${order.order_number} updated!`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (data.order) {
+          setOrders((prev) => prev.map((o) => (o.id === order.id ? data.order : o)));
+        }
+        showNotification(
+          updates.send_shipping_email
+            ? `Order #${order.order_number} marked as Shipped & tracking email dispatched!`
+            : `Order #${order.order_number} updated!`
+        );
+        loadData();
+      } else {
+        showNotification(data.error || 'Failed to update order', 'error');
         loadData();
       }
-    } catch (e) {
+    } catch (e: any) {
       showNotification('Failed to update order', 'error');
+      loadData();
+    }
+  };
+
+  const handleStatusChange = (order: Order, nextStatus: string) => {
+    if (nextStatus === order.status) return;
+
+    if (nextStatus === 'shipped') {
+      // Require shipping details form before marking order as Shipped
+      setShippingModalOrder(order);
+      setShippingCarrier(order.tracking_carrier || '');
+      setShippingTrackingNumber(order.tracking_number || '');
+      setShippingTrackingUrl(order.tracking_url || '');
+      setShippingFormError('');
+      return;
+    }
+
+    handleUpdateOrder(order, { status: nextStatus as any });
+  };
+
+  const handleConfirmShipping = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!shippingModalOrder) return;
+
+    if (!shippingCarrier.trim()) {
+      setShippingFormError('Courier Name is required.');
+      return;
+    }
+
+    if (!shippingTrackingNumber.trim()) {
+      setShippingFormError('Shipping / Tracking ID (AWB) is required.');
+      return;
+    }
+
+    setIsSubmittingShipping(true);
+    setShippingFormError('');
+
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: shippingModalOrder.id,
+          order_number: shippingModalOrder.order_number,
+          status: 'shipped',
+          tracking_carrier: shippingCarrier.trim(),
+          tracking_number: shippingTrackingNumber.trim(),
+          tracking_url: shippingTrackingUrl.trim() || undefined,
+          send_shipping_email: true,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showNotification(`Order #${shippingModalOrder.order_number} marked as Shipped & tracking email sent!`);
+        if (data.order) {
+          setOrders((prev) => prev.map((o) => (o.id === shippingModalOrder.id ? data.order : o)));
+        }
+        setShippingModalOrder(null);
+        loadData();
+      } else {
+        setShippingFormError(data.error || 'Failed to update shipping status.');
+      }
+    } catch (err: any) {
+      setShippingFormError(err?.message || 'Network error while confirming shipment.');
+    } finally {
+      setIsSubmittingShipping(false);
+    }
+  };
+
+  const handleResendShippingEmail = async (order: Order) => {
+    setResendingEmailId(order.id);
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: order.id,
+          order_number: order.order_number,
+          send_shipping_email: true,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showNotification(`Shipping notification email resent to ${order.customer_email}!`);
+        if (data.order) {
+          setOrders((prev) => prev.map((o) => (o.id === order.id ? data.order : o)));
+        }
+      } else {
+        showNotification(data.error || 'Failed to resend shipping email.', 'error');
+      }
+    } catch (e: any) {
+      showNotification('Network error while resending shipping email.', 'error');
+    } finally {
+      setResendingEmailId(null);
     }
   };
 
@@ -2204,61 +2333,114 @@ export default function AdminDashboardPage() {
                           <p className="text-gray-600">{order.shipping_address?.country}</p>
                         </div>
 
-                        {/* Status & Tracking Update */}
-                        <div className="bg-gray-50 p-3.5 rounded-xl space-y-2">
-                          <p className="font-bold text-gray-700 uppercase tracking-wider">
+                        {/* Status & Fulfillment Controls */}
+                        <div className="bg-gray-50 p-3.5 rounded-xl space-y-2.5">
+                          <p className="font-bold text-gray-700 uppercase tracking-wider text-[11px]">
                             Update Fulfillment
                           </p>
                           <div className="grid grid-cols-2 gap-2">
-                            <select
-                              value={order.status}
-                              onChange={(e) =>
-                                handleUpdateOrder(order, { status: e.target.value as any })
-                              }
-                              className="px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-800"
-                            >
-                              <option value="pending">Pending</option>
-                              <option value="confirmed">Confirmed</option>
-                              <option value="processing">Processing</option>
-                              <option value="shipped">Shipped</option>
-                              <option value="delivered">Delivered</option>
-                              <option value="cancelled">Cancelled</option>
-                            </select>
+                            <div>
+                              <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">
+                                Order Status
+                              </label>
+                              <select
+                                value={order.status}
+                                onChange={(e) => handleStatusChange(order, e.target.value)}
+                                className="w-full px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#143728]"
+                              >
+                                {ALL_ORDER_STATUSES.map((opt) => (
+                                  <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
 
-                            <select
-                              value={order.payment_status}
-                              onChange={(e) =>
-                                handleUpdateOrder(order, { payment_status: e.target.value as any })
-                              }
-                              className="px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-800"
-                            >
-                              <option value="pending">Unpaid</option>
-                              <option value="paid">Paid</option>
-                              <option value="failed">Failed</option>
-                              <option value="refunded">Refunded</option>
-                            </select>
+                            <div>
+                              <label className="block text-[10px] uppercase font-bold text-gray-500 mb-1">
+                                Payment Status
+                              </label>
+                              <select
+                                value={order.payment_status}
+                                onChange={(e) =>
+                                  handleUpdateOrder(order, { payment_status: e.target.value as any })
+                                }
+                                className="w-full px-2.5 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-800 focus:outline-none focus:border-[#143728]"
+                              >
+                                <option value="pending">Unpaid / Pending</option>
+                                <option value="paid">Paid</option>
+                                <option value="failed">Failed</option>
+                                <option value="refunded">Refunded</option>
+                              </select>
+                            </div>
                           </div>
 
-                          <div className="flex gap-1.5 pt-1">
-                            <input
-                              type="text"
-                              placeholder="Courier (e.g. BlueDart)"
-                              defaultValue={order.tracking_carrier || ''}
-                              onBlur={(e) =>
-                                handleUpdateOrder(order, { tracking_carrier: e.target.value })
-                              }
-                              className="w-1/2 px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-xs"
-                            />
-                            <input
-                              type="text"
-                              placeholder="Tracking AWB #"
-                              defaultValue={order.tracking_number || ''}
-                              onBlur={(e) =>
-                                handleUpdateOrder(order, { tracking_number: e.target.value })
-                              }
-                              className="w-1/2 px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-xs"
-                            />
-                          </div>
+                          {/* Action prompt if order is currently in Processing */}
+                          {order.status === 'processing' && (
+                            <div className="pt-1">
+                              <button
+                                type="button"
+                                onClick={() => handleStatusChange(order, 'shipped')}
+                                className="w-full py-1.5 px-3 bg-[#143728] text-white rounded-lg text-xs font-semibold hover:bg-[#0f291e] transition cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
+                              >
+                                <Truck size={13} />
+                                Enter Shipping Details &amp; Ship
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Active Shipping Details for Shipped & Delivered orders */}
+                          {(order.status === 'shipped' || order.status === 'delivered') && (
+                            <div className="pt-2 border-t border-gray-200 mt-2 space-y-2">
+                              <div className="bg-white p-2.5 rounded-lg border border-gray-200 text-xs space-y-1">
+                                <div className="flex justify-between items-center text-gray-700">
+                                  <span>Courier: <strong>{order.tracking_carrier || 'Express Partner'}</strong></span>
+                                  <span>AWB: <strong className="font-mono text-[#143728]">{order.tracking_number || 'Pending'}</strong></span>
+                                </div>
+                                {order.tracking_url && (
+                                  <div className="pt-0.5">
+                                    <a
+                                      href={order.tracking_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-[11px] text-[#143728] hover:underline inline-flex items-center gap-1 font-medium"
+                                    >
+                                      <ExternalLink size={10} />
+                                      Track Consignment
+                                    </a>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="flex items-center justify-between pt-1">
+                                <span className="text-[11px] text-gray-500 flex items-center gap-1">
+                                  <Mail size={12} className="text-[#143728]" />
+                                  {order.status_email_sent_at
+                                    ? 'Shipping email sent'
+                                    : 'Email not sent'}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleResendShippingEmail(order)}
+                                  disabled={resendingEmailId === order.id}
+                                  className="px-2.5 py-1 text-[11px] font-semibold bg-[#143728] text-white rounded-md hover:bg-[#0f291e] transition cursor-pointer flex items-center gap-1 disabled:opacity-60"
+                                  title="Resend official shipping email via Brevo"
+                                >
+                                  {resendingEmailId === order.id ? (
+                                    <>
+                                      <RefreshCw size={11} className="animate-spin" />
+                                      Resending...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Mail size={11} />
+                                      Resend Email
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -4356,6 +4538,129 @@ export default function AdminDashboardPage() {
                   className="px-5 py-2 rounded-xl bg-[#143728] text-white font-semibold"
                 >
                   Save Banner Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Fulfill & Ship Order Modal */}
+      {shippingModalOrder && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <div className="flex items-center gap-2 text-[#143728]">
+                <Truck size={20} />
+                <h3 className="font-serif text-lg font-bold text-gray-900">
+                  Fulfill &amp; Ship Order #{shippingModalOrder.order_number}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShippingModalOrder(null)}
+                className="text-gray-400 hover:text-gray-700 p-1 rounded-lg cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {shippingFormError && (
+              <div className="mt-3 p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200 flex items-center gap-2">
+                <AlertCircle size={16} className="shrink-0 text-red-600" />
+                <span>{shippingFormError}</span>
+              </div>
+            )}
+
+            <div className="mt-4 p-3 bg-gray-50 rounded-xl text-xs space-y-1 text-gray-600">
+              <p>Customer: <strong>{shippingModalOrder.customer_name}</strong> ({shippingModalOrder.customer_email})</p>
+              <p>
+                Destination: {shippingModalOrder.shipping_address?.city}, {shippingModalOrder.shipping_address?.state} {shippingModalOrder.shipping_address?.postal_code}
+              </p>
+            </div>
+
+            <form onSubmit={handleConfirmShipping} className="mt-4 space-y-3.5">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  Courier / Carrier Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. BlueDart, Delhivery, DTDC, FedEx"
+                  value={shippingCarrier}
+                  onChange={(e) => {
+                    setShippingCarrier(e.target.value);
+                    setShippingFormError('');
+                  }}
+                  className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  Shipping / Tracking ID (AWB) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. BLU982187349, AWB-78219"
+                  value={shippingTrackingNumber}
+                  onChange={(e) => {
+                    setShippingTrackingNumber(e.target.value);
+                    setShippingFormError('');
+                  }}
+                  className="w-full px-3.5 py-2 font-mono text-xs bg-gray-50 border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  Consignment Tracking URL <span className="text-gray-400 font-normal">(Optional)</span>
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://track.bluedart.com/..."
+                  value={shippingTrackingUrl}
+                  onChange={(e) => setShippingTrackingUrl(e.target.value)}
+                  className="w-full px-3.5 py-2 text-xs bg-gray-50 border border-gray-300 rounded-xl focus:border-[#143728] focus:outline-none"
+                />
+              </div>
+
+              <div className="p-3 bg-[#EFF7F2] text-[#143728] text-xs rounded-xl border border-[#C6E3D2]">
+                <p className="font-semibold flex items-center gap-1.5">
+                  <Mail size={13} />
+                  Automatic Customer Notification
+                </p>
+                <p className="text-[11px] mt-0.5 text-[#1b4b37]">
+                  Confirming shipment will update the order status to <strong>SHIPPED</strong> and immediately send the official NOTIONS® shipping &amp; tracking email with these details to <strong>{shippingModalOrder.customer_email}</strong> via Brevo.
+                </p>
+              </div>
+
+              <div className="flex gap-2 justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShippingModalOrder(null)}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-50 transition cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingShipping}
+                  className="px-5 py-2 bg-[#143728] text-white text-xs font-semibold rounded-xl hover:bg-[#0f291e] transition cursor-pointer flex items-center gap-1.5 disabled:opacity-60 shadow-sm"
+                >
+                  {isSubmittingShipping ? (
+                    <>
+                      <RefreshCw size={13} className="animate-spin" />
+                      Saving &amp; Dispatching...
+                    </>
+                  ) : (
+                    <>
+                      <Check size={13} />
+                      Save &amp; Confirm Shipping
+                    </>
+                  )}
                 </button>
               </div>
             </form>
