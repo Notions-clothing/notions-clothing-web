@@ -1952,14 +1952,14 @@
   ],
   "password_reset_otps": [
     {
-      "id": "otp-1793688029957-elvn",
+      "id": "otp-1793692365743-c3e0",
       "email": "mrithulmridhu6@gmail.com",
       "role": "customer",
-      "otp_hash": "32596eb8ac0d3082db51dab14b50528a6c4670b791f56eb12e9649b818d2c4b9",
+      "otp_hash": "e242427fdfcd7036c754b1eeed887b9fbbc0604b8be55ef080bed1b6926c13bd",
       "attempts": 1,
-      "expires_at": "2026-11-03T06:50:29.957Z",
-      "created_at": "2026-11-03T06:40:29.957Z",
-      "used": true
+      "expires_at": "2026-11-03T08:02:45.743Z",
+      "created_at": "2026-11-03T07:52:45.743Z",
+      "used": false
     }
   ]
 }
