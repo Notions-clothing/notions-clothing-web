@@ -1,13 +1,30 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import CartDrawer from '@/components/CartDrawer';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
+import JsonLd from '@/components/JsonLd';
 import { getProducts } from '@/lib/db';
 import { Tag } from 'lucide-react';
+import {
+  buildPageMetadata,
+  getCanonicalUrl,
+  getCollectionJsonLd,
+  getBreadcrumbJsonLd,
+} from '@/lib/seo';
 
 export const revalidate = 0;
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Seasonal Privileges & Offers — Exclusive Menswear Pricing',
+  description:
+    'Explore curated seasonal privileges and special pricing on opulent menswear, handcrafted shoes, and artisanal accessories at NOTIONS®.',
+  path: '/offers',
+  image: '/logo.png',
+  keywords: ['menswear sale', 'clothing privileges', 'luxury menswear discounts', 'NOTIONS offers'],
+});
 
 export default async function OffersPage() {
   const allProducts = await getProducts();
@@ -15,8 +32,22 @@ export default async function OffersPage() {
     (p) => p.compare_at_price && p.compare_at_price > p.price
   );
 
+  const pageUrl = getCanonicalUrl('/offers');
+  const collectionJsonLd = getCollectionJsonLd({
+    name: 'Seasonal Privileges & Offers',
+    description: 'Special pricing on selected opulent menswear pieces and handcrafted footwear.',
+    url: pageUrl,
+    products: discountedProducts,
+  });
+
+  const breadcrumbsJsonLd = getBreadcrumbJsonLd([
+    { name: 'Home', url: getCanonicalUrl('/') },
+    { name: 'Offers', url: pageUrl },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF9F5]">
+      <JsonLd data={[collectionJsonLd, breadcrumbsJsonLd]} />
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
@@ -41,7 +72,7 @@ export default async function OffersPage() {
               Sign up for our newsletter below to receive private invitations to exclusive archive sales.
             </p>
             <Link
-              href="/category/men"
+              href="/category/men-s-apparel"
               className="inline-block px-6 py-2.5 bg-[#143728] text-white text-xs font-semibold rounded-full hover:bg-[#0d281c] transition"
             >
               Shop All Menswear

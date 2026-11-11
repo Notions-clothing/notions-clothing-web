@@ -207,8 +207,9 @@ export default function HeroBanner({ banners: initialBanners, banner: singleBann
             const itemTitle = item.title || 'Every Outfit a Statement.';
             const itemSubtitle = item.subtitle || 'NEW COLLECTION';
             const itemDescription = item.description || "Premium men's fashion for your everyday journey.";
-            const itemCtaUrl = item.cta_url || '/category/men';
+            const itemCtaUrl = item.cta_url || '/category/men-s-apparel';
             const itemCtaLabel = item.cta_label || 'Shop Now';
+            const isPrimarySlide = total > 1 ? idx === 1 : idx === 0;
 
             return (
               <div
@@ -220,7 +221,7 @@ export default function HeroBanner({ banners: initialBanners, banner: singleBann
                   src={itemSrc}
                   alt={itemTitle}
                   fill
-                  priority={total > 1 ? idx === 1 : idx === 0}
+                  priority={isPrimarySlide}
                   sizes="(max-width: 1280px) 100vw, 1280px"
                   className="object-cover object-[68%_12%] md:object-[center_16%]"
                 />
@@ -237,9 +238,15 @@ export default function HeroBanner({ banners: initialBanners, banner: singleBann
                       </span>
                     )}
 
-                    <h1 className="font-serif text-[30px] sm:text-[46px] lg:text-[54px] text-[#161616] leading-[1.08] tracking-tight mb-2 sm:mb-4">
-                      {renderFormattedTitle(itemTitle)}
-                    </h1>
+                    {isPrimarySlide ? (
+                      <h1 className="font-serif text-[30px] sm:text-[46px] lg:text-[54px] text-[#161616] leading-[1.08] tracking-tight mb-2 sm:mb-4">
+                        {renderFormattedTitle(itemTitle)}
+                      </h1>
+                    ) : (
+                      <h2 className="font-serif text-[30px] sm:text-[46px] lg:text-[54px] text-[#161616] leading-[1.08] tracking-tight mb-2 sm:mb-4">
+                        {renderFormattedTitle(itemTitle)}
+                      </h2>
+                    )}
 
                     {itemDescription && (
                       <p className="text-xs sm:text-[15px] text-[#3B3730] mb-4 sm:mb-6 leading-relaxed font-normal">

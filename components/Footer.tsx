@@ -88,14 +88,14 @@ export default function Footer() {
               }`}
             >
               <ul className="space-y-2 text-[#555555]">
-                <li><Link href="/category/men-shirts" className="hover:text-[#143728] transition block py-0.5">Shirts</Link></li>
-                <li><Link href="/category/men-jeans" className="hover:text-[#143728] transition block py-0.5">Jeans</Link></li>
-                <li><Link href="/category/men-trousers" className="hover:text-[#143728] transition block py-0.5">Trousers</Link></li>
-                <li><Link href="/category/men-t-shirts" className="hover:text-[#143728] transition block py-0.5">T-shirts</Link></li>
-                <li><Link href="/category/men-shorts" className="hover:text-[#143728] transition block py-0.5">Shorts</Link></li>
-                <li><Link href="/category/men-jackets" className="hover:text-[#143728] transition block py-0.5">Jackets</Link></li>
-                <li><Link href="/category/men-dhothis" className="hover:text-[#143728] transition block py-0.5">Dhothis</Link></li>
-                <li><Link href="/category/men-kurta" className="hover:text-[#143728] transition block py-0.5">Kurta</Link></li>
+                <li><Link href="/category/shirts" className="hover:text-[#143728] transition block py-0.5">Shirts</Link></li>
+                <li><Link href="/category/jeans" className="hover:text-[#143728] transition block py-0.5">Jeans</Link></li>
+                <li><Link href="/category/trousers" className="hover:text-[#143728] transition block py-0.5">Trousers</Link></li>
+                <li><Link href="/category/t-shirt" className="hover:text-[#143728] transition block py-0.5">T-shirts</Link></li>
+                <li><Link href="/category/shorts" className="hover:text-[#143728] transition block py-0.5">Shorts</Link></li>
+                <li><Link href="/category/jackets" className="hover:text-[#143728] transition block py-0.5">Jackets</Link></li>
+                <li><Link href="/category/dhothis" className="hover:text-[#143728] transition block py-0.5">Dhothis</Link></li>
+                <li><Link href="/category/kurta" className="hover:text-[#143728] transition block py-0.5">Kurta</Link></li>
               </ul>
             </div>
           </div>
@@ -125,10 +125,10 @@ export default function Footer() {
               }`}
             >
               <ul className="space-y-2 text-[#555555]">
-                <li><Link href="/category/shoes" className="hover:text-[#143728] transition block py-0.5">Shoes</Link></li>
+                <li><Link href="/category/shoe" className="hover:text-[#143728] transition block py-0.5">Shoes</Link></li>
                 <li><Link href="/category/sandals" className="hover:text-[#143728] transition block py-0.5">Sandals</Link></li>
                 <li><Link href="/category/caps" className="hover:text-[#143728] transition block py-0.5">Caps</Link></li>
-                <li><Link href="/category/rings" className="hover:text-[#143728] transition block py-0.5">Rings</Link></li>
+                <li><Link href="/category/ring" className="hover:text-[#143728] transition block py-0.5">Rings</Link></li>
                 <li><Link href="/category/bracelet" className="hover:text-[#143728] transition block py-0.5">Bracelet</Link></li>
                 <li><Link href="/category/chain" className="hover:text-[#143728] transition block py-0.5">Chain</Link></li>
                 <li><Link href="/new-arrivals" className="hover:text-[#143728] transition block py-0.5">New Arrivals</Link></li>

@@ -8,15 +8,25 @@ import {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    let body: any;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid or missing JSON payload' }, { status: 400 });
+    }
+
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json({ error: 'Invalid request payload' }, { status: 400 });
+    }
+
     const { items, customer, existingReservationToken } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
+      return NextResponse.json({ error: 'Cart is empty or items array is missing' }, { status: 400 });
     }
 
-    if (!customer || !customer.email || !customer.name || !customer.phone) {
-      return NextResponse.json({ error: 'Missing customer contact details' }, { status: 400 });
+    if (!customer || typeof customer !== 'object' || !customer.email || !customer.name || !customer.phone) {
+      return NextResponse.json({ error: 'Missing customer contact details (name, email, phone)' }, { status: 400 });
     }
 
     const orderNumber = `NOT-${Date.now().toString().slice(-6)}`;

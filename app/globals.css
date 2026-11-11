@@ -49,9 +49,15 @@ html {
 
 /* Pre-intro sequence: prevent homepage flashing before animation */
 html.notions-intro-pending #homepage-content-wrapper {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.notions-intro-pending #homepage-content-wrapper {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 #homepage-content-wrapper {

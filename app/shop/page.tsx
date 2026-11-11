@@ -1,11 +1,29 @@
 import React, { Suspense } from 'react';
+import type { Metadata } from 'next';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ShopClient from '@/components/ShopClient';
+import JsonLd from '@/components/JsonLd';
 import { ProductCardSkeleton } from '@/components/Skeleton';
 import { getProducts, getCategories } from '@/lib/db';
+import { buildPageMetadata, getCollectionJsonLd, getBreadcrumbJsonLd, getCanonicalUrl } from '@/lib/seo';
 
 export const revalidate = 0; // Always serve fresh catalog data
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'Shop All Collections — Luxury Menswear & Accessories',
+  description:
+    'Explore the complete NOTIONS® luxury catalog: bespoke shirts, fine tailored trousers, raw denim, opulent footwear, and handcrafted jewelry accessories.',
+  path: '/shop',
+  image: '/logo.png',
+  keywords: [
+    'shop menswear',
+    'luxury apparel catalog',
+    "men's designer clothes",
+    'bespoke shirts',
+    'luxury shoes',
+  ],
+});
 
 export default async function ShopPage() {
   const [products, categories] = await Promise.all([
@@ -13,8 +31,22 @@ export default async function ShopPage() {
     getCategories(),
   ]);
 
+  const shopUrl = getCanonicalUrl('/shop');
+  const collectionJsonLd = getCollectionJsonLd({
+    name: 'All Collections',
+    description: 'Explore the complete NOTIONS® luxury menswear and accessories catalog.',
+    url: shopUrl,
+    products,
+  });
+
+  const breadcrumbsJsonLd = getBreadcrumbJsonLd([
+    { name: 'Home', url: getCanonicalUrl('/') },
+    { name: 'Shop', url: shopUrl },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF9F5]">
+      <JsonLd data={[collectionJsonLd, breadcrumbsJsonLd]} />
       <Navbar />
 
       <main className="flex-1">

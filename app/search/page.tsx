@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import CartDrawer from '@/components/CartDrawer';
@@ -6,11 +7,21 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { getProducts } from '@/lib/db';
 import { Search } from 'lucide-react';
+import { buildPrivateMetadata } from '@/lib/seo';
 
 export const revalidate = 0;
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string }>;
+}
+
+export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
+  const { q } = await searchParams;
+  const query = q?.trim() || '';
+  return buildPrivateMetadata(
+    query ? `Search: "${query}"` : 'Search Catalog',
+    '/search'
+  );
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
@@ -56,7 +67,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               Try searching for "Linen", "Jeans", "Sneaker", "Tee", or browse by collection.
             </p>
             <Link
-              href="/category/men"
+              href="/category/men-s-apparel"
               className="inline-block px-5 py-2.5 bg-[#143728] text-white text-xs font-semibold rounded-full hover:bg-[#0d281c] transition"
             >
               Browse Men's Apparel

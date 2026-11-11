@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import ProductCard from './ProductCard';
 import { Product } from '@/types/database';
 import { Loader2 } from 'lucide-react';
@@ -111,9 +112,17 @@ export default function AllProductsSection({
             All Products
           </h2>
         </div>
-        <p className="text-xs text-[#736E65]">
-          Showing {products.length} {initialTotal ? `of ${initialTotal}` : ''} opulent pieces
-        </p>
+        <div className="flex items-center gap-4">
+          <p className="text-xs text-[#736E65]">
+            Showing {products.length} {initialTotal ? `of ${initialTotal}` : ''} opulent pieces
+          </p>
+          <Link
+            href="/shop"
+            className="text-xs font-semibold text-[#143728] hover:underline hidden sm:inline-block"
+          >
+            Browse Full Catalog →
+          </Link>
+        </div>
       </div>
 
       {/* Product Grid: 5 columns on desktop (lg:grid-cols-5) -> 2 rows of 5 = 10 */}
@@ -147,6 +156,14 @@ export default function AllProductsSection({
           </button>
         </div>
       )}
+
+      <noscript>
+        <div className="mt-8 text-center">
+          <Link href="/shop" className="text-xs font-semibold text-[#143728] underline">
+            Browse all products in our complete catalog →
+          </Link>
+        </div>
+      </noscript>
 
       {/* Infinite Scroll Sentinel and Indicator */}
       {infiniteScrollActive && (
