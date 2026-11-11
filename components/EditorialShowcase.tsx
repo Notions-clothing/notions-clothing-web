@@ -9,7 +9,7 @@ import { Banner } from '@/types/database';
 export function ModernEssentialsCard({ banner }: { banner?: Banner }) {
   const title = banner?.title || 'For Every Version of You.';
   const subtitle = banner?.subtitle || 'MODERN ESSENTIALS';
-  const ctaUrl = banner?.cta_url || '/category/men';
+  const ctaUrl = banner?.cta_url || '/category/men-s-apparel';
   const ctaLabel = banner?.cta_label || 'Explore Collection';
   const bgSrc = banner?.image_url || '/logo.png';
 
@@ -84,7 +84,7 @@ export function PromoBannersRow({
       defaultTitle: 'FOOTWEAR THAT MOVES YOU',
       defaultDesc: 'Premium shoes & sandals for every step.',
       defaultCta: 'Shop Footwear',
-      defaultUrl: '/category/footwear',
+      defaultUrl: '/category/foot-wear',
     },
     {
       id: 'accessories',

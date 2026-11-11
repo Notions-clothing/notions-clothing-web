@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Navbar from '@/components/Navbar';
 import SplashScreen from '@/components/SplashScreen';
 import HeroBanner from '@/components/HeroBanner';
@@ -9,8 +10,24 @@ import BrandShowcaseSection from '@/components/BrandShowcaseSection';
 import AllProductsSection from '@/components/AllProductsSection';
 import Footer from '@/components/Footer';
 import { getCategories, getProducts, getBanners, getBrandShowcase } from '@/lib/db';
+import { buildPageMetadata } from '@/lib/seo';
 
 export const revalidate = 0; // Ensure fresh data on every visit
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'NOTIONS® — Opulent Clothing | Luxury Menswear & Accessories',
+  description:
+    'Discover timeless luxury, opulent menswear, handcrafted footwear, and refined accessories at NOTIONS®. Designed for the modern discerning gentleman.',
+  path: '/',
+  image: '/logo.png',
+  keywords: [
+    'luxury menswear',
+    'opulent clothing',
+    "men's designer fashion",
+    'bespoke menswear',
+    'luxury footwear',
+  ],
+});
 
 export default async function HomePage() {
   const categories = await getCategories();

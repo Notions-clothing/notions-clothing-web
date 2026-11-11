@@ -1,18 +1,96 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getOrdersAdmin, saveOrder, deleteOrder } from '@/lib/db';
 import { sendOrderStatusEmail } from '@/lib/email';
 import { Order } from '@/types/database';
+import { createClient } from '@/utils/supabase/server';
+import { cookies } from 'next/headers';
 
-export async function GET() {
+/**
+ * Validates whether the incoming request is from an authorized administrator.
+ * Reuses both the existing HTTP-only admin cookie and Supabase session auth.
+ * Returns { authorized: true } or appropriate 401/403 status and message.
+ */
+async function checkAdminAuthorization(
+  req: NextRequest
+): Promise<{ authorized: boolean; status?: number; error?: string }> {
+  // 1. Check HTTP-only admin session cookie established via /api/admin/auth
+  const adminCookie = req.cookies.get('notions_admin_auth');
+  if (adminCookie?.value === 'authenticated') {
+    return { authorized: true };
+  }
+
+  // 2. Check Supabase authenticated session
+  try {
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const adminEmail = (process.env.ADMIN_EMAIL || 'admin@notionsclothing.com').toLowerCase();
+      const userRole = user.app_metadata?.role || user.user_metadata?.role;
+      const isAdmin = userRole === 'admin' || user.email?.toLowerCase() === adminEmail;
+
+      if (isAdmin) {
+        return { authorized: true };
+      }
+      // Authenticated, but lacking administrator role
+      return {
+        authorized: false,
+        status: 403,
+        error: 'Forbidden: Administrative privileges required',
+      };
+    }
+  } catch {
+    // Non-blocking fallback to customer session check
+  }
+
+  // 3. Check customer session cookie (authenticated non-admin)
+  const customerSession = req.cookies.get('notions_customer_session');
+  if (customerSession?.value) {
+    try {
+      const sessionData = JSON.parse(Buffer.from(customerSession.value, 'base64').toString('utf8'));
+      if (sessionData?.id) {
+        return {
+          authorized: false,
+          status: 403,
+          error: 'Forbidden: Administrative privileges required',
+        };
+      }
+    } catch {
+      // Invalid format
+    }
+  }
+
+  // 4. Anonymous / Unauthenticated
+  return {
+    authorized: false,
+    status: 401,
+    error: 'Unauthorized: Authentication required',
+  };
+}
+
+export async function GET(req: NextRequest) {
+  const auth = await checkAdminAuthorization(req);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 401 });
+  }
+
   const orders = await getOrdersAdmin();
   return NextResponse.json(orders);
 }
 
 const VALID_ORDER_STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
+  const auth = await checkAdminAuthorization(req);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 401 });
+  }
+
   try {
-    const data = await request.json();
+    const data = await req.json();
     const allOrders = await getOrdersAdmin();
     const existing: Order | undefined = allOrders.find(
       (o) => (data.id && o.id === data.id) || (data.order_number && o.order_number === data.order_number)
@@ -47,7 +125,6 @@ export async function POST(request: Request) {
     }
 
     // 3. Keep Payment Status Separate from Order Status
-    // Changing order status must NEVER alter payment status.
     const allowedPaymentStatuses = ['pending', 'paid', 'failed', 'refunded'];
     const newPaymentStatus =
       data.payment_status && allowedPaymentStatuses.includes(data.payment_status)
@@ -101,7 +178,6 @@ export async function POST(request: Request) {
             status_email_sent_at: new Date().toISOString(),
           });
         } else if (explicitSendRequested) {
-          // If explicit resend was requested and failed, return an error response
           return NextResponse.json(
             {
               error: emailResult.message || 'Failed to dispatch shipping notification email via Brevo.',
@@ -127,9 +203,14 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(req: NextRequest) {
+  const auth = await checkAdminAuthorization(req);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 401 });
+  }
+
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
     if (!id) {
       return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });

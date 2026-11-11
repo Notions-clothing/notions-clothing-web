@@ -17,7 +17,12 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         localStorage.getItem('notions_splash_seen') === 'true' ||
         sessionStorage.getItem('notions_splash_seen') === 'true';
 
-      if (alreadySeen) {
+      const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (alreadySeen || prefersReducedMotion) {
         document.documentElement.classList.remove('notions-intro-pending');
         if (onComplete) onComplete();
         return;

@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Order } from '@/types/database';
-import { CheckCircle2, ArrowRight } from 'lucide-react';
+import { CheckCircle2, ArrowRight, ShieldCheck, Mail, Loader2 } from 'lucide-react';
 
 export default function OrderConfirmationPage() {
   const params = useParams();
@@ -19,6 +19,41 @@ export default function OrderConfirmationPage() {
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
+  const [verifyEmail, setVerifyEmail] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const fetchOrderByEmail = async (emailToVerify: string) => {
+    if (!emailToVerify.trim()) {
+      setErrorMsg('Please enter your email address.');
+      return false;
+    }
+    setVerifying(true);
+    setErrorMsg('');
+
+    try {
+      const res = await fetch(
+        `/api/orders/lookup?orderNumber=${encodeURIComponent(cleanNum || orderNumber)}&email=${encodeURIComponent(emailToVerify.trim())}`
+      );
+      const data = await res.json();
+
+      if (res.ok && data.success && data.order) {
+        setOrder(data.order);
+        try {
+          sessionStorage.setItem(`notions_order_${cleanNum}`, JSON.stringify(data.order));
+        } catch (e) {}
+        return true;
+      } else {
+        setErrorMsg(data.error || 'No matching order found for this email.');
+        return false;
+      }
+    } catch (err) {
+      setErrorMsg('Unable to verify order. Please check your network connection.');
+      return false;
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   useEffect(() => {
     // 1. Try reading from sessionStorage or localStorage
@@ -45,199 +80,266 @@ export default function OrderConfirmationPage() {
       console.error('Failed to parse cached order:', e);
     }
 
-    // 2. Try fetching order from server API
-    fetch('/api/admin/orders')
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          const match = data.find((o: Order) => {
-            const oNum = (o.order_number || '').replace(/^#/, '').toLowerCase();
-            return (
-              oNum === cleanNum.toLowerCase() ||
-              o.id === orderNumber ||
-              o.id === cleanNum
-            );
-          });
-          if (match) {
-            setOrder(match);
-          }
-        }
-      })
-      .catch((err) => console.error('Failed to fetch order:', err))
-      .finally(() => setLoading(false));
+    // 2. Try reading email from URL search params (e.g. redirected from checkout)
+    const urlEmail =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search).get('email')?.trim() || ''
+        : '';
+
+    if (urlEmail) {
+      setVerifyEmail(urlEmail);
+      fetchOrderByEmail(urlEmail).finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
   }, [orderNumber, cleanNum]);
+
+  const handleManualVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetchOrderByEmail(verifyEmail);
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF9F5]">
       <Navbar />
 
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
-        {/* Success Banner */}
-        <div className="text-center mb-10">
-         
-          <span className="text-xs font-semibold uppercase tracking-widest text-[#143728]">
-            Order Confirmed & Paid
-          </span>
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#181818] mt-2 mb-2">
-            {order?.customer_name ? `Thank you, ${order.customer_name}` : 'Thank you for your order'}
-          </h1>
-          <p className="text-xs sm:text-sm text-[#5C574F] max-w-md mx-auto">
-            Your opulent order <strong className="text-[#181818]">#{order?.order_number || cleanNum}</strong> has been secured.
-            {order?.customer_email && (
-              <> A confirmation notice has been sent to <strong className="text-[#181818]">{order.customer_email}</strong>.</>
-            )}
-          </p>
-        </div>
-
-        {/* Order Details Card */}
-        <div className="bg-white rounded-2xl border border-[#EDE8DE] p-6 sm:p-8 space-y-6 shadow-2xs">
-          <div className="flex flex-col sm:flex-row justify-between pb-6 border-b border-[#EDE8DE] gap-4 text-xs">
-            <div>
-              <span className="text-[#7A756D] block">Order Number</span>
-              <strong className="text-sm text-[#181818]">#{order?.order_number || cleanNum}</strong>
-            </div>
-            <div>
-              <span className="text-[#7A756D] block">Date Placed</span>
-              <strong className="text-sm text-[#181818]">
-                {order?.created_at
-                  ? new Date(order.created_at).toLocaleDateString('en-IN', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })
-                  : new Date().toLocaleDateString('en-IN', {
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric',
-                    })}
-              </strong>
-            </div>
-            <div>
-              <span className="text-[#7A756D] block">Payment Gateway</span>
-              <span className="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-[#D9EFE0] text-[#143728]">
-                Razorpay Verified
-              </span>
-            </div>
-            <div>
-              <span className="text-[#7A756D] block">Fulfillment Status</span>
-              <span className="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-[#F5F2EB] text-[#181818]">
-                {(order?.status || 'CONFIRMED').toUpperCase()}
-              </span>
-            </div>
+        {loading ? (
+          <div className="py-24 text-center">
+            <Loader2 className="w-8 h-8 text-[#143728] animate-spin mx-auto mb-4" />
+            <p className="text-xs uppercase tracking-widest text-[#7A756D]">Retrieving order verification...</p>
           </div>
+        ) : order ? (
+          <>
+            {/* Success Banner */}
+            <div className="text-center mb-10">
+              <span className="text-xs font-semibold uppercase tracking-widest text-[#143728]">
+                Order Confirmed & Paid
+              </span>
+              <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#181818] mt-2 mb-2">
+                {order?.customer_name ? `Thank you, ${order.customer_name}` : 'Thank you for your order'}
+              </h1>
+              <p className="text-xs sm:text-sm text-[#5C574F] max-w-md mx-auto">
+                Your opulent order <strong className="text-[#181818]">#{order?.order_number || cleanNum}</strong> has been secured.
+                {order?.customer_email && (
+                  <> A confirmation notice has been sent to <strong className="text-[#181818]">{order.customer_email}</strong>.</>
+                )}
+              </p>
+            </div>
 
-          {/* Items List */}
-          {order?.items && order.items.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-[#143728]">
-                Purchased Items
-              </h3>
-              <div className="divide-y divide-[#EDE8DE]">
-                {order.items.map((item: any, idx: number) => {
-                  const unitPrice = Number(item.unit_price ?? item.unitPrice ?? item.price ?? 0);
-                  const qty = Number(item.quantity ?? 1);
-                  const lineTotal = Number(item.line_total ?? unitPrice * qty);
-                  const prodName = item.product_name || item.productName || item.name || 'Men’s Apparel';
-                  const imgUrl = item.image_url || item.imageUrl || item.image || item.selectedColorImage;
-                  const sizeLabel = item.variant_label || item.variantLabel || item.selectedSize || item.size;
-                  const colorName = item.selected_color || item.selectedColor || item.color;
-                  const colorHex = item.selected_color_hex || item.selectedColorHex;
+            {/* Order Details Card */}
+            <div className="bg-white rounded-2xl border border-[#EDE8DE] p-6 sm:p-8 space-y-6 shadow-2xs">
+              <div className="flex flex-col sm:flex-row justify-between pb-6 border-b border-[#EDE8DE] gap-4 text-xs">
+                <div>
+                  <span className="text-[#7A756D] block">Order Number</span>
+                  <strong className="text-sm text-[#181818]">#{order?.order_number || cleanNum}</strong>
+                </div>
+                <div>
+                  <span className="text-[#7A756D] block">Date Placed</span>
+                  <strong className="text-sm text-[#181818]">
+                    {order?.created_at
+                      ? new Date(order.created_at).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })
+                      : new Date().toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                  </strong>
+                </div>
+                <div>
+                  <span className="text-[#7A756D] block">Payment Gateway</span>
+                  <span className="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-[#D9EFE0] text-[#143728]">
+                    Razorpay Verified
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[#7A756D] block">Fulfillment Status</span>
+                  <span className="inline-block mt-0.5 px-2 py-0.5 rounded text-[10px] font-semibold bg-[#F5F2EB] text-[#181818]">
+                    {(order?.status || 'CONFIRMED').toUpperCase()}
+                  </span>
+                </div>
+              </div>
 
-                  return (
-                    <div key={item.id || item.product_id || idx} className="py-3 flex items-center justify-between text-xs">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-12 h-14 relative bg-[#F5F3EF] rounded overflow-hidden flex-shrink-0">
-                          {imgUrl ? (
-                            <Image src={imgUrl} alt={prodName} fill className="object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-[10px] text-[#888888] font-bold">N</div>
-                          )}
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-[#181818]">{prodName}</h4>
-                          <p className="text-[#7A756D] text-[11px] flex items-center flex-wrap gap-1 mt-0.5">
-                            {sizeLabel && <span>Size: {sizeLabel}</span>}
-                            {colorName && (
-                              <span className="flex items-center gap-1">
-                                •
-                                {colorHex && (
-                                  <span
-                                    className="inline-block w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs"
-                                    style={{ backgroundColor: colorHex }}
-                                  />
+              {/* Items List */}
+              {order?.items && order.items.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#143728]">
+                    Purchased Items
+                  </h3>
+                  <div className="divide-y divide-[#EDE8DE]">
+                    {order.items.map((item: any, idx: number) => {
+                      const unitPrice = Number(item.unit_price ?? item.unitPrice ?? item.price ?? 0);
+                      const qty = Number(item.quantity ?? 1);
+                      const lineTotal = Number(item.line_total ?? unitPrice * qty);
+                      const prodName = item.product_name || item.productName || item.name || 'Men’s Apparel';
+                      const imgUrl = item.image_url || item.imageUrl || item.image || item.selectedColorImage;
+                      const sizeLabel = item.variant_label || item.variantLabel || item.selectedSize || item.size;
+                      const colorName = item.selected_color || item.selectedColor || item.color;
+                      const colorHex = item.selected_color_hex || item.selectedColorHex;
+
+                      return (
+                        <div key={item.id || item.product_id || idx} className="py-3 flex items-center justify-between text-xs">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-12 h-14 relative bg-[#F5F3EF] rounded overflow-hidden flex-shrink-0">
+                              {imgUrl ? (
+                                <Image src={imgUrl} alt={prodName} fill className="object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-[10px] text-[#888888] font-bold">N</div>
+                              )}
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-[#181818]">{prodName}</h4>
+                              <p className="text-[#7A756D] text-[11px] flex items-center flex-wrap gap-1 mt-0.5">
+                                {sizeLabel && <span>Size: {sizeLabel}</span>}
+                                {colorName && (
+                                  <span className="flex items-center gap-1">
+                                    •
+                                    {colorHex && (
+                                      <span
+                                        className="inline-block w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs"
+                                        style={{ backgroundColor: colorHex }}
+                                      />
+                                    )}
+                                    <span className="text-[#181818] font-medium">{colorName}</span>
+                                  </span>
                                 )}
-                                <span className="text-[#181818] font-medium">{colorName}</span>
-                              </span>
-                            )}
-                            <span>• Qty: {qty}</span>
-                          </p>
+                                <span>• Qty: {qty}</span>
+                              </p>
+                            </div>
+                          </div>
+                          <span className="font-bold text-[#181818]">
+                            ₹{lineTotal.toLocaleString('en-IN')}
+                          </span>
                         </div>
-                      </div>
-                      <span className="font-bold text-[#181818]">
-                        ₹{lineTotal.toLocaleString('en-IN')}
-                      </span>
-                    </div>
-                  );
-                })}
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Totals & Delivery Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-[#EDE8DE] text-xs">
+                {/* Delivery Destination */}
+                <div className="bg-[#FAF9F5] p-4 rounded-xl border border-[#EDE8DE]">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#143728] block mb-2">
+                    Delivery Destination
+                  </span>
+                  {order?.shipping_address ? (
+                    <p className="text-[#333333] leading-relaxed">
+                      <strong>{order.customer_name}</strong><br />
+                      {order.shipping_address.street}<br />
+                      {order.shipping_address.city}, {order.shipping_address.state} - {order.shipping_address.postal_code}<br />
+                      {order.customer_phone && <>Phone: {order.customer_phone}</>}
+                    </p>
+                  ) : (
+                    <p className="text-[#5C574F] leading-relaxed">
+                      Garments dispatched via courier concierge directly to your shipping destination.
+                    </p>
+                  )}
+                </div>
+
+                {/* Financial Summary */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-[#555555]">
+                    <span>Subtotal</span>
+                    <span className="font-medium text-[#181818]">
+                      ₹{(order?.subtotal || order?.total_amount || 0).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-[#555555]">
+                    <span>Shipping</span>
+                    <span className="font-medium text-[#181818]">
+                      {order?.shipping_amount === 0 || !order ? 'Complimentary' : `₹${order.shipping_amount}`}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-base font-bold text-[#181818] pt-2 border-t border-[#EDE8DE]">
+                    <span>Amount Paid</span>
+                    <span className="text-[#143728]">
+                      ₹{(order?.total_amount || 0).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
 
-          {/* Totals & Delivery Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-[#EDE8DE] text-xs">
-            {/* Delivery Destination */}
-            <div className="bg-[#FAF9F5] p-4 rounded-xl border border-[#EDE8DE]">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#143728] block mb-2">
-                Delivery Destination
-              </span>
-              {order?.shipping_address ? (
-                <p className="text-[#333333] leading-relaxed">
-                  <strong>{order.customer_name}</strong><br />
-                  {order.shipping_address.street}<br />
-                  {order.shipping_address.city}, {order.shipping_address.state} - {order.shipping_address.postal_code}<br />
-                  Phone: {order.customer_phone}
-                </p>
-              ) : (
-                <p className="text-[#5C574F] leading-relaxed">
-                  Garments dispatched via courier concierge directly to your shipping destination.
+            {/* Back to Home CTA */}
+            <div className="mt-8 text-center">
+              <Link
+                href="/"
+                className="inline-flex items-center space-x-2 px-8 py-3 bg-[#143728] hover:bg-[#0d281c] text-white text-xs font-semibold rounded-full transition shadow-sm"
+              >
+                <span>Return to Storefront</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </>
+        ) : (
+          /* Secure Verification Prompt for Uncached / Direct Navigation */
+          <div className="max-w-md mx-auto my-12 bg-white rounded-2xl border border-[#EDE8DE] p-8 text-center shadow-sm">
+            <div className="w-12 h-12 bg-[#F3EFE6] rounded-full flex items-center justify-center mx-auto mb-4 text-[#143728]">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <h2 className="font-serif text-2xl font-bold text-[#181818] mb-2">
+              Verify Order Ownership
+            </h2>
+            <p className="text-xs text-[#6B665E] mb-6 leading-relaxed">
+              To protect customer privacy, please enter the verified email address associated with Order <strong className="text-[#181818]">#{cleanNum || orderNumber}</strong>.
+            </p>
+
+            <form onSubmit={handleManualVerify} className="space-y-4">
+              <div className="relative text-left">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#7A756D] mb-1">
+                  Customer Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-[#A0988A] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="email"
+                    required
+                    value={verifyEmail}
+                    onChange={(e) => setVerifyEmail(e.target.value)}
+                    placeholder="name@example.com"
+                    className="w-full pl-10 pr-4 py-2.5 bg-[#FAF9F5] border border-[#DDD6C8] rounded-xl text-xs text-[#181818] focus:outline-hidden focus:border-[#143728]"
+                  />
+                </div>
+              </div>
+
+              {errorMsg && (
+                <p className="text-xs text-[#D9383A] bg-[#FDEDEC] p-2.5 rounded-lg border border-[#FADBD8]">
+                  {errorMsg}
                 </p>
               )}
-            </div>
 
-            {/* Financial Summary */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-[#555555]">
-                <span>Subtotal</span>
-                <span className="font-medium text-[#181818]">
-                  ₹{(order?.subtotal || order?.total_amount || 0).toLocaleString('en-IN')}
-                </span>
-              </div>
-              <div className="flex justify-between text-[#555555]">
-                <span>Shipping</span>
-                <span className="font-medium text-[#181818]">
-                  {order?.shipping_amount === 0 || !order ? 'Complimentary' : `₹${order.shipping_amount}`}
-                </span>
-              </div>
-              <div className="flex justify-between text-base font-bold text-[#181818] pt-2 border-t border-[#EDE8DE]">
-                <span>Amount Paid</span>
-                <span className="text-[#143728]">
-                  ₹{(order?.total_amount || 0).toLocaleString('en-IN')}
-                </span>
-              </div>
+              <button
+                type="submit"
+                disabled={verifying}
+                className="w-full py-3 bg-[#143728] hover:bg-[#0d281c] text-white text-xs font-semibold rounded-xl transition flex items-center justify-center space-x-2 disabled:opacity-50"
+              >
+                {verifying ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Verifying Order...</span>
+                  </>
+                ) : (
+                  <span>Verify & Access Order</span>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-6 pt-6 border-t border-[#EDE8DE]">
+              <Link
+                href="/account"
+                className="text-xs text-[#7A756D] hover:text-[#143728] transition font-medium"
+              >
+                Sign in to your NOTIONS account
+              </Link>
             </div>
           </div>
-        </div>
-
-        {/* Back to Home CTA */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center space-x-2 px-8 py-3 bg-[#143728] hover:bg-[#0d281c] text-white text-xs font-semibold rounded-full transition shadow-sm"
-          >
-            <span>Return to Storefront</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+        )}
       </main>
 
       <Footer />

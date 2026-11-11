@@ -276,7 +276,8 @@ export default function CheckoutPage() {
                   sessionStorage.setItem(`notions_order_${orderData.orderNumber}`, JSON.stringify(verifyData.order));
                 }
               } catch (e) {}
-              router.push(`/order-confirmation/${orderData.orderNumber}`);
+              const emailParam = formData?.email ? `?email=${encodeURIComponent(formData.email.trim())}` : '';
+              router.push(`/order-confirmation/${orderData.orderNumber}${emailParam}`);
             } else {
               setErrorMsg(verifyData.error || 'Payment verification failed. Please contact support.');
               setLoading(false);

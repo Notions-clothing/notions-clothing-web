@@ -1,20 +1,51 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import CartDrawer from '@/components/CartDrawer';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
+import JsonLd from '@/components/JsonLd';
 import { getProducts } from '@/lib/db';
 import { Sparkles } from 'lucide-react';
+import {
+  buildPageMetadata,
+  getCanonicalUrl,
+  getCollectionJsonLd,
+  getBreadcrumbJsonLd,
+} from '@/lib/seo';
 
 export const revalidate = 0;
+
+export const metadata: Metadata = buildPageMetadata({
+  title: 'New Arrivals — Seasonal Luxury Menswear & Accessories',
+  description:
+    'Discover the latest opulent arrivals at NOTIONS®. Fresh seasonal menswear silhouettes, refined shirting, and handcrafted footwear tailored from fine natural fabrics.',
+  path: '/new-arrivals',
+  image: '/logo.png',
+  keywords: ['new arrivals', 'latest menswear', 'luxury new fashion', 'NOTIONS new collection'],
+});
 
 export default async function NewArrivalsPage() {
   const allProducts = await getProducts();
   const newArrivals = allProducts.filter((p) => p.is_new_arrival || p.is_bestseller);
 
+  const pageUrl = getCanonicalUrl('/new-arrivals');
+  const collectionJsonLd = getCollectionJsonLd({
+    name: 'New Arrivals',
+    description: 'Fresh seasonal luxury silhouettes tailored from fine natural fabrics.',
+    url: pageUrl,
+    products: newArrivals,
+  });
+
+  const breadcrumbsJsonLd = getBreadcrumbJsonLd([
+    { name: 'Home', url: getCanonicalUrl('/') },
+    { name: 'New Arrivals', url: pageUrl },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF9F5]">
+      <JsonLd data={[collectionJsonLd, breadcrumbsJsonLd]} />
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">

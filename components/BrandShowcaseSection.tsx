@@ -70,7 +70,7 @@ export default function BrandShowcaseSection({ brandShowcase }: BrandShowcaseSec
                 <div className="relative h-8 sm:h-16 w-28 sm:w-52">
                   <Image
                     src={brand_logo_url}
-                    alt="Brand Logo"
+                    alt="TANAY by NOTIONS® Brand Logo"
                     fill
                     className="object-contain object-left"
                   />

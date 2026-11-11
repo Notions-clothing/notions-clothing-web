@@ -36,7 +36,7 @@ function formatCurrency(amount: number): string {
  * Wraps content in the official NOTIONS® Opulent Clothing responsive HTML email shell.
  */
 function getEmailShell(contentHtml: string, previewText?: string): string {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://notionsclothing.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.notionsonline.in';
   const senderEmail = process.env.BREVO_SENDER_EMAIL || 'concierge@notionsclothing.com';
 
   return `<!DOCTYPE html>
@@ -203,7 +203,7 @@ export async function sendWelcomeEmail(options: { email: string; name: string })
     return { success: false, message: 'Email is required.' };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://notionsclothing.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.notionsonline.in';
   const customerName = escapeHtml(name || 'Patron');
   const subject = `Welcome to NOTIONS Opulent Clothing`;
   const previewText = `Welcome to the Atelier, ${customerName}. Discover contemporary luxury.`;
@@ -526,7 +526,7 @@ export async function sendOrderStatusEmail(
     `
     : '';
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://notionsclothing.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.notionsonline.in';
   const lookupUrl = `${siteUrl}/account?orderNumber=${encodeURIComponent(order.order_number)}`;
 
   const bodyHtml = `

@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound, redirect } from 'next/navigation';
@@ -6,13 +7,56 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import CategorySortSelect from '@/components/CategorySortSelect';
+import JsonLd from '@/components/JsonLd';
 import { getCategoryBySlug, getCategories, getProducts } from '@/lib/db';
+import {
+  buildPageMetadata,
+  getCanonicalUrl,
+  getCollectionJsonLd,
+  getBreadcrumbJsonLd,
+} from '@/lib/seo';
 
 export const revalidate = 0;
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const currentCategory = await getCategoryBySlug(slug);
+
+  if (!currentCategory) {
+    if (slug === 'men' || slug === 'all' || slug === 'men-apparel' || slug === 'mens-apparel' || slug === 'footwear') {
+      return buildPageMetadata({
+        title: 'Redirecting...',
+        description: 'Redirecting to category catalog...',
+        path: `/category/${slug}`,
+        noIndex: true,
+      });
+    }
+    notFound();
+  }
+
+  const cleanDescription = currentCategory.description
+    ? currentCategory.description.replace(/\s+/g, ' ').trim().slice(0, 160)
+    : `Explore our hand-finished collection of opulent ${currentCategory.name} and bespoke luxury apparel at NOTIONS®.`;
+
+  return buildPageMetadata({
+    title: `${currentCategory.name} Collection — Luxury Menswear`,
+    description: cleanDescription,
+    // Canonical points strictly to the clean base category path (stripping ?sort= params)
+    path: `/category/${currentCategory.slug}`,
+    image: currentCategory.image_url || '/logo.png',
+    keywords: [
+      currentCategory.name,
+      `${currentCategory.name} collection`,
+      'luxury menswear',
+      'designer clothing',
+      'NOTIONS',
+    ],
+  });
 }
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
@@ -62,24 +106,49 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     filteredProducts.sort((a, b) => b.price - a.price);
   }
 
+  const categoryUrl = getCanonicalUrl(`/category/${currentCategory.slug}`);
+  const collectionJsonLd = getCollectionJsonLd({
+    name: currentCategory.name,
+    description: currentCategory.description || undefined,
+    url: categoryUrl,
+    products: filteredProducts,
+  });
+
+  const breadcrumbsList = [{ name: 'Home', url: getCanonicalUrl('/') }];
+  if (parentCategory) {
+    breadcrumbsList.push({
+      name: parentCategory.name,
+      url: getCanonicalUrl(`/category/${parentCategory.slug}`),
+    });
+  }
+  breadcrumbsList.push({
+    name: currentCategory.name,
+    url: categoryUrl,
+  });
+  const breadcrumbsJsonLd = getBreadcrumbJsonLd(breadcrumbsList);
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF9F5]">
+      <JsonLd data={[collectionJsonLd, breadcrumbsJsonLd]} />
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
-        <nav className="flex items-center space-x-2 text-xs text-[#7A756D] mb-6">
-          <Link href="/" className="hover:text-[#143728]">Home</Link>
+        <nav
+          aria-label="Breadcrumb"
+          className="flex items-center space-x-2 text-xs text-[#7A756D] mb-6"
+        >
+          <Link href="/" className="hover:text-[#143728] transition">Home</Link>
           <span>/</span>
           {parentCategory && (
             <>
-              <Link href={`/category/${parentCategory.slug}`} className="hover:text-[#143728]">
+              <Link href={`/category/${parentCategory.slug}`} className="hover:text-[#143728] transition">
                 {parentCategory.name}
               </Link>
               <span>/</span>
             </>
           )}
-          <span className="text-[#181818] font-medium">{currentCategory.name}</span>
+          <span className="text-[#181818] font-medium" aria-current="page">{currentCategory.name}</span>
         </nav>
 
         {/* Category Header Banner with Full Width & Height Cover Image */}
